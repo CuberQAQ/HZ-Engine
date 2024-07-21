@@ -35,19 +35,179 @@ class Storage {
         this._core = _core;
         this.projectDir = null;
         this.preloadedData = null;
+        // Storage Data
+        /**
+         * 全局数据
+         * 其中的数据不会跟随存档保存，而是直接存储在全局数据文件中
+         * 如：设置、CG解锁情况等
+         */
+        this._globalData = null;
+        /**
+         * 存档数据
+         * 其中的数据会跟随存档保存
+         * 如：脚本执行位置即调用栈，攻略度等
+         */
+        this._archiveData = null;
     }
     loadProject(path) {
         if (!(0, fs_1.readdirAssetsSync)({ path })) {
             throw "Dir not exist";
         }
         this.projectDir = path;
-        this.preloadScript();
+        this.preload();
+    }
+    get globalData() {
+        if (!this._globalData) {
+            this.loadGlobalData();
+        }
+        if (this._globalData == null)
+            throw `[HZEngine] GlobalData is null`;
+        return this._globalData;
     }
     /**
-     * 预加载脚本
-     * 遍历出所有hzs文件和所有label，建立map
+     * alias globalData
      */
-    preloadScript() {
+    get gd() {
+        return this.globalData;
+    }
+    get archiveData() {
+        if (!this._archiveData) {
+            this.loadArchiveData();
+        }
+        if (this._archiveData == null)
+            throw `[HZEngine] ArchiveData is null`;
+        return this._archiveData;
+    }
+    /**
+     * alias archiveData
+     */
+    get sd() {
+        return this.archiveData;
+    }
+    loadGlobalData() {
+        if (!this.projectDir) {
+            throw "projectDir is null, please loadProject first";
+        }
+        if (hmFS.statAssetsSync({
+            path: path_polyfill_1.default.join(this.projectDir, "globalData.json"),
+        })) {
+            this._globalData = JSON.parse((0, fs_1.readFileAssetsSync)({
+                path: path_polyfill_1.default.join(this.projectDir, "globalData.json"),
+                options: {
+                    encoding: "utf8",
+                },
+            }));
+            if (this._globalData == null) {
+                this._globalData = {}; // TODO initial GlobalData value
+            }
+        }
+        else {
+            console.log(`[HZEngine] globalData.json not exist, create it.`);
+            this._globalData = {}; // Initial GlobalData value
+            (0, fs_1.writeFileAssetsSync)({
+                path: path_polyfill_1.default.join(this.projectDir, "globalData.json"),
+                data: JSON.stringify(this._globalData),
+            });
+        }
+    }
+    /**
+     * 保存全局数据
+     * 可以多次調用，實際上會異步儲存，也就是在一個宏任務中即使調用多次，也只會在宏任務結束後儲存一次
+     */
+    saveGlobalData() {
+        if (!this.projectDir) {
+            throw "projectDir is null, please loadProject first";
+        }
+        setTimeout(() => {
+            if (!this.projectDir) {
+                throw "projectDir is null, please loadProject first";
+            }
+            let res = (0, fs_1.writeFileAssetsSync)({
+                path: path_polyfill_1.default.join(this.projectDir, "globalData.json"),
+                data: JSON.stringify(this._globalData),
+            });
+            if (res < 0)
+                throw `[HZEngine] save globalData to globalData.json failed, code = ${res}`;
+            console.log(`[HZEngine] save globalData to globalData.json`);
+        }, 0);
+    }
+    loadArchiveData(archivePath) {
+        if (archivePath) {
+            if (!this.projectDir)
+                throw `projectDir is null, please loadProject first`;
+            if (!hmFS.statAssetsSync({
+                path: path_polyfill_1.default.join(this.projectDir, archivePath),
+            })) {
+                throw `Archive [${archivePath}] not exist`;
+            }
+            let archiveData = JSON.parse((0, fs_1.readFileAssetsSync)({
+                path: path_polyfill_1.default.join(this.projectDir, archivePath),
+                options: {
+                    encoding: "utf8",
+                },
+            }));
+            if (archiveData == null)
+                archiveData = {};
+            this._archiveData = archiveData;
+            console.log(`[HZEngine] load archiveData from ${archivePath}`);
+        }
+        else {
+            console.log(`[HZEngine] load archiveData from empty template`);
+            this._archiveData = {};
+        }
+    }
+    /**
+     * 保存存档数据
+     * 可以多次調用，實際上會異步儲存，也就是在一個宏任務中即使調用多次，也只會在宏任務結束後儲存一次
+     * @param archivePath 存档文件目錄及名字
+     */
+    saveArchiveData(archivePath) {
+        if (!this.projectDir)
+            throw `projectDir is null, please loadProject first`;
+        setTimeout(() => {
+            if (!this.projectDir)
+                throw `projectDir is null, please loadProject first`;
+            let res = (0, fs_1.writeFileAssetsSync)({
+                path: path_polyfill_1.default.join(this.projectDir, archivePath),
+                data: JSON.stringify(this._archiveData),
+            });
+            if (res < 0)
+                throw `[HZEngine] save archiveData to ${archivePath} failed, code = ${res}`;
+            console.log(`[HZEngine] save archiveData to ${archivePath}`);
+        }, 0);
+    }
+    getSaveableData(data, auto_correct, ...key_chain) {
+        let obj = data;
+        // if(obj == null) throw `[HZEngine] saveable data is null`
+        for (let key of key_chain) {
+            if (obj == null)
+                throw `[HZEngine] saveable data is null`;
+            if (typeof obj !== "object")
+                throw `[HZEngine] saveable data is not object`;
+            if (Array.isArray(obj))
+                throw `[HZEngine] saveable data is array`;
+            if (!obj[key]) {
+                if (auto_correct) {
+                    obj[key] = {};
+                }
+                else
+                    throw `[HZEngine] saveable data key ${key} not exist`;
+            }
+            obj = obj[key];
+        }
+        if (obj == null)
+            throw `[HZEngine] saveable data result obj is null`;
+        if (typeof obj !== "object")
+            throw `[HZEngine] saveable data result obj is not array or object`;
+        if (Array.isArray(obj))
+            throw `[HZEngine] saveable data result is an array`;
+        return obj;
+    }
+    checkSaveableData(data, ...key_chain) {
+        return this.getSaveableData(data, false, ...key_chain);
+    }
+    // Preload
+    preload() {
         if (!this.projectDir) {
             throw "projectDir is null, please loadProject first";
         }
@@ -57,6 +217,9 @@ class Storage {
             // 已经预加载过了，退出
             this.preloadedData = JSON.parse((0, fs_1.readFileAssetsSync)({
                 path: path_polyfill_1.default.join(this.projectDir, "preloaded.json"),
+                options: {
+                    encoding: "utf8",
+                },
             }));
             return;
         }
@@ -65,7 +228,29 @@ class Storage {
                 labelMap: {},
                 hzsInfoMap: {},
             },
+            image: {
+                nameMap: {},
+            },
         };
+        this.preloadScript();
+        this.preloadImage();
+        // console.log(JSON.stringify(this.preloadedData));
+        (0, fs_1.writeFileAssetsSync)({
+            path: path_polyfill_1.default.join(this.projectDir, "preloaded.json"),
+            data: JSON.stringify(this.preloadedData),
+        });
+        // console.log(
+        //   `${Path.join(this.projectDir, "preloaded.json")} = ${readFileAssetsSync({
+        //     path: Path.join(this.projectDir, "preloaded.json"),
+        //     options:{encoding:"utf8"}
+        //   })}`
+        // );
+    }
+    /**
+     * 预加载脚本
+     * 遍历出所有hzs文件和所有label，建立map
+     */
+    preloadScript() {
         // 记录脚本label的位置
         // 这里的index是以0开始计数的行数
         let labelMap = this.preloadedData.script.labelMap;
@@ -107,6 +292,7 @@ class Storage {
             let contentStr = buffer.toString();
             let contentLines = contentStr.split("\n");
             let totalLines = contentLines.length;
+            hzsInfoMap[path] = { totalLines };
             for (let i = 0; i < totalLines; ++i) {
                 let line = contentLines[i].trim();
                 if (line.startsWith("*")) {
@@ -129,16 +315,53 @@ at [${labelMap[label][0]}(line ${labelMap[label][1]})] \
                 }
             }
         }
-        console.log(JSON.stringify(this.preloadedData));
-        console.log("awa1");
-        (0, fs_1.writeFileAssetsSync)({
-            path: path_polyfill_1.default.join(this.projectDir, "preloaded.json"),
-            data: JSON.stringify(this.preloadedData),
-        });
-        console.log("awa2");
-        console.log(`${path_polyfill_1.default.join(this.projectDir, "preloaded.json")} = ${(0, fs_1.readFileAssetsSync)({
-            path: path_polyfill_1.default.join(this.projectDir, "preloaded.json"),
-        })}`);
+    }
+    /**
+     * 预加载资源
+     * 遍历所有png文件，计算对应的name key，建立map
+     */
+    preloadImage() {
+        // 记录脚本label的位置
+        // 这里的index是以0开始计数的行数
+        let nameMap = this.preloadedData.image.nameMap;
+        let imageDir = path_polyfill_1.default.join(this.projectDir, "image");
+        if (!(0, fs_1.readdirAssetsSync)({ path: imageDir }))
+            throw "项目文件夹中image文件夹不存在";
+        // 遍历所有hzs文件
+        traverseImage(imageDir);
+        function traverseImage(path) {
+            let dirs = (0, fs_1.readdirAssetsSync)({ path });
+            console.log(dirs);
+            for (let dir of dirs) {
+                let subpath = path_polyfill_1.default.join(path, dir);
+                if ((0, fs_1.isFileAssetsSync)({ path: subpath })) {
+                    // 是文件
+                    if (dir.endsWith(".png")) {
+                        preloadImage(subpath);
+                    }
+                }
+                else {
+                    // 是目录
+                    traverseImage(subpath);
+                }
+            }
+        }
+        /**
+         * 1. 预加载所有的image并检查冲突
+         * 2. 记录所有image的name key和路径
+         */
+        function preloadImage(path) {
+            let raw_name = path_polyfill_1.default.parse(path).name;
+            let name_key = raw_name
+                .trim()
+                .replace("_", " ")
+                .replace(/ +/, " ")
+                .toLowerCase();
+            if (nameMap[name_key])
+                throw `Image name key conflict [${name_key}], at file [${path}] and [${nameMap[name_key]}]`;
+            nameMap[name_key] = [path];
+        }
+        console.log(`Preloaded image: ${JSON.stringify(this.preloadedData.image.nameMap)}`);
     }
 }
 exports.Storage = Storage;

@@ -1,24 +1,41 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Storage = exports.UI = exports.HZEngineCore = void 0;
+const basic_command_1 = require("./plugins/basic_command");
+const global_gesture_1 = require("./plugins/global_gesture");
+const script_1 = require("./script");
 const storage_1 = require("./storage");
 Object.defineProperty(exports, "Storage", { enumerable: true, get: function () { return storage_1.Storage; } });
+const system_1 = require("./system");
 const ui_1 = require("./ui");
 Object.defineProperty(exports, "UI", { enumerable: true, get: function () { return ui_1.UI; } });
 class HZEngineCore {
     constructor() {
         this.ui = new ui_1.UI(this);
         this.storage = new storage_1.Storage(this);
+        this.script = new script_1.Script(this);
+        this.system = new system_1.System(this);
         // Event Bus
         this._eventCallbacks = new Map();
+        // internal plugin
+        this.loadPlugin("global_gesture", global_gesture_1.global_gesture);
+        this.loadPlugin("basic_command", basic_command_1.basic_command);
     }
     loadProject(projectPath) {
         this.storage.loadProject(projectPath);
     }
-    start() { }
+    start() {
+        this.system.start();
+    }
     // Load Plugin
     loadPlugin(name, plugin) {
+        console.log(`[HZEngine] load plugin [${name}]`);
         plugin(this);
+    }
+    // because Zepp OS does not support eval
+    // we use new Function(code) to eval
+    eval(code) {
+        this.eval(code);
     }
     on(event, cb) {
         if (this._eventCallbacks.has(event)) {

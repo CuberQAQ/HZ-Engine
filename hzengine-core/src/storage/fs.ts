@@ -23,55 +23,80 @@ function getAppDir(appId = (hmApp.getPackageInfo() as any).appId) {
   }
 }
 
-export function readdirAssetsSync(option: { path: string }): string[] | undefined {
+export function readdirAssetsSync(option: {
+  path: string;
+}): string[] | undefined {
   return hmFS.readdirSync({
     path: fromDataToAssetsPath(option.path),
   });
 }
 
-export function isFileDataSync(option: {path: string}) {
-    let code = hmFS.openSync({path: option.path})
-    if(code >= 0) {
-        hmFS.closeSync({fd: code})
-        return true
-    }
-    else {
-        return false
-    }
+export function isFileDataSync(option: { path: string }) {
+  let code = hmFS.openSync({ path: option.path });
+  if (code >= 0) {
+    hmFS.closeSync({ fd: code });
+    return true;
+  } else {
+    return false;
+  }
 }
 
-export function isFileAssetsSync(option: {path: string}) {
-    console.log("path="+option.path);
-    
-    let code = hmFS.openAssetsSync({path: option.path})
-    if(code >= 0) {
-        hmFS.closeSync({fd: code})
-        return true
-    }
-    else {
-        return false
-    }
-}
+export function isFileAssetsSync(option: { path: string }) {
+  // console.log("path=" + option.path);
 
+  let code = hmFS.openAssetsSync({ path: option.path });
+  if (code >= 0) {
+    hmFS.closeSync({ fd: code });
+    return true;
+  } else {
+    return false;
+  }
+}
 
 /**
  * 将基于assets的文件路径转换为基于data的文件路径
  */
 function fromDataToAssetsPath(path: string) {
-    return Path.join(`../../${getAppDir()}/assets`, path)
+  return Path.join(`../../${getAppDir()}/assets`, path);
 }
 
-export function writeFileAssetsSync(opt: {path: string, data: string | ArrayBuffer | DataView, options?: hmFS.writeFileSync.Options}) {
-    return hmFS.writeFileSync({
-        path: fromDataToAssetsPath(opt.path),
-        data: opt.data,
-        options: opt.options
-    })
+export function writeFileAssetsSync(opt: {
+  path: string;
+  data: string | ArrayBuffer | DataView;
+  options?: hmFS.writeFileSync.Options;
+}) {
+  // console.log("write path="+opt.path);
+  let fd = hmFS.openAssetsSync({path: opt.path, flag: hmFS.O_WRONLY | hmFS.O_CREAT})
+  if(fd < 0) throw "Open Assets File Failed code="+fd
+  let buf = opt.data
+  if(buf instanceof DataView) {
+    buf = buf.buffer // TODO maybe error
+  }
+  if(typeof buf === 'string') buf = Buffer.from(buf).buffer
+  
+  let res = hmFS.writeSync({
+    fd,
+    buffer: buf,
+  })
+  hmFS.closeSync({fd})
+  return res
 }
 
-export function readFileAssetsSync(opt: {path: string, options?: hmFS.readFileSync.Options}) {
-    return hmFS.readFileSync({
-        path: fromDataToAssetsPath(opt.path),
-        options: opt.options
-    })
+export function readFileAssetsSync(opt: {
+  path: string;
+  options?: hmFS.readFileSync.Options;
+}) {
+  // console.log("read path="+opt.path);
+  let fd = hmFS.openAssetsSync({path: opt.path, flag: hmFS.O_RDONLY})
+  if(fd < 0) throw "Open Assets File Failed code="+fd
+  let size = hmFS.statAssetsSync({path: opt.path})!.size
+  let arrbuf = new ArrayBuffer(size)
+  hmFS.readSync({fd, buffer: arrbuf})
+  hmFS.closeSync({fd})
+  if(opt.options && typeof opt.options.encoding === 'string') {
+    return Buffer.from(arrbuf).toString(opt.options.encoding)
+  } 
+  else {
+    return arrbuf
+  }
 }

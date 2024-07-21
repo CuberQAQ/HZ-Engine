@@ -69,7 +69,7 @@ function isFileDataSync(option) {
 }
 exports.isFileDataSync = isFileDataSync;
 function isFileAssetsSync(option) {
-    console.log("path=" + option.path);
+    // console.log("path=" + option.path);
     let code = hmFS.openAssetsSync({ path: option.path });
     if (code >= 0) {
         hmFS.closeSync({ fd: code });
@@ -87,17 +87,38 @@ function fromDataToAssetsPath(path) {
     return path_polyfill_1.default.join(`../../${getAppDir()}/assets`, path);
 }
 function writeFileAssetsSync(opt) {
-    return hmFS.writeFileSync({
-        path: fromDataToAssetsPath(opt.path),
-        data: opt.data,
-        options: opt.options
+    // console.log("write path="+opt.path);
+    let fd = hmFS.openAssetsSync({ path: opt.path, flag: hmFS.O_WRONLY | hmFS.O_CREAT });
+    if (fd < 0)
+        throw "Open Assets File Failed code=" + fd;
+    let buf = opt.data;
+    if (buf instanceof DataView) {
+        buf = buf.buffer; // TODO maybe error
+    }
+    if (typeof buf === 'string')
+        buf = Buffer.from(buf).buffer;
+    let res = hmFS.writeSync({
+        fd,
+        buffer: buf,
     });
+    hmFS.closeSync({ fd });
+    return res;
 }
 exports.writeFileAssetsSync = writeFileAssetsSync;
 function readFileAssetsSync(opt) {
-    return hmFS.readFileSync({
-        path: fromDataToAssetsPath(opt.path),
-        options: opt.options
-    });
+    // console.log("read path="+opt.path);
+    let fd = hmFS.openAssetsSync({ path: opt.path, flag: hmFS.O_RDONLY });
+    if (fd < 0)
+        throw "Open Assets File Failed code=" + fd;
+    let size = hmFS.statAssetsSync({ path: opt.path }).size;
+    let arrbuf = new ArrayBuffer(size);
+    hmFS.readSync({ fd, buffer: arrbuf });
+    hmFS.closeSync({ fd });
+    if (opt.options && typeof opt.options.encoding === 'string') {
+        return Buffer.from(arrbuf).toString(opt.options.encoding);
+    }
+    else {
+        return arrbuf;
+    }
 }
 exports.readFileAssetsSync = readFileAssetsSync;

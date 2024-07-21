@@ -1,0 +1,20 @@
+*start
+    
+    character girl "綾地寧寧"
+
+    show girl normal
+    scene bg cafe
+
+    # "神秘人物" "欢迎来到HZEngine的世界!"
+
+    jump ciallo
+
+
+*end
+
+    # hide girl
+    "游戲結束，恭喜你達成真結局"
+
+    "即将触发轮回！！"
+
+    jump start

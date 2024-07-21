@@ -1,18 +1,38 @@
+import { basic_command } from "./plugins/basic_command";
+import { global_gesture } from "./plugins/global_gesture";
+import { Script } from "./script";
 import { Storage } from "./storage";
+import { System } from "./system";
 import { UI } from "./ui";
 
 class HZEngineCore {
   ui = new UI(this);
   storage = new Storage(this);
-  constructor() {}
+  script = new Script(this)
+  system = new System(this)
+  constructor() {
+    // internal plugin
+    this.loadPlugin("global_gesture", global_gesture) 
+    this.loadPlugin("basic_command", basic_command)
+  }
   loadProject(projectPath: string) {
     this.storage.loadProject(projectPath)
   }
-  start() {}
+  start() {
+    this.system.start()
+  }
 
   // Load Plugin
   loadPlugin(name: string, plugin: Plugin) {
+    console.log(`[HZEngine] load plugin [${name}]`);
+    
     plugin(this);
+  }
+
+  // because Zepp OS does not support eval
+  // we use new Function(code) to eval
+  eval(code: string) {
+    this.eval(code)
   }
 
   // Event Bus
