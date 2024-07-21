@@ -171,7 +171,8 @@ export function basic_commands(core: HZEngineCore) {
     if (ctx.slicedArgs.length > 2 || ctx.slicedArgs.length < 1) {
       throw `Say Command: incorrect amount of args`;
     }
-
+    console.log("rawtext=" + ctx.rawtext);
+    
     if (ctx.slicedArgs.length === 1) {
       console.log(`[SAY] ${ctx.slicedArgs[0].str}`);
       sayAction(core, "", ctx.slicedArgs[0].str);

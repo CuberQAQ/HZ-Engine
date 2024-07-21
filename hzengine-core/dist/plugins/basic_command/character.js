@@ -7,11 +7,7 @@ function character_command(core) {
     // Used to create a character, and save it to script field in archive storage,
     // so that it can be used when the archive is loaded next time the game starts
     // by loading the archive.
-    // Command rule:
-    //  1. the first argument is the name of the character
-    //  2. the second argument is the short name of the character
-    //  3. the third argument is the display name of the character
-    // if the third argument is not specified, the display name will be the same as the short name
+    // syntax: character <short_name> <display_name>
     // if the short name is conflict with an existing character, the script will throw an error
     core.script.use((ctx, next) => {
         if (ctx.rawtext.trim().split(" ")[0].toLowerCase() !== "character")

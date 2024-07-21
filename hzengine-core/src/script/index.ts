@@ -5,13 +5,16 @@ import * as hmApp from "@zos/app";
 import path from "@cuberqaq/path-polyfill";
 import { HzsInfo, Storage } from "../storage";
 import { readFileAssetsSync } from "../storage/fs";
-import { sliceStr } from "./strtools";
+import { splitStr2Objs } from "./strtools";
 import { readline } from "./readscript";
 export class Script {
   constructor(private _core: HZEngineCore) {}
 
   // Route Stack
-  private _routeStack: ([path: string, index: number] | null)[] = [];
+  private _routeStack: {
+    position: [path: string, index: number] | null;
+    statementStack: Script.StatementStack;
+  }[] = [];
   private _statementStack: Script.StatementStack = [];
 
   /**
@@ -69,13 +72,39 @@ export class Script {
    * @param targetLabel
    */
   callLabel(targetLabel: string) {
+    console.log(
+      `pending to call label ${targetLabel}, stack=${JSON.stringify(
+        this._routeStack
+      )}`
+    );
     let labelData = this._locateLabel(targetLabel);
-    this._routeStack.push(this._nextRunPosition);
+    this._routeStack.push({
+      position: this._nextRunPosition ? [...this._nextRunPosition] : null,
+      statementStack: this._statementStack,
+    });
     this._nextRunPosition = labelData;
+    this._statementStack = [];
+
+    console.log(
+      `finished call label ${targetLabel}, stack=${JSON.stringify(
+        this._routeStack
+      )}`
+    );
   }
 
   return() {
-    this._nextRunPosition = this._routeStack.pop() ?? null;
+    console.log(`pending to return, stack=${JSON.stringify(this._routeStack)}`);
+
+    let stackItem = this._routeStack.pop();
+    if (stackItem) {
+      this._statementStack = stackItem.statementStack;
+      this._nextRunPosition = stackItem.position;
+    } else {
+      this._nextRunPosition = null;
+      this._statementStack = [];
+    }
+
+    console.log(`finished return, stack=${JSON.stringify(this._routeStack)}`);
   }
 
   clear() {
@@ -179,7 +208,10 @@ export class Script {
       this._statementAnalyseStack
     );
   }
-  useAnalyseStatement(middleware: Script.MiddlewareForAnalyseStatement, add_front?: boolean) {
+  useAnalyseStatement(
+    middleware: Script.MiddlewareForAnalyseStatement,
+    add_front?: boolean
+  ) {
     if (add_front) {
       this._analyseStatementMiddlewares.unshift(middleware);
     } else {
@@ -198,7 +230,7 @@ export class Script {
    */
   analyseStatement(ctx: Script.Context) {
     console.log("[HZEngine] analyse statement");
-    
+
     // Backup _nextRunPosition
     let _nextRunPositionBackup: [path: string, index: number] | null = this
       ._nextRunPosition
@@ -231,9 +263,9 @@ export class Script {
           let sub_ctx = this._buildAnalyseStatementContext(rawCommand, [
             ...this._nextRunPosition,
           ]);
-          
+
           console.log(`[HZEngine] analyse statement command [${rawCommand}]`);
-          
+
           // Process command
           if (this._analyseStatementMiddlewares.length === 0) {
             // TODO do nothing
@@ -262,8 +294,14 @@ export class Script {
     // Check if the statement stack is empty
     if (this._statementAnalyseStack.length > 0) {
       throw `statement not closed, at file [${
-        this._statementAnalyseStack[this._statementAnalyseStack.length - 1][1][0]
-      }] line [${this._statementAnalyseStack[this._statementAnalyseStack.length - 1][1][1] + 1}]`;
+        this._statementAnalyseStack[
+          this._statementAnalyseStack.length - 1
+        ][1][0]
+      }] line [${
+        this._statementAnalyseStack[
+          this._statementAnalyseStack.length - 1
+        ][1][1] + 1
+      }]`;
     }
 
     // Reset _nextRunPosition to the backup value, and switch back to normal mode, and continue executing
@@ -298,14 +336,24 @@ export namespace Script {
   export class Context {
     constructor(
       protected _core: HZEngineCore,
-      public rawtext: string,
+      private _rawtext: string,
       public readonly currentPath: string,
       public readonly currentLineIndex: number,
       private _statementStack: StatementStack
     ) {}
+    public get rawtext(): string {
+      return this._rawtext;
+    }
+    public set rawtext(rawtext: string) {
+      this._rawtext = rawtext;
+      this._rawtextChanged = true;
+    }
+    private _rawtextChanged = false;
     private _slicedArgs: Context.SlicedArg[] | null = null;
     get slicedArgs(): Context.SlicedArg[] {
-      if (!this._slicedArgs) this._slicedArgs = sliceStr(this.rawtext);
+      if (!this._slicedArgs || this._rawtextChanged)
+        this._slicedArgs = splitStr2Objs(this.rawtext);
+      this._rawtextChanged = false;
       return this._slicedArgs;
     }
     /**
@@ -389,7 +437,10 @@ export namespace Script {
       this._core.storage.saveGlobalData();
     }
   }
-  export type MiddlewareForAnalyseStatement = (ctx: ContextForAnalyseStatement, next: () => void) => void;
+  export type MiddlewareForAnalyseStatement = (
+    ctx: ContextForAnalyseStatement,
+    next: () => void
+  ) => void;
   export class ContextForAnalyseStatement extends Context {
     startStatement(
       identifier: string,
@@ -415,7 +466,8 @@ export namespace Script {
   export namespace Context {
     export interface SlicedArg {
       str: string;
-      isQuoted: boolean; // 是否被雙引號包圍
+      isQuoted?: boolean; // 是否被雙引號包圍
+      isSquared?: boolean; // 是否被方括號包圍
     }
   }
 

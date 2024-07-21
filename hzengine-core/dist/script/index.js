@@ -63,13 +63,28 @@ class Script {
      * @param targetLabel
      */
     callLabel(targetLabel) {
+        console.log(`pending to call label ${targetLabel}, stack=${JSON.stringify(this._routeStack)}`);
         let labelData = this._locateLabel(targetLabel);
-        this._routeStack.push(this._nextRunPosition);
+        this._routeStack.push({
+            position: this._nextRunPosition ? [...this._nextRunPosition] : null,
+            statementStack: this._statementStack,
+        });
         this._nextRunPosition = labelData;
+        this._statementStack = [];
+        console.log(`finished call label ${targetLabel}, stack=${JSON.stringify(this._routeStack)}`);
     }
     return() {
-        var _a;
-        this._nextRunPosition = (_a = this._routeStack.pop()) !== null && _a !== void 0 ? _a : null;
+        console.log(`pending to return, stack=${JSON.stringify(this._routeStack)}`);
+        let stackItem = this._routeStack.pop();
+        if (stackItem) {
+            this._statementStack = stackItem.statementStack;
+            this._nextRunPosition = stackItem.position;
+        }
+        else {
+            this._nextRunPosition = null;
+            this._statementStack = [];
+        }
+        console.log(`finished return, stack=${JSON.stringify(this._routeStack)}`);
     }
     clear() {
         this._nextRunPosition = null;
@@ -234,17 +249,26 @@ class Script {
 exports.Script = Script;
 (function (Script) {
     class Context {
-        constructor(_core, rawtext, currentPath, currentLineIndex, _statementStack) {
+        constructor(_core, _rawtext, currentPath, currentLineIndex, _statementStack) {
             this._core = _core;
-            this.rawtext = rawtext;
+            this._rawtext = _rawtext;
             this.currentPath = currentPath;
             this.currentLineIndex = currentLineIndex;
             this._statementStack = _statementStack;
+            this._rawtextChanged = false;
             this._slicedArgs = null;
         }
+        get rawtext() {
+            return this._rawtext;
+        }
+        set rawtext(rawtext) {
+            this._rawtext = rawtext;
+            this._rawtextChanged = true;
+        }
         get slicedArgs() {
-            if (!this._slicedArgs)
-                this._slicedArgs = (0, strtools_1.sliceStr)(this.rawtext);
+            if (!this._slicedArgs || this._rawtextChanged)
+                this._slicedArgs = (0, strtools_1.splitStr2Objs)(this.rawtext);
+            this._rawtextChanged = false;
             return this._slicedArgs;
         }
         /**

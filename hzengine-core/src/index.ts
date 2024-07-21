@@ -29,11 +29,6 @@ class HZEngineCore {
     plugin(this);
   }
 
-  // because Zepp OS does not support eval
-  // we use new Function(code) to eval
-  eval(code: string) {
-    this.eval(code)
-  }
 
   // Event Bus
   private _eventCallbacks: Map<string, Set<Function>> = new Map();

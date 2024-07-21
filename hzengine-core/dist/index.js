@@ -32,11 +32,6 @@ class HZEngineCore {
         console.log(`[HZEngine] load plugin [${name}]`);
         plugin(this);
     }
-    // because Zepp OS does not support eval
-    // we use new Function(code) to eval
-    eval(code) {
-        this.eval(code);
-    }
     on(event, cb) {
         if (this._eventCallbacks.has(event)) {
             this._eventCallbacks.get(event).add(cb);
