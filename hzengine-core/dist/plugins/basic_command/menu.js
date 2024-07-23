@@ -69,7 +69,7 @@ function menu_statement(core) {
         if (ctx.rawtext.trim().split(" ")[0] !== "menu")
             return next();
         let data = ctx.startStatement("menu");
-        console.log("[HZEngine] Menu start");
+        // console.log("[HZEngine] Menu start");
         // the data here is {} at first, so dont read its properties, because the properties are not defined yet
         // we will define the properties here
         data.start_position = [
@@ -86,7 +86,7 @@ function menu_statement(core) {
             ctx.statementStack[ctx.statementStack.length - 1][0] !== "menu") {
             throw `@${ctx.slicedArgs[1]} must in menu statement`;
         }
-        console.log("[HZEngine] Menu label: " + ctx.slicedArgs[1].str);
+        // console.log("[HZEngine] Menu label: " + ctx.slicedArgs[1].str);
         let menu_stack_item = ctx.statementStack[ctx.statementStack.length - 1];
         // parse the enable js expression (syntax: enable={js_expression})
         // get the js_expression and put it in the menu data
@@ -121,7 +121,7 @@ function menu_statement(core) {
     core.script.useAnalyseStatement((ctx, next) => {
         if (ctx.rawtext.trim().split(/ +/).join(" ") !== "end menu")
             return next();
-        console.log("[HZEngine] Menu analyse end");
+        // console.log("[HZEngine] Menu analyse end");
         let data = ctx.endStatement("menu");
         // the data here is {} at first, so dont read its properties, because the properties are not defined yet
         // we will define the properties here
@@ -132,8 +132,13 @@ function menu_statement(core) {
             data.start_position[1],
         ]);
     });
+    function buildMenuViewProp(menu_data) {
+        // parse menu item string
+        let parsed_item_list = [];
+        for (let item of menu_data.item_list) {
+            parsed_item_list.push(Object.assign(Object.assign({}, item), { text: core.script.parseString(item.text) }));
+        }
+        return { itemList: parsed_item_list };
+    }
 }
 exports.menu_statement = menu_statement;
-function buildMenuViewProp(menu_data) {
-    return { itemList: menu_data.item_list };
-}

@@ -4,7 +4,7 @@
  * @returns
  */
 export function splitStr2Objs(str: string) {
-  let res: { str: string; isQuoted?: boolean, isSquared?: boolean }[] = [];
+  let res: { str: string; isQuoted?: boolean; isSquared?: boolean }[] = [];
   let len = str.length;
   let p = 0;
   while (p < len) {
@@ -28,13 +28,13 @@ export function splitStr2Objs(str: string) {
       }
       res.push({ str: transformedStr!, isQuoted: true });
       p = q + 1;
-    } else if (str[p] === '[') {
+    } else if (str[p] === "[") {
       // find next `]`
       let q = p + 1;
-      while (q < len && str[q] !== ']') {
+      while (q < len && str[q] !== "]") {
         // if (str[q] === "\\") q += 2;
         // else ++q;
-        ++q
+        ++q;
       }
       if (q >= len) throw "square brackets not completed";
       let resstr = str.slice(p + 1, q);
@@ -73,3 +73,53 @@ export function splitStr2Strs(str: string) {
 export function transformStr(str: string) {
   return JSON.parse(`"${str}"`);
 }
+
+// 翻译hzengine script插值字符串
+// 语法："...[expression]..."
+// 如果希望在字符串中显示`[`，请使用两个`[`，如`"[[正常显示而不被当作表达式的文字]]"`
+export function parseInterpolatedStr(str: string): ParsedInterpolationItem[] {
+  let len = str.length;
+  let p = 0;
+  let expr_record: [l: number, r: number][] = []
+  while (p < len) {
+    // 寻找第一个`[`
+    while (p < len && str[p] !== "[") ++p;
+    if (p >= len) break;
+    // 判断是否是两个`[`
+    if (str[p] === "[" && str[p + 1] === "[") {
+      p += 2;
+      continue;
+    }
+    // 寻找第一个`]`
+    let q = p + 1;
+    while (q < len && str[q] !== "]") {
+      ++q;
+      // 判断是否是两个`]`
+      while (q < len && str[q] === "]" && str[q + 1] === "]") {
+        q += 2;
+      }
+    }
+    if (q >= len) {
+      // 没有找到`]`，报错
+      throw `Interpolated string lose closing bracket: ${str}`;
+    }
+    expr_record.push([p, q]);
+    p = q + 1;
+  }
+  let left = 0, right = len
+  let res: ParsedInterpolationItem[] = []
+  for (let i = 0; i < expr_record.length; ++i) {
+    let [l, r] = expr_record[i]
+    if(l > left) res.push({ str: str.slice(left, l), isExpression: false });
+    res.push({ str: str.slice(l + 1, r), isExpression: true });
+    left = r + 1
+  }
+  if(left < right) res.push({ str: str.slice(left, right), isExpression: false });
+  return res
+
+}
+
+type ParsedInterpolationItem = {
+  str: string;
+  isExpression: boolean;
+} 

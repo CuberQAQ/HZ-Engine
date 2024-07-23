@@ -99,11 +99,14 @@ export class Storage {
    * 保存全局数据
    * 可以多次調用，實際上會異步儲存，也就是在一個宏任務中即使調用多次，也只會在宏任務結束後儲存一次
    */
+  private _saveGlobalDataTimerId: number | null = null;
   saveGlobalData() {
     if (!this.projectDir) {
       throw "projectDir is null, please loadProject first";
     }
-    setTimeout(() => {
+    if (this._saveGlobalDataTimerId) return;
+    this._saveGlobalDataTimerId = setTimeout(() => {
+      this._saveGlobalDataTimerId = null;
       if (!this.projectDir) {
         throw "projectDir is null, please loadProject first";
       }
@@ -145,14 +148,18 @@ export class Storage {
     }
   }
 
+  _saveArchiveDataTimerId: number | null = null;
   /**
    * 保存存档数据
    * 可以多次調用，實際上會異步儲存，也就是在一個宏任務中即使調用多次，也只會在宏任務結束後儲存一次
    * @param archivePath 存档文件目錄及名字
    */
-  saveArchiveData(archivePath: string) {
+  saveArchiveData(archivePath: string, immediate = false) {
     if (!this.projectDir) throw `projectDir is null, please loadProject first`;
-    setTimeout(() => {
+    console.log("[HZEngine] will save archiveData to " + archivePath);
+    let saveFunc = () => {
+      console.log("[HZEngine] saving archiveData to " + archivePath);
+
       if (!this.projectDir)
         throw `projectDir is null, please loadProject first`;
       let res = writeFileAssetsSync({
@@ -162,7 +169,18 @@ export class Storage {
       if (res < 0)
         throw `[HZEngine] save archiveData to ${archivePath} failed, code = ${res}`;
       console.log(`[HZEngine] save archiveData to ${archivePath}`);
-    }, 0);
+    };
+    if (immediate) {
+      saveFunc();
+      if(this._saveArchiveDataTimerId) {
+        clearTimeout(this._saveArchiveDataTimerId);
+        this._saveArchiveDataTimerId = null;
+      }
+    } else
+      this._saveArchiveDataTimerId = setTimeout(() => {
+        this._saveArchiveDataTimerId = null;
+        saveFunc();
+      }, 0);
   }
 
   getSaveableData(
@@ -267,7 +285,7 @@ export class Storage {
     traverseScript(scriptDir);
     function traverseScript(path: string) {
       let dirs = readdirAssetsSync({ path });
-      console.log(dirs);
+      // console.log(dirs);
 
       for (let dir of dirs!) {
         let subpath = Path.join(path, dir);
@@ -341,7 +359,7 @@ at [${labelMap[label][0]}(line ${labelMap[label][1]})] \
     traverseImage(imageDir);
     function traverseImage(path: string) {
       let dirs = readdirAssetsSync({ path });
-      console.log(dirs);
+      // console.log(dirs);
 
       for (let dir of dirs!) {
         let subpath = Path.join(path, dir);
@@ -372,9 +390,9 @@ at [${labelMap[label][0]}(line ${labelMap[label][1]})] \
         throw `Image name key conflict [${name_key}], at file [${path}] and [${nameMap[name_key]}]`;
       nameMap[name_key] = [path];
     }
-    console.log(
-      `Preloaded image: ${JSON.stringify(this.preloadedData.image.nameMap)}`
-    );
+    // console.log(
+    //   `Preloaded image: ${JSON.stringify(this.preloadedData.image.nameMap)}`
+    // );
   }
 }
 
@@ -390,12 +408,15 @@ export namespace Storage {
     | { [key: string]: JSONValue }
     | JSONValue[];
 
-  export type Saveable<T> = {
+  export type Saveable<T> =
+    | {
         [P in keyof T]: T[P] extends JSONValue
           ? T[P]
           : T[P] extends NotAssignableToJson
           ? never
           : Saveable<T[P]>;
-      } | JSONValue[] | JSONValue;
+      }
+    | JSONValue[]
+    | JSONValue;
   type NotAssignableToJson = bigint | symbol | Function;
 }

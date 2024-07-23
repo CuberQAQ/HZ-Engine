@@ -36,7 +36,7 @@ export function basic_commands(core: HZEngineCore) {
   core.script.use((ctx, next) => {
     let str = ctx.rawtext.trim();
     if (!str.startsWith("echo")) return next();
-    console.log(`[ECHO] ${str.slice(4).trim()}`);
+    console.log(`[ECHO] ${core.script.parseString(str.slice(4).trim())}`);
   });
 
   // show command
@@ -171,7 +171,6 @@ export function basic_commands(core: HZEngineCore) {
     if (ctx.slicedArgs.length > 2 || ctx.slicedArgs.length < 1) {
       throw `Say Command: incorrect amount of args`;
     }
-    console.log("rawtext=" + ctx.rawtext);
     
     if (ctx.slicedArgs.length === 1) {
       console.log(`[SAY] ${ctx.slicedArgs[0].str}`);
@@ -194,10 +193,10 @@ export function basic_commands(core: HZEngineCore) {
     if (ctx.slicedArgs.length === 2) {
       if (
         ctx.slicedArgs[1].isQuoted ||
-        isNaN(parseFloat(ctx.slicedArgs[1].str))
+        !isFinite(Number(ctx.slicedArgs[1].str))
       )
         throw `Pause Command: the second arg must be a number`;
-      core.system.pause(parseFloat(ctx.slicedArgs[1].str));
+      core.system.pause(Number(ctx.slicedArgs[1].str));
     } else core.system.pause();
   });
 }
@@ -205,6 +204,7 @@ export function basic_commands(core: HZEngineCore) {
 export function sayAction(core: HZEngineCore, who: string, what: string) {
   const say_view_tag = "hzengine.say";
   const say_view_name = "say";
+  what = core.script.parseString(what);
   let message = {
     who,
     what,

@@ -3,7 +3,6 @@ import { HZEngineCore, UI } from "../..";
 import { System } from "../../system";
 
 export function global_gesture(core: HZEngineCore) {
-  console.log("fuck huami");
 
   let touchPad = core.ui.getLayer("ct")!.widgetFactory.createWidget(hmUI.widget.TEXT, {
     x: 0,
@@ -14,7 +13,7 @@ export function global_gesture(core: HZEngineCore) {
   });
 
   touchPad.addEventListener(hmUI.event.SELECT, (info: any) => {
-    console.log("ct SELECT event");
+    console.log("按下了屏幕");
     if(core.system.condition === System.Condition.Pause) {
         core.system.continue()
     }

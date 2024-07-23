@@ -31,7 +31,9 @@ function character_command(core) {
                 throw `Character Command: short name [${short_name}] conflict, at file [${characterMap[short_name].declare_info.path}] line [${characterMap[short_name].declare_info.index + 1}] and `;
         }
         else {
-            let display_name = ctx.slicedArgs[2].str;
+            let display_name = ctx.slicedArgs[2].isQuoted
+                ? core.script.parseString(ctx.slicedArgs[2].str)
+                : ctx.slicedArgs[2].str;
             characterMap[short_name] = buildCharacterInfo(short_name, display_name);
         }
         function buildCharacterInfo(short_name, display_name) {

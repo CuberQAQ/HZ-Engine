@@ -8,15 +8,12 @@
     show girl normal
     girl "歡迎來到星光咖啡館！"
     # show girl amazed
-    girl "你想喝點什麽呢"
     call menu_test
-
-    [REAL] show girl normal
-    girl "欢迎下次光临~"
     
     return
 
 *menu_test
+    girl "你想喝點什麽呢"
     menu
     @"冰美式"
         [REAL] show girl amazed
@@ -36,5 +33,9 @@
         girl "那是不可能的..."
         [REAL] show girl hazukashii
         girl "私の０７２１を見てください！"
+    @"还是不喝了"
+        [REAL] show girl normal
+        girl "好哒~欢迎下次光临~"
+        return
     end menu
-    return
+    jump menu_test

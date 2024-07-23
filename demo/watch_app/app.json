@@ -2,7 +2,7 @@
   "configVersion": "v3",
   "app": {
     "appId": 224091,
-    "appName": "Empty",
+    "appName": "HZEngine Demo",
     "appType": "app",
     "version": {
       "code": 1,
@@ -39,7 +39,7 @@
   },
   "i18n": {
     "en-US": {
-      "appName": "Empty"
+      "appName": "HZEngine Demo"
     }
   },
   "defaultLanguage": "en-US"

@@ -1,4 +1,5 @@
 *start
+    #启用REAL mode实机模式，包含完整的show语句
     # [REAL = true]
 
     character girl "綾地寧寧"
@@ -6,9 +7,11 @@
     show girl normal
     scene bg cafe
 
-    [REAL] "只有在实机才能看到这句话"
+    # 使用 [{decorator_name}] command 可以使用装饰器
+    # 例如内置装饰器[REAL]的作用是在实机模式下执行后面的语句
+    # [REAL] "只有在实机才能看到这句话"
     # "神秘人物" "欢迎来到HZEngine的世界!"
-    "欢迎来到HZEngine Demo\n(dev-0721a)"
+    "欢迎来到HZEngine Demo\n(dev-0721b)"
 
     menu
     @"前往咖啡馆"
@@ -34,6 +37,10 @@
         end menu
         "菜单结束"
         "嵌套测试完成"
+    @"if语句测试"
+        call if_test
+    @"轮回测试"
+        call loop_test
     end menu
 
 

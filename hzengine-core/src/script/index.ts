@@ -5,19 +5,28 @@ import * as hmApp from "@zos/app";
 import path from "@cuberqaq/path-polyfill";
 import { HzsInfo, Storage } from "../storage";
 import { readFileAssetsSync } from "../storage/fs";
-import { splitStr2Objs } from "./strtools";
+import { parseInterpolatedStr, splitStr2Objs } from "./strtools";
 import { readline } from "./readscript";
 export class Script {
   constructor(private _core: HZEngineCore) {}
 
-  // Route Stack
-  private _routeStack: {
+  /**
+   * 调用栈
+   * 在call时保存当前执行位置和语句栈，在return时恢复执行位置和语句栈
+   */
+  private _callStack: {
     position: [path: string, index: number] | null;
     statementStack: Script.StatementStack;
   }[] = [];
+
+  /**
+   * 语句栈
+   * 比如while, if，会在语句开始时入栈，语句结束时出栈
+   */
   private _statementStack: Script.StatementStack = [];
 
   /**
+   * 下一次执行的脚本位置
    * 注意：存储该值的时候应总是拷贝赋值而非直接引用赋值
    */
   private _nextRunPosition: [path: string, index: number] | null = null;
@@ -32,7 +41,7 @@ export class Script {
     let nowRunPosition: [path: string, index: number] = [
       ...this._nextRunPosition,
     ];
-    this._incrementNextPosition();
+    this.incrementNextPosition();
 
     let rawCommand = readline(nowRunPosition[0], nowRunPosition[1])!;
     if (rawCommand.trim().length && !rawCommand.trim().startsWith("#")) {
@@ -58,12 +67,17 @@ export class Script {
    * @param targetLabel
    */
   jumpLabel(targetLabel: string) {
-    let labelData = this._locateLabel(targetLabel);
-    this._nextRunPosition = labelData;
+    let labelPosition = this._locateLabel(targetLabel);
+    this._nextRunPosition = labelPosition;
+    this._statementStack = [];
   }
 
-  jump(path: string, index: number) {
+  jump(path: string, index: number, clearStatementStack: boolean = false) {
     this._nextRunPosition = [path, index];
+
+    if (clearStatementStack) {
+      this._statementStack = [];
+    }
   }
 
   /**
@@ -72,30 +86,30 @@ export class Script {
    * @param targetLabel
    */
   callLabel(targetLabel: string) {
-    console.log(
-      `pending to call label ${targetLabel}, stack=${JSON.stringify(
-        this._routeStack
-      )}`
-    );
-    let labelData = this._locateLabel(targetLabel);
-    this._routeStack.push({
+    // console.log(
+    //   `pending to call label ${targetLabel}, stack=${JSON.stringify(
+    //     this._routeStack
+    //   )}`
+    // );
+    let labelPosition = this._locateLabel(targetLabel);
+    this._callStack.push({
       position: this._nextRunPosition ? [...this._nextRunPosition] : null,
       statementStack: this._statementStack,
     });
-    this._nextRunPosition = labelData;
+    this._nextRunPosition = labelPosition;
     this._statementStack = [];
 
-    console.log(
-      `finished call label ${targetLabel}, stack=${JSON.stringify(
-        this._routeStack
-      )}`
-    );
+    // console.log(
+    //   `finished call label ${targetLabel}, stack=${JSON.stringify(
+    //     this._routeStack
+    //   )}`
+    // );
   }
 
   return() {
-    console.log(`pending to return, stack=${JSON.stringify(this._routeStack)}`);
+    // console.log(`pending to return, stack=${JSON.stringify(this._routeStack)}`);
 
-    let stackItem = this._routeStack.pop();
+    let stackItem = this._callStack.pop();
     if (stackItem) {
       this._statementStack = stackItem.statementStack;
       this._nextRunPosition = stackItem.position;
@@ -104,13 +118,14 @@ export class Script {
       this._statementStack = [];
     }
 
-    console.log(`finished return, stack=${JSON.stringify(this._routeStack)}`);
+    // console.log(`finished return, stack=${JSON.stringify(this._routeStack)}`);
   }
 
   clear() {
     this._nextRunPosition = null;
-    this._routeStack = [];
+    this._callStack = [];
   }
+
 
   private _locateLabel(labelName: string) {
     if (this._core.storage.preloadedData == null)
@@ -123,7 +138,7 @@ export class Script {
     return labelData;
   }
 
-  private _incrementNextPosition() {
+  public incrementNextPosition() {
     if (this._core.storage.preloadedData == null)
       throw "Preloaded Data is Null";
     if (!this._nextRunPosition) throw "_nextRunPosition is null";
@@ -229,7 +244,7 @@ export class Script {
    * and continue executing.
    */
   analyseStatement(ctx: Script.Context) {
-    console.log("[HZEngine] analyse statement");
+    console.log("[HZEngine] Start statement analyse mode");
 
     // Backup _nextRunPosition
     let _nextRunPositionBackup: [path: string, index: number] | null = this
@@ -244,10 +259,10 @@ export class Script {
         this._nextRunPosition[0],
         this._nextRunPosition[1]
       );
-      if (!rawCommand)
-        throw `Readline Error, at file [${this._nextRunPosition[0]}] line [${
-          this._nextRunPosition[1] + 1
-        }]`;
+      if (rawCommand == null)
+        throw `Readline Error(got ${rawCommand}), at file [${
+          this._nextRunPosition[0]
+        }] line [${this._nextRunPosition[1] + 1}]`;
 
       // If the command is not empty and not a comment
       if (rawCommand.trim().length && !rawCommand.trim().startsWith("#")) {
@@ -264,7 +279,7 @@ export class Script {
             ...this._nextRunPosition,
           ]);
 
-          console.log(`[HZEngine] analyse statement command [${rawCommand}]`);
+          // console.log(`[HZEngine] analyse statement command [${rawCommand}]`);
 
           // Process command
           if (this._analyseStatementMiddlewares.length === 0) {
@@ -286,7 +301,7 @@ export class Script {
       }
 
       // Move to the next line
-      this._incrementNextPosition();
+      this.incrementNextPosition();
     }
 
     this._nextRunPosition = _nextRunPositionBackup;
@@ -305,7 +320,7 @@ export class Script {
     }
 
     // Reset _nextRunPosition to the backup value, and switch back to normal mode, and continue executing
-    console.log("[HZEngine] analyse statement finish");
+    console.log("[HZEngine] Finished analyse statement mode ");
   }
 
   // eval
@@ -320,6 +335,8 @@ export class Script {
     }
   }
   evalExpression(code: string) {
+    console.log(`[HZEngine] evalExpression: ${code}`);
+
     try {
       return new Function("sd", "gd", `return (${code})`)(
         this._core.storage.sd,
@@ -328,6 +345,21 @@ export class Script {
     } catch (e) {
       console.log(`Error in evalExpression: ${e}`);
     }
+  }
+
+  // parse string
+  parseString(str: string) {
+    let parsedInterpolated = parseInterpolatedStr(str);
+    let res: string = "";
+    for (let item of parsedInterpolated) {
+      if (item.isExpression) {
+        res += this.evalExpression(item.str);
+      } else {
+        res += item.str;
+      }
+    }
+
+    return res;
   }
 }
 

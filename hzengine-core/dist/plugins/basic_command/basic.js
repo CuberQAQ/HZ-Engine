@@ -41,7 +41,7 @@ function basic_commands(core) {
         let str = ctx.rawtext.trim();
         if (!str.startsWith("echo"))
             return next();
-        console.log(`[ECHO] ${str.slice(4).trim()}`);
+        console.log(`[ECHO] ${core.script.parseString(str.slice(4).trim())}`);
     });
     // show command
     core.script.use((ctx, next) => {
@@ -168,7 +168,6 @@ function basic_commands(core) {
         if (ctx.slicedArgs.length > 2 || ctx.slicedArgs.length < 1) {
             throw `Say Command: incorrect amount of args`;
         }
-        console.log("rawtext=" + ctx.rawtext);
         if (ctx.slicedArgs.length === 1) {
             console.log(`[SAY] ${ctx.slicedArgs[0].str}`);
             sayAction(core, "", ctx.slicedArgs[0].str);
@@ -201,6 +200,7 @@ exports.basic_commands = basic_commands;
 function sayAction(core, who, what) {
     const say_view_tag = "hzengine.say";
     const say_view_name = "say";
+    what = core.script.parseString(what);
     let message = {
         who,
         what,

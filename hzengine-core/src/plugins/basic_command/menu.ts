@@ -86,7 +86,7 @@ export function menu_statement(core: HZEngineCore) {
     if (ctx.rawtext.trim().split(" ")[0] !== "menu") return next();
     let data = ctx.startStatement("menu");
 
-    console.log("[HZEngine] Menu start");
+    // console.log("[HZEngine] Menu start");
 
     // the data here is {} at first, so dont read its properties, because the properties are not defined yet
     // we will define the properties here
@@ -107,7 +107,7 @@ export function menu_statement(core: HZEngineCore) {
       throw `@${ctx.slicedArgs[1]} must in menu statement`;
     }
 
-    console.log("[HZEngine] Menu label: " + ctx.slicedArgs[1].str);
+    // console.log("[HZEngine] Menu label: " + ctx.slicedArgs[1].str);
 
     let menu_stack_item = ctx.statementStack[ctx.statementStack.length - 1];
 
@@ -147,7 +147,7 @@ export function menu_statement(core: HZEngineCore) {
   // analyse menu end statement
   core.script.useAnalyseStatement((ctx, next) => {
     if (ctx.rawtext.trim().split(/ +/).join(" ") !== "end menu") return next();
-    console.log("[HZEngine] Menu analyse end");
+    // console.log("[HZEngine] Menu analyse end");
 
     let data: MenuStatementData = ctx.endStatement(
       "menu"
@@ -161,14 +161,19 @@ export function menu_statement(core: HZEngineCore) {
       data.start_position[1],
     ]);
   });
+
+  function buildMenuViewProp(menu_data: MenuStatementData): UI.MenuViewProp {
+    // parse menu item string
+    let parsed_item_list: UI.MenuItemData[] = [];
+    for (let item of menu_data.item_list) {
+      parsed_item_list.push({ ...item, text: core.script.parseString(item.text) });
+    }
+    return { itemList: parsed_item_list };
+  }
 }
 
 interface MenuStatementData {
   start_position: [path: string, index: number];
   end_position: [path: string, index: number];
   item_list: UI.MenuItemData[];
-}
-
-function buildMenuViewProp(menu_data: MenuStatementData): UI.MenuViewProp {
-  return { itemList: menu_data.item_list };
 }

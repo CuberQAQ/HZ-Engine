@@ -48,6 +48,12 @@ class Storage {
          * 如：脚本执行位置即调用栈，攻略度等
          */
         this._archiveData = null;
+        /**
+         * 保存全局数据
+         * 可以多次調用，實際上會異步儲存，也就是在一個宏任務中即使調用多次，也只會在宏任務結束後儲存一次
+         */
+        this._saveGlobalDataTimerId = null;
+        this._saveArchiveDataTimerId = null;
     }
     loadProject(path) {
         if (!(0, fs_1.readdirAssetsSync)({ path })) {
@@ -110,15 +116,14 @@ class Storage {
             });
         }
     }
-    /**
-     * 保存全局数据
-     * 可以多次調用，實際上會異步儲存，也就是在一個宏任務中即使調用多次，也只會在宏任務結束後儲存一次
-     */
     saveGlobalData() {
         if (!this.projectDir) {
             throw "projectDir is null, please loadProject first";
         }
-        setTimeout(() => {
+        if (this._saveGlobalDataTimerId)
+            return;
+        this._saveGlobalDataTimerId = setTimeout(() => {
+            this._saveGlobalDataTimerId = null;
             if (!this.projectDir) {
                 throw "projectDir is null, please loadProject first";
             }
@@ -161,10 +166,12 @@ class Storage {
      * 可以多次調用，實際上會異步儲存，也就是在一個宏任務中即使調用多次，也只會在宏任務結束後儲存一次
      * @param archivePath 存档文件目錄及名字
      */
-    saveArchiveData(archivePath) {
+    saveArchiveData(archivePath, immediate = false) {
         if (!this.projectDir)
             throw `projectDir is null, please loadProject first`;
-        setTimeout(() => {
+        console.log("[HZEngine] will save archiveData to " + archivePath);
+        let saveFunc = () => {
+            console.log("[HZEngine] saving archiveData to " + archivePath);
             if (!this.projectDir)
                 throw `projectDir is null, please loadProject first`;
             let res = (0, fs_1.writeFileAssetsSync)({
@@ -174,7 +181,19 @@ class Storage {
             if (res < 0)
                 throw `[HZEngine] save archiveData to ${archivePath} failed, code = ${res}`;
             console.log(`[HZEngine] save archiveData to ${archivePath}`);
-        }, 0);
+        };
+        if (immediate) {
+            saveFunc();
+            if (this._saveArchiveDataTimerId) {
+                clearTimeout(this._saveArchiveDataTimerId);
+                this._saveArchiveDataTimerId = null;
+            }
+        }
+        else
+            this._saveArchiveDataTimerId = setTimeout(() => {
+                this._saveArchiveDataTimerId = null;
+                saveFunc();
+            }, 0);
     }
     getSaveableData(data, auto_correct, ...key_chain) {
         let obj = data;
@@ -262,7 +281,7 @@ class Storage {
         traverseScript(scriptDir);
         function traverseScript(path) {
             let dirs = (0, fs_1.readdirAssetsSync)({ path });
-            console.log(dirs);
+            // console.log(dirs);
             for (let dir of dirs) {
                 let subpath = path_polyfill_1.default.join(path, dir);
                 if ((0, fs_1.isFileAssetsSync)({ path: subpath })) {
@@ -331,7 +350,7 @@ at [${labelMap[label][0]}(line ${labelMap[label][1]})] \
         traverseImage(imageDir);
         function traverseImage(path) {
             let dirs = (0, fs_1.readdirAssetsSync)({ path });
-            console.log(dirs);
+            // console.log(dirs);
             for (let dir of dirs) {
                 let subpath = path_polyfill_1.default.join(path, dir);
                 if ((0, fs_1.isFileAssetsSync)({ path: subpath })) {
@@ -361,7 +380,9 @@ at [${labelMap[label][0]}(line ${labelMap[label][1]})] \
                 throw `Image name key conflict [${name_key}], at file [${path}] and [${nameMap[name_key]}]`;
             nameMap[name_key] = [path];
         }
-        console.log(`Preloaded image: ${JSON.stringify(this.preloadedData.image.nameMap)}`);
+        // console.log(
+        //   `Preloaded image: ${JSON.stringify(this.preloadedData.image.nameMap)}`
+        // );
     }
 }
 exports.Storage = Storage;

@@ -91,7 +91,9 @@ export function readFileAssetsSync(opt: {
   if(fd < 0) throw "Open Assets File Failed code="+fd
   let size = hmFS.statAssetsSync({path: opt.path})!.size
   let arrbuf = new ArrayBuffer(size)
-  hmFS.readSync({fd, buffer: arrbuf})
+  let res = hmFS.readSync({fd, buffer: arrbuf})
+  console.log("read size="+res);
+  
   hmFS.closeSync({fd})
   if(opt.options && typeof opt.options.encoding === 'string') {
     return Buffer.from(arrbuf).toString(opt.options.encoding)
