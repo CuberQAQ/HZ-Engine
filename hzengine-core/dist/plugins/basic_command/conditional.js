@@ -203,6 +203,7 @@ function conditional(core) {
         }
         // jump to while statement start line (loop)
         let data = ctx.statementStack[ctx.statementStack.length - 1][2];
+        ctx.endStatement("while");
         core.script.jump(...data.start_position, false);
     });
     // analyse while statement start
@@ -238,18 +239,26 @@ function conditional(core) {
             ctx.slicedArgs[0].str.toLowerCase() !== "break") {
             return next();
         }
-        // check if the closest statement is breakable
+        // find the closest breakable statement
         // (currently only while statement is breakable)
         //(debug) output stack
         console.log("Stack=" + JSON.stringify(ctx.statementStack));
-        if (ctx.statementStack.length === 0 ||
-            ctx.statementStack[ctx.statementStack.length - 1][0] !== "while") {
-            throw `Break statement: break statement must come after while statement, at file [${ctx.currentPath}] line [${ctx.currentLineIndex}]`;
+        let resIndex = -1;
+        for (let i = ctx.statementStack.length - 1; i >= 0; i--) {
+            if (ctx.statementStack[i][0] === "while") {
+                resIndex = i;
+                break;
+            }
         }
-        let data = ctx.endStatement("while");
-        console.log(`Break command: break from while statement at file [${data.start_position[0]}] line [${data.start_position[1] + 1}]`);
+        if (resIndex === -1) {
+            throw `Break command: break statement must come after while statement, at file [${ctx.currentPath}] line [${ctx.currentLineIndex}]`;
+        }
+        let data = ctx.statementStack[resIndex][2];
+        console.log(`Break command: break from ${ctx.statementStack[resIndex][0]} statement at file [${data.start_position[0]}] line [${data.start_position[1] + 1}]`);
         core.script.jump(...data.end_position, false);
         core.script.incrementNextPosition();
+        // clear statement stack from breakable statement
+        ctx.statementStack.splice(resIndex + 1, ctx.statementStack.length - resIndex - 1);
     });
 }
 exports.conditional = conditional;

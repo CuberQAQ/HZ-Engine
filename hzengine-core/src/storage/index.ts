@@ -14,13 +14,30 @@ export class Storage {
 
   projectDir: string | null = null;
   preloadedData: NonNullable<any> | null = null;
+  packageData: NonNullable<any> | null = null;
   loadProject(path: string) {
     if (!readdirAssetsSync({ path })) {
       throw "Dir not exist";
     }
     this.projectDir = path;
 
+    this.loadPackageData();
     this.preload();
+  }
+
+  loadPackageData() {
+    if (!this.projectDir) throw "projectDir is null";
+    if (
+      !hmFS.statAssetsSync({ path: Path.join(this.projectDir, "hz_package.json") })
+    ) {
+      throw "HZEngine Package File (hz_package.json) not exist";
+    }
+    this.packageData = JSON.parse(
+      readFileAssetsSync({
+        path: Path.join(this.projectDir, "hz_package.json"),
+        options: { encoding: "utf8" },
+      }) as string
+    );
   }
 
   // Storage Data
@@ -172,7 +189,7 @@ export class Storage {
     };
     if (immediate) {
       saveFunc();
-      if(this._saveArchiveDataTimerId) {
+      if (this._saveArchiveDataTimerId) {
         clearTimeout(this._saveArchiveDataTimerId);
         this._saveArchiveDataTimerId = null;
       }

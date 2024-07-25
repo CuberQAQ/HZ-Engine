@@ -1,0 +1,35 @@
+{
+  "name": "hzengine-cli",
+  "version": "1.0.0",
+  "description": "HZ-Engine CLI",
+  "type": "module",
+  "bin": {
+    "hzengine-cli": "index.js",
+    "hzengine": "index.js",
+    "hze": "index.js"
+  },
+  "scripts": {
+    "link": "npm link"
+  },
+  "keywords": [
+    "hzengine"
+  ],
+  "author": "CuberQAQ",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "clear": "^0.1.0",
+    "commander": "^12.1.0",
+    "configstore": "^7.0.0",
+    "ejs": "^3.1.10",
+    "figlet": "^1.7.0",
+    "fs-extra": "^11.2.0",
+    "inquirer": "^10.1.2"
+  },
+  "devDependencies": {
+    "@types/clear": "^0.1.4",
+    "@types/configstore": "^6.0.2",
+    "@types/figlet": "^1.5.8",
+    "@types/fs-extra": "^11.0.4"
+  }
+}

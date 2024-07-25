@@ -188,9 +188,9 @@ function basic_commands(core) {
             throw `Pause Command: incorrect amount of args`;
         if (ctx.slicedArgs.length === 2) {
             if (ctx.slicedArgs[1].isQuoted ||
-                isNaN(parseFloat(ctx.slicedArgs[1].str)))
+                !isFinite(Number(ctx.slicedArgs[1].str)))
                 throw `Pause Command: the second arg must be a number`;
-            core.system.pause(parseFloat(ctx.slicedArgs[1].str));
+            core.system.pause(Number(ctx.slicedArgs[1].str));
         }
         else
             core.system.pause();

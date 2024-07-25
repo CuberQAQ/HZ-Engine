@@ -1,6 +1,6 @@
 *start
-    #启用实机模式
-    [REAL = true]
+    #启用REAL mode实机模式，包含完整的show语句
+    # [REAL = true]
 
     character girl "綾地寧寧"
 
@@ -16,6 +16,8 @@
     menu
     @"前往咖啡馆"
         call ciallo
+    @"前往eval测试"
+        call eval_test
     @"嵌套menu测试"
         menu 
         @"choice1"

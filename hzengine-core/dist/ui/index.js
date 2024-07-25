@@ -39,6 +39,7 @@ class UI {
         this.addLayer("fg", 3);
         this.addLayer("ct", 5);
         this.addLayer("overlay", 7);
+        this.addRouter("page", "overlay", false);
     }
     get layerList() {
         return this._layerList;
@@ -75,10 +76,10 @@ class UI {
     getRouter(tag) {
         return this._routerMap.get(tag);
     }
-    addRouter(tag, layer) {
+    addRouter(tag, layer, isSave = true) {
         if (this._routerMap.has(tag))
             throw `Route with tag [${tag}] already exist!`;
-        this._routerMap.set(tag, new UI.Router(this, tag, layer));
+        this._routerMap.set(tag, new UI.Router(this, tag, layer, isSave));
     }
 }
 exports.UI = UI;
@@ -114,10 +115,11 @@ exports.UI = UI;
     }
     UI.Layer = Layer;
     class Router {
-        constructor(_ui, tag, layer) {
+        constructor(_ui, tag, layer, isSave = true) {
             this._ui = _ui;
             this.tag = tag;
             this.layer = layer;
+            this.isSave = isSave;
             this.viewStack = [];
             this.activeViewInstance = null;
         }

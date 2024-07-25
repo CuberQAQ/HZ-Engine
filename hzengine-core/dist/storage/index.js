@@ -35,6 +35,7 @@ class Storage {
         this._core = _core;
         this.projectDir = null;
         this.preloadedData = null;
+        this.packageData = null;
         // Storage Data
         /**
          * 全局数据
@@ -60,7 +61,19 @@ class Storage {
             throw "Dir not exist";
         }
         this.projectDir = path;
+        this.loadPackageData();
         this.preload();
+    }
+    loadPackageData() {
+        if (!this.projectDir)
+            throw "projectDir is null";
+        if (!hmFS.statAssetsSync({ path: path_polyfill_1.default.join(this.projectDir, "hz_package.json") })) {
+            throw "HZEngine Package File (hz_package.json) not exist";
+        }
+        this.packageData = JSON.parse((0, fs_1.readFileAssetsSync)({
+            path: path_polyfill_1.default.join(this.projectDir, "hz_package.json"),
+            options: { encoding: "utf8" },
+        }));
     }
     get globalData() {
         if (!this._globalData) {

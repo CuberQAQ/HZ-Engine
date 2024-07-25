@@ -1,2 +1,14 @@
 msgid "example"
 msgstr "This is an example in device"
+
+msgid "start_game"
+msgstr "Start Game"
+
+msgid "load_archive"
+msgstr "Load Archive"
+
+msgid "gallery"
+msgstr "Gallery"
+
+msgid "settings"
+msgstr "Settings"

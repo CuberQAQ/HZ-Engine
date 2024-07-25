@@ -1,15 +1,10 @@
 import * as hmUI from "@zos/ui";
-import { UI } from "hzengine-core";
 import { getDeviceInfo, SCREEN_SHAPE_SQUARE } from "@zos/device";
+import { UI } from "hzengine-core";
 import { px } from "@zos/utils";
 import { Fx } from "../../shared/fx.js";
 const { width, height, screenShape } = getDeviceInfo();
-export default function CustomViews(core) {
-    core.ui.registerView("say", CustomSayView);
-    core.ui.registerView("fg_img", FgImgView);
-    core.ui.registerView("bg_img", BgImgView);
-    core.ui.registerView("menu", MenuView);
-}
+export { CustomSayView as SayView, FgImgView, BgImgView, MenuView };
 /**
  * 顯示對話文字的窗口
  */

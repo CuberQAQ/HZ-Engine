@@ -1,17 +1,12 @@
 import * as hmUI from "@zos/ui";
-import { HZEngineCore, UI } from "hzengine-core";
 import { getDeviceInfo, SCREEN_SHAPE_SQUARE } from "@zos/device";
+import { HZEngineCore, UI } from "hzengine-core";
 import { px } from "@zos/utils";
 import { Fx } from "../../shared/fx.js";
 import path from "@cuberqaq/path-polyfill";
 const { width, height, screenShape } = getDeviceInfo();
 
-export default function CustomViews(core: HZEngineCore) {
-  core.ui.registerView("say", CustomSayView);
-  core.ui.registerView("fg_img", FgImgView);
-  core.ui.registerView("bg_img", BgImgView);
-  core.ui.registerView("menu", MenuView);
-}
+export { CustomSayView as SayView, FgImgView, BgImgView, MenuView };
 
 /**
  * 顯示對話文字的窗口
@@ -45,6 +40,7 @@ class CustomSayView extends UI.MessageView {
         text_size: px(40),
         color: 0xffffff,
         text: prop.who,
+        font: "project/font/normal.ttf",
       }),
       what_text: this._widgetFactory.createWidget(hmUI.widget.TEXT, {
         x: (width - w) / 2 + px(10),
@@ -57,6 +53,7 @@ class CustomSayView extends UI.MessageView {
         align_h: hmUI.align.CENTER_H,
         text: this.enableAnim ? "" : prop.what,
         text_style: hmUI.text_style.WRAP,
+        font: "project/font/normal.ttf",
       }),
     };
 
@@ -239,8 +236,9 @@ class MenuView extends UI.MenuView {
           normal_color: 0x444444,
           press_color: 0x666666,
           click_func: getClickFunc(i, [...itemProp.position]),
+          font: "project/font/normal.ttf",
         });
-        button.setAlpha(200)
+        button.setAlpha(200);
         this._buttonWidgetList.push(button);
         y += h + v_space;
       }

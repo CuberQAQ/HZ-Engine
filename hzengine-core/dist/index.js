@@ -25,7 +25,15 @@ class HZEngineCore {
         this.storage.loadProject(projectPath);
     }
     start() {
-        this.system.start();
+        var _a;
+        // this.system.start()
+        let title = (_a = this.storage.packageData) === null || _a === void 0 ? void 0 : _a.name;
+        if (title == null) {
+            throw `[HZEngine] project name is null, please loadProject first or check your project.json format`;
+        }
+        this.ui.getRouter("page").push("title", {
+            title,
+        });
     }
     // Load Plugin
     loadPlugin(name, plugin) {

@@ -9,6 +9,7 @@ export class UI {
     this.addLayer("fg", 3);
     this.addLayer("ct", 5);
     this.addLayer("overlay", 7);
+    this.addRouter("page", "overlay", false);
   }
 
   // Layer
@@ -67,10 +68,10 @@ export class UI {
     return this._routerMap.get(tag);
   }
 
-  addRouter(tag: string, layer: string) {
+  addRouter(tag: string, layer: string, isSave: boolean = true) {
     if (this._routerMap.has(tag))
       throw `Route with tag [${tag}] already exist!`;
-    this._routerMap.set(tag, new UI.Router(this, tag, layer));
+    this._routerMap.set(tag, new UI.Router(this, tag, layer, isSave));
   }
 }
 
@@ -145,7 +146,7 @@ export namespace UI {
   }
 
   export class Router {
-    constructor(private _ui: UI, public tag: string, public layer: string) {}
+    constructor(private _ui: UI, public tag: string, public layer: string, public isSave = true) {}
     viewStack: [view_name: string, prop: Storage.Saveable<unknown>][] = [];
     get length() {
       return this.viewStack.length;

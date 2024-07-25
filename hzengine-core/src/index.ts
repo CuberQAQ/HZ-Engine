@@ -8,27 +8,33 @@ import { UI } from "./ui";
 class HZEngineCore {
   ui = new UI(this);
   storage = new Storage(this);
-  script = new Script(this)
-  system = new System(this)
+  script = new Script(this);
+  system = new System(this);
   constructor() {
     // internal plugin
-    this.loadPlugin("global_gesture", global_gesture) 
-    this.loadPlugin("basic_command", basic_command)
+    this.loadPlugin("global_gesture", global_gesture);
+    this.loadPlugin("basic_command", basic_command);
   }
   loadProject(projectPath: string) {
-    this.storage.loadProject(projectPath)
+    this.storage.loadProject(projectPath);
   }
   start() {
-    this.system.start()
+    // this.system.start()
+    let title = this.storage.packageData?.name;
+    if (title == null) {
+      throw `[HZEngine] project name is null, please loadProject first or check your project.json format`;
+    }
+    this.ui.getRouter("page")!.push("title", {
+      title,
+    });
   }
 
   // Load Plugin
   loadPlugin(name: string, plugin: Plugin) {
     console.log(`[HZEngine] load plugin [${name}]`);
-    
+
     plugin(this);
   }
-
 
   // Event Bus
   private _eventCallbacks: Map<string, Set<Function>> = new Map();
