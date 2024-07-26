@@ -1,9 +1,11 @@
 import { HZEngineCore } from "..";
+import { ArchiveStateAccessor } from "../storage/decorator";
 
 export class System {
-  constructor(private _core: HZEngineCore) {}
+  constructor(public _core: HZEngineCore) {}
 
-  condition: System.Condition = System.Condition.Free;
+  @ArchiveStateAccessor("system.condition")
+  accessor condition: System.Condition = System.Condition.Free;
 
   pause(delayMs?: number) {
     console.log(`[HZEngine] Pause`);
@@ -48,6 +50,10 @@ export class System {
   }
 
   start(initLabel: string = "start") {
+    // 初始化存档
+    this._core.storage.archiveData
+    console.log("ciallo");
+    
     this._core.script.clear();
     this._core.script.jumpLabel(initLabel);
     this.run();

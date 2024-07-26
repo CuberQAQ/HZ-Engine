@@ -39,6 +39,9 @@
         call if_test
     @"轮回测试"
         call loop_test
+    @"eval测试"
+        "即将执行一个不存在的函数，请观察日志输出"
+        eval ciallo()
     end menu
 
 

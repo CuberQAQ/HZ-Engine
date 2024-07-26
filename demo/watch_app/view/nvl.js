@@ -2,7 +2,7 @@ import * as hmUI from "@zos/ui";
 import { getDeviceInfo, SCREEN_SHAPE_SQUARE } from "@zos/device";
 import { UI } from "hzengine-core";
 import { px } from "@zos/utils";
-import { Fx } from "../../shared/fx.js";
+import { Fx } from "../shared/fx.js";
 const { width, height, screenShape } = getDeviceInfo();
 export { CustomSayView as SayView, FgImgView, BgImgView, MenuView };
 /**
@@ -215,7 +215,13 @@ class MenuView extends UI.MenuView {
                 return () => {
                     // jump to the next line of the @label
                     this.core.script.jump(jump_position[0], jump_position[1] + 1);
-                    this._hideButtons();
+                    // this._hideButtons();
+                    // destroy menu view
+                    let router = this.core.ui.getRouter("menu");
+                    if (!router) {
+                        throw "menu router not found";
+                    }
+                    router.pop();
                     // Continue to run game at next js task
                     this.core.system.unBlock();
                 };

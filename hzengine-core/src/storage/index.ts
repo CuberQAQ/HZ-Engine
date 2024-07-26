@@ -12,29 +12,31 @@ import Path from "@cuberqaq/path-polyfill";
 export class Storage {
   constructor(private _core: HZEngineCore) {}
 
-  projectDir: string | null = null;
+  projectRoot: string | null = null;
   preloadedData: NonNullable<any> | null = null;
   packageData: NonNullable<any> | null = null;
   loadProject(path: string) {
     if (!readdirAssetsSync({ path })) {
       throw "Dir not exist";
     }
-    this.projectDir = path;
+    this.projectRoot = path;
 
     this.loadPackageData();
     this.preload();
   }
 
   loadPackageData() {
-    if (!this.projectDir) throw "projectDir is null";
+    if (!this.projectRoot) throw "projectDir is null";
     if (
-      !hmFS.statAssetsSync({ path: Path.join(this.projectDir, "hz_package.json") })
+      !hmFS.statAssetsSync({
+        path: Path.join(this.projectRoot, "hz_package.json"),
+      })
     ) {
       throw "HZEngine Package File (hz_package.json) not exist";
     }
     this.packageData = JSON.parse(
       readFileAssetsSync({
-        path: Path.join(this.projectDir, "hz_package.json"),
+        path: Path.join(this.projectRoot, "hz_package.json"),
         options: { encoding: "utf8" },
       }) as string
     );
@@ -83,17 +85,18 @@ export class Storage {
   }
 
   loadGlobalData() {
-    if (!this.projectDir) {
+    if (!this.projectRoot) {
       throw "projectDir is null, please loadProject first";
     }
+    this._core.emit("beforeLoadGlobalData");
     if (
       hmFS.statAssetsSync({
-        path: Path.join(this.projectDir, "globalData.json"),
+        path: Path.join(this.projectRoot, "globalData.json"),
       })
     ) {
       this._globalData = JSON.parse(
         readFileAssetsSync({
-          path: Path.join(this.projectDir, "globalData.json"),
+          path: Path.join(this.projectRoot, "globalData.json"),
           options: {
             encoding: "utf8",
           },
@@ -101,14 +104,16 @@ export class Storage {
       );
       if (this._globalData == null) {
         this._globalData = {}; // TODO initial GlobalData value
+        this._core.emit("initGlobalData");
       }
     } else {
       console.log(`[HZEngine] globalData.json not exist, create it.`);
       this._globalData = {}; // Initial GlobalData value
       writeFileAssetsSync({
-        path: Path.join(this.projectDir, "globalData.json"),
+        path: Path.join(this.projectRoot, "globalData.json"),
         data: JSON.stringify(this._globalData),
       });
+      this._core.emit("afterLoadGlobalData");
     }
   }
 
@@ -118,50 +123,55 @@ export class Storage {
    */
   private _saveGlobalDataTimerId: number | null = null;
   saveGlobalData() {
-    if (!this.projectDir) {
+    if (!this.projectRoot) {
       throw "projectDir is null, please loadProject first";
     }
     if (this._saveGlobalDataTimerId) return;
     this._saveGlobalDataTimerId = setTimeout(() => {
       this._saveGlobalDataTimerId = null;
-      if (!this.projectDir) {
+      if (!this.projectRoot) {
         throw "projectDir is null, please loadProject first";
       }
+      this._core.emit("beforeSaveGlobalData");
       let res = writeFileAssetsSync({
-        path: Path.join(this.projectDir, "globalData.json"),
+        path: Path.join(this.projectRoot, "globalData.json"),
         data: JSON.stringify(this._globalData),
       });
       if (res < 0)
         throw `[HZEngine] save globalData to globalData.json failed, code = ${res}`;
       console.log(`[HZEngine] save globalData to globalData.json`);
+      this._core.emit("afterSaveGlobalData");
     }, 0);
   }
 
   loadArchiveData(archivePath?: string) {
+    this._core.emit("beforeLoadArchive");
     if (archivePath) {
-      if (!this.projectDir)
+      if (!this.projectRoot)
         throw `projectDir is null, please loadProject first`;
       if (
         !hmFS.statAssetsSync({
-          path: Path.join(this.projectDir, archivePath),
+          path: Path.join(this.projectRoot, archivePath),
         })
       ) {
         throw `Archive [${archivePath}] not exist`;
       }
       let archiveData: Storage.JSONValue = JSON.parse(
         readFileAssetsSync({
-          path: Path.join(this.projectDir, archivePath),
+          path: Path.join(this.projectRoot, archivePath),
           options: {
             encoding: "utf8",
           },
         }) as string
       );
-      if (archiveData == null) archiveData = {};
+      if (archiveData == null) throw `[HZEngine] ArchiveData is null`;
       this._archiveData = archiveData;
       console.log(`[HZEngine] load archiveData from ${archivePath}`);
+      this._core.emit("afterLoadArchive");
     } else {
       console.log(`[HZEngine] load archiveData from empty template`);
       this._archiveData = {};
+      this._core.emit("initArchiveData");
     }
   }
 
@@ -172,20 +182,23 @@ export class Storage {
    * @param archivePath 存档文件目錄及名字
    */
   saveArchiveData(archivePath: string, immediate = false) {
-    if (!this.projectDir) throw `projectDir is null, please loadProject first`;
+    if (!this.projectRoot) throw `projectDir is null, please loadProject first`;
+    this._core.emit("beforeSaveArchive");
     console.log("[HZEngine] will save archiveData to " + archivePath);
     let saveFunc = () => {
       console.log("[HZEngine] saving archiveData to " + archivePath);
 
-      if (!this.projectDir)
+      if (!this.projectRoot)
         throw `projectDir is null, please loadProject first`;
       let res = writeFileAssetsSync({
-        path: Path.join(this.projectDir, archivePath),
+        path: Path.join(this.projectRoot, archivePath),
         data: JSON.stringify(this._archiveData),
       });
       if (res < 0)
         throw `[HZEngine] save archiveData to ${archivePath} failed, code = ${res}`;
       console.log(`[HZEngine] save archiveData to ${archivePath}`);
+
+      this._core.emit("afterSaveArchive");
     };
     if (immediate) {
       saveFunc();
@@ -204,27 +217,51 @@ export class Storage {
     data: Storage.JSONValue,
     auto_correct: boolean,
     ...key_chain: string[]
-  ): Record<string, Storage.JSONValue> {
+  ): NonNullable<Storage.JSONValue> {
     let obj = data;
 
     // if(obj == null) throw `[HZEngine] saveable data is null`
     for (let key of key_chain) {
-      if (obj == null) throw `[HZEngine] saveable data is null`;
+      if (obj == null) throw Error(`[HZEngine] saveable data is null`);
       if (typeof obj !== "object")
-        throw `[HZEngine] saveable data is not object`;
-      if (Array.isArray(obj)) throw `[HZEngine] saveable data is array`;
+        throw Error(`[HZEngine] saveable data is not object`);
+      if (Array.isArray(obj)) throw Error(`[HZEngine] saveable data is array`);
       if (!obj[key]) {
         if (auto_correct) {
           obj[key] = {};
-        } else throw `[HZEngine] saveable data key ${key} not exist`;
+        } else throw Error(`[HZEngine] saveable data key ${key} not exist`);
       }
       obj = obj[key];
     }
-    if (obj == null) throw `[HZEngine] saveable data result obj is null`;
-    if (typeof obj !== "object")
-      throw `[HZEngine] saveable data result obj is not array or object`;
-    if (Array.isArray(obj)) throw `[HZEngine] saveable data result is an array`;
+    if (obj == null) throw Error(`[HZEngine] saveable data result obj is null`);
+    // if (typeof obj !== "object")
+    // throw Error(`[HZEngine] saveable data result obj is not array or object`);
+    // if (Array.isArray(obj)) throw Error(`[HZEngine] saveable data result is an array, key_chain = ${key_chain.join(".")}, res = ${JSON.stringify(obj)}`);
     return obj;
+  }
+
+  setSaveableData(
+    data: Storage.JSONValue,
+    auto_correct: boolean,
+    value: Storage.JSONValue,
+    ...key_chain: string[]
+  ) {
+    console.log(
+      `[HZEngine] setSaveableData ${key_chain} = ${JSON.stringify(value)}`
+    );
+
+    if (key_chain.length == 0) throw `key_chain is empty`;
+    let parentObj = this.getSaveableData(
+      data,
+      auto_correct,
+      ...key_chain.slice(0, -1)
+    );
+
+    if (parentObj == null) throw `[HZEngine] saveable data is null`;
+    if (typeof parentObj !== "object")
+      throw `[HZEngine] saveable data is not object`;
+    if (Array.isArray(parentObj)) throw `[HZEngine] saveable data is array`;
+    parentObj[key_chain[key_chain.length - 1]] = value;
   }
 
   checkSaveableData(data: Storage.JSONValue, ...key_chain: string[]) {
@@ -234,19 +271,19 @@ export class Storage {
   // Preload
 
   preload() {
-    if (!this.projectDir) {
+    if (!this.projectRoot) {
       throw "projectDir is null, please loadProject first";
     }
 
     if (
       hmFS.statAssetsSync({
-        path: Path.join(this.projectDir, "preloaded.json"),
+        path: Path.join(this.projectRoot, "preloaded.json"),
       })
     ) {
       // 已经预加载过了，退出
       this.preloadedData = JSON.parse(
         readFileAssetsSync({
-          path: Path.join(this.projectDir, "preloaded.json"),
+          path: Path.join(this.projectRoot, "preloaded.json"),
           options: {
             encoding: "utf8",
           },
@@ -271,7 +308,7 @@ export class Storage {
     // console.log(JSON.stringify(this.preloadedData));
 
     writeFileAssetsSync({
-      path: Path.join(this.projectDir, "preloaded.json"),
+      path: Path.join(this.projectRoot, "preloaded.json"),
       data: JSON.stringify(this.preloadedData),
     });
 
@@ -291,7 +328,7 @@ export class Storage {
     // 这里的index是以0开始计数的行数
     let labelMap: Record<string, [path: string, index: number]> =
       this.preloadedData.script.labelMap;
-    let scriptDir = Path.join(this.projectDir!, "script");
+    let scriptDir = Path.join(this.projectRoot!, "script");
 
     let hzsInfoMap: Record<string, HzsInfo> =
       this.preloadedData.script.hzsInfoMap;
@@ -367,7 +404,7 @@ at [${labelMap[label][0]}(line ${labelMap[label][1]})] \
     // 这里的index是以0开始计数的行数
     let nameMap: Record<string, [path: string]> =
       this.preloadedData.image.nameMap;
-    let imageDir = Path.join(this.projectDir!, "image");
+    let imageDir = Path.join(this.projectRoot!, "image");
 
     if (!readdirAssetsSync({ path: imageDir }))
       throw "项目文件夹中image文件夹不存在";
@@ -411,6 +448,10 @@ at [${labelMap[label][0]}(line ${labelMap[label][1]})] \
     //   `Preloaded image: ${JSON.stringify(this.preloadedData.image.nameMap)}`
     // );
   }
+
+  // Decorator Field
+  _archiveStateSetterRegisteredList: Set<string> = new Set();
+  _archiveStateGetterRegisteredList: Set<string> = new Set();
 }
 
 // 记录脚本文件信息

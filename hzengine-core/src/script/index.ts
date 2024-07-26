@@ -7,29 +7,33 @@ import { HzsInfo, Storage } from "../storage";
 import { readFileAssetsSync } from "../storage/fs";
 import { parseInterpolatedStr, splitStr2Objs } from "./strtools";
 import { readline } from "./readscript";
+import { ArchiveStateAccessor } from "../storage/decorator";
 export class Script {
-  constructor(private _core: HZEngineCore) {}
-
+  constructor(public _core: HZEngineCore) {}
   /**
    * 调用栈
    * 在call时保存当前执行位置和语句栈，在return时恢复执行位置和语句栈
    */
-  private _callStack: {
+  @ArchiveStateAccessor("script.callStack")
+  private accessor _callStack: {
     position: [path: string, index: number] | null;
     statementStack: Script.StatementStack;
   }[] = [];
+  
 
   /**
    * 语句栈
    * 比如while, if，会在语句开始时入栈，语句结束时出栈
    */
-  private _statementStack: Script.StatementStack = [];
+  @ArchiveStateAccessor("script.statementStack")
+  private accessor _statementStack: Script.StatementStack = [];
 
   /**
    * 下一次执行的脚本位置
    * 注意：存储该值的时候应总是拷贝赋值而非直接引用赋值
    */
-  private _nextRunPosition: [path: string, index: number] | null = null;
+  @ArchiveStateAccessor("script.nextRunPosition")
+  private accessor _nextRunPosition: [path: string, index: number] | null = null;
 
   // Script Run
 
@@ -418,7 +422,7 @@ export namespace Script {
         throw `the last statement in the stack is not ${identifier}, at file [${
           this.currentPath
         }] line [${this.currentLineIndex + 1}]`;
-      return this._statementStack.pop()![2];
+      return this._statementStack.pop()![2] as NonNullable<Storage.Saveable<unknown>>;
     }
     get statementStack() {
       return this._statementStack;
@@ -435,8 +439,8 @@ export namespace Script {
         "script",
         "statement_data",
         this.currentPath
-      );
-      if (!statement_data_in_file[this.currentLineIndex]) {
+      ) as Record<string, NonNullable<Storage.Saveable<unknown>>>;
+      if (!statement_data_in_file[""+this.currentLineIndex]) {
         this._core.script.analyseStatement(this);
         statement_data_in_file = this._core.storage.getSaveableData(
           this._core.storage.globalData,
@@ -444,7 +448,7 @@ export namespace Script {
           "script",
           "statement_data",
           this.currentPath
-        );
+        ) as Record<string, NonNullable<Storage.Saveable<unknown>>>;
         if (!statement_data_in_file[this.currentLineIndex])
           throw `analyse statement failed as statement data not found, at file [${
             this.currentPath
@@ -464,8 +468,8 @@ export namespace Script {
         "script",
         "statement_data",
         start_position[0]
-      );
-      statement_data_in_file[start_position[1]] = statement_data;
+      ) as Record<string, NonNullable<Storage.Saveable<unknown>>>;
+      statement_data_in_file[""+start_position[1]] = statement_data;
       this._core.storage.saveGlobalData();
     }
   }
@@ -489,8 +493,8 @@ export namespace Script {
         "script",
         "statement_data",
         this.currentPath
-      );
-      statement_data_in_file[this.currentLineIndex] = statement_data;
+      ) as Record<string, NonNullable<Storage.Saveable<unknown>>>;
+      statement_data_in_file[""+this.currentLineIndex] = statement_data;
       this._core.storage.saveGlobalData();
       return statement_data;
     }
@@ -511,3 +515,4 @@ export namespace Script {
   export type StatementStack = StatementStackItem[];
   export type StatementData = NonNullable<Storage.JSONValue>;
 }
+

@@ -2,7 +2,6 @@ import * as hmUI from "@zos/ui";
 import { getDeviceInfo, SCREEN_SHAPE_SQUARE } from "@zos/device";
 import { HZEngineCore, UI } from "hzengine-core";
 import { px } from "@zos/utils";
-import { Fx } from "../../shared/fx.js";
 import path from "@cuberqaq/path-polyfill";
 import { getText } from "@zos/i18n";
 const { width, height, screenShape } = getDeviceInfo();
@@ -66,12 +65,19 @@ export class TitleView extends UI.View<TitleViewProp> {
           y,
           w,
           h,
-          text: getText("load_archive"),
+          text: getText("continue_game"),
           text_size: px(36),
           normal_color: 0x333333,
           press_color: 0x555555,
           click_func: () => {
-            this.core.ui.getRouter("page")!.push("load_archive", {});
+            // hmUI.showToast({ text: "施工中..." });
+            try {
+              this.core.storage.loadArchiveData("archive000.json");
+            } catch(e) {
+              console.log("請先開始遊戲");
+              throw e
+            }
+            this.core.ui.getRouter("page")!.pop();
           },
         }
       );
@@ -94,6 +100,7 @@ export class TitleView extends UI.View<TitleViewProp> {
           normal_color: 0x333333,
           press_color: 0x555555,
           click_func: () => {
+            hmUI.showToast({ text: "施工中..." });
             this.core.ui.getRouter("page")!.push("gallery", {});
           },
         }
@@ -117,6 +124,7 @@ export class TitleView extends UI.View<TitleViewProp> {
           normal_color: 0x333333,
           press_color: 0x555555,
           click_func: () => {
+            hmUI.showToast({ text: "施工中..." });
             this.core.ui.getRouter("page")!.push("settings", {});
           },
         }

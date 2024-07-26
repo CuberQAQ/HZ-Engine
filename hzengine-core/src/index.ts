@@ -1,3 +1,4 @@
+import { Async } from "./async";
 import { basic_command } from "./plugins/basic_command";
 import { global_gesture } from "./plugins/global_gesture";
 import { Script } from "./script";
@@ -6,8 +7,10 @@ import { System } from "./system";
 import { UI } from "./ui";
 
 class HZEngineCore {
-  ui = new UI(this);
+  // 請不要調整這裡的初始化順序，不然會有問題（裝飾器裡有時候要用到前面初始化的東西）
+  private _eventCallbacks: Map<string, Set<Function>> = new Map();
   storage = new Storage(this);
+  ui = new UI(this);
   script = new Script(this);
   system = new System(this);
   constructor() {
@@ -18,14 +21,17 @@ class HZEngineCore {
   loadProject(projectPath: string) {
     this.storage.loadProject(projectPath);
   }
-  start() {
+  start(callback?: () => unknown) {
     // this.system.start()
-    let title = this.storage.packageData?.name;
-    if (title == null) {
-      throw `[HZEngine] project name is null, please loadProject first or check your project.json format`;
-    }
-    this.ui.getRouter("page")!.push("title", {
-      title,
+    Async.nextTick(() => {
+      let title = this.storage.packageData?.name;
+      if (title == null) {
+        throw `[HZEngine] project name is null, please loadProject first or check your project.json format`;
+      }
+      this.ui.getRouter("page")!.push("title", {
+        title,
+      });
+      callback?.();
     });
   }
 
@@ -37,7 +43,6 @@ class HZEngineCore {
   }
 
   // Event Bus
-  private _eventCallbacks: Map<string, Set<Function>> = new Map();
   on(event: string, cb: Function) {
     if (this._eventCallbacks.has(event)) {
       this._eventCallbacks.get(event)!.add(cb);
@@ -57,4 +62,4 @@ class HZEngineCore {
 
 type Plugin = (core: HZEngineCore) => void;
 
-export { HZEngineCore, UI, Storage };
+export { HZEngineCore, UI, Storage, Script, System };
