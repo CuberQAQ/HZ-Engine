@@ -1,6 +1,6 @@
 {
   "name": "hzengine-cli",
-  "version": "1.0.0",
+  "version": "0.1.0-dev",
   "description": "HZ-Engine CLI",
   "type": "module",
   "bin": {
@@ -15,7 +15,7 @@
     "hzengine"
   ],
   "author": "CuberQAQ",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "dependencies": {
     "chalk": "^5.3.0",
     "clear": "^0.1.0",

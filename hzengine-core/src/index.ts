@@ -1,3 +1,8 @@
+/**
+ * HZEngineCore
+ * @copyright Copyright (c) 2024 CuberQAQ. All rights reserved. 
+ */
+
 import { Async } from "./async";
 import { basic_command } from "./plugins/basic_command";
 import { global_gesture } from "./plugins/global_gesture";

@@ -1,16 +1,18 @@
 {
   "name": "hzengine-core",
-  "version": "1.0.0",
+  "version": "0.1.0-dev",
   "description": "An Visual Novel Engine for Zepp OS",
   "main": "./dist/index",
-  "types": "./src/index",
+  "types": "./types/index",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
     "watch": "tsc --watch"
   },
   "keywords": [
     "Galgame",
+    "HZEngine",
+    "NVL",
     "ZeppOS"
   ],
   "author": "CuberQAQ",

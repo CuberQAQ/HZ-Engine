@@ -1,4 +1,8 @@
 "use strict";
+/**
+ * HZEngineCore
+ * @copyright Copyright (c) 2024 CuberQAQ. All rights reserved.
+ */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.System = exports.Script = exports.Storage = exports.UI = exports.HZEngineCore = void 0;
 const async_1 = require("./async");

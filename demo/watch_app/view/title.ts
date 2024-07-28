@@ -6,6 +6,9 @@ import path from "@cuberqaq/path-polyfill";
 import { getText } from "@zos/i18n";
 const { width, height, screenShape } = getDeviceInfo();
 
+/**
+ * 游戏标题页面
+ */
 export class TitleView extends UI.View<TitleViewProp> {
   _widgets: any | null = null;
   _widgetFactory = this.core.ui.getLayer(this.layer)!.widgetFactory;

@@ -7,9 +7,9 @@ import {} from "@zos/ui";
 export class UI {
   constructor(public _core: HZEngineCore) {
     this.addLayer("bg", 1);
-    this.addLayer("fg", 3);
-    this.addLayer("ct", 5);
-    this.addLayer("overlay", 7);
+    this.addLayer("fg", 2);
+    this.addLayer("ct", 3);
+    this.addLayer("overlay", 4);
     this.addRouter("page", "overlay", false);
   }
 

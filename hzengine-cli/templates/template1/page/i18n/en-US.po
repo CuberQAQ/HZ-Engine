@@ -1,0 +1,29 @@
+msgid "example"
+msgstr "This is an example in device"
+
+msgid "start_game"
+msgstr "Start Game"
+
+msgid "load_archive"
+msgstr "Load Archive"
+
+msgid "gallery"
+msgstr "Gallery"
+
+msgid "settings"
+msgstr "Settings"
+
+msgid "quick_menu"
+msgstr "Quick Menu"
+
+msgid "quick_save"
+msgstr "Quick Save"
+
+msgid "quick_load"
+msgstr "Quick Load"
+
+msgid "archive_page"
+msgstr "Archive Page"
+
+msgid "continue_game"
+msgstr "Continue Game"

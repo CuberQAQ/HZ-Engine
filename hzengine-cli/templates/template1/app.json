@@ -2,15 +2,15 @@
   "configVersion": "v3",
   "app": {
     "appId": 224091,
-    "appName": "HZEngine Demo",
+    "appName": "HZEngine Project",
     "appType": "app",
     "version": {
       "code": 1,
       "name": "1.0.0"
     },
     "icon": "icon.png",
-    "vender": "zepp",
-    "description": "empty application"
+    "vender": "CuberQAQ",
+    "description": "An template HZEngine project"
   },
   "permissions": ["data:os.device.info"],
   "runtime": {
@@ -43,7 +43,7 @@
   },
   "i18n": {
     "en-US": {
-      "appName": "HZEngine Demo"
+      "appName": "HZEngine Project"
     }
   },
   "defaultLanguage": "en-US"

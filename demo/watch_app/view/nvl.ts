@@ -3,13 +3,13 @@ import { getDeviceInfo, SCREEN_SHAPE_SQUARE } from "@zos/device";
 import { HZEngineCore, UI } from "hzengine-core";
 import { px } from "@zos/utils";
 import { Fx } from "../shared/fx.js";
-import path from "@cuberqaq/path-polyfill";
+
 const { width, height, screenShape } = getDeviceInfo();
 
 export { CustomSayView as SayView, FgImgView, BgImgView, MenuView };
 
 /**
- * 顯示對話文字的窗口
+ * 显示人物角色对话的view
  */
 class CustomSayView extends UI.MessageView {
   _fx: Fx | null = null;
@@ -23,14 +23,14 @@ class CustomSayView extends UI.MessageView {
     console.log(`SayView OnCreate who=${prop.who} what=${prop.what}`);
     this._what = prop.what;
     this._widgets = {
-      bg: this._widgetFactory.createWidget(hmUI.widget.FILL_RECT, {
+      bg: this._widgetFactory.createWidget(hmUI.widget.IMG, {
         x: (width - w) / 2,
         y: height / 2,
         w,
         h,
-        color: 0x555555,
-        radius: 5,
-        alpha: 128,
+        src: "raw/project/gui/say_bg.png",
+        auto_scale: true,
+        // alpha: 128, // only 3.0 support
       }),
       who_text: this._widgetFactory.createWidget(hmUI.widget.TEXT, {
         x: (width - w) / 2 + px(10),
@@ -54,7 +54,6 @@ class CustomSayView extends UI.MessageView {
         text_style: hmUI.text_style.WRAP,
       }),
     };
-
     this._widgets.bg.setEnable(false);
     this._widgets.who_text.setEnable(false);
     this._widgets.what_text.setEnable(false);
@@ -82,6 +81,7 @@ class CustomSayView extends UI.MessageView {
     hmUI.deleteWidget(this._widgets.what_text);
   }
   _buildAnim() {
+    // 打字机效果动画
     if (this._fx) this._fx.setEnable(false);
     this._fx = new Fx({
       begin: 0, // Initial value of function. 初始函数值
@@ -103,7 +103,7 @@ class CustomSayView extends UI.MessageView {
 }
 
 /**
- * 展示人物立绘的窗口
+ * 展示人物立绘的view
  */
 class FgImgView extends UI.FgImgView {
   _widget: any = null;
@@ -130,7 +130,7 @@ class FgImgView extends UI.FgImgView {
 }
 
 /**
- * 展示背景的窗口
+ * 展示背景图片、CG的view
  */
 class BgImgView extends UI.BgImgView {
   _widget: any = null;
@@ -179,6 +179,10 @@ class BgImgView extends UI.BgImgView {
   }
 }
 
+/**
+ * 展示选择菜单（用于分支选项）的view
+ * 
+ */
 class MenuView extends UI.MenuView {
   _widgetFactory = this.core.ui.getLayer(this.layer)!.widgetFactory;
   _buttonWidgetList: any[] | null = null;
