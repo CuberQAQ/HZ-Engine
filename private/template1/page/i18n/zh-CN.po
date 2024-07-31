@@ -1,0 +1,28 @@
+
+
+msgid "start_game"
+msgstr "开始游戏"
+
+msgid "load_archive"
+msgstr "读取存档"
+
+msgid "gallery"
+msgstr "鉴赏"
+
+msgid "settings"
+msgstr "设置"
+
+msgid "quick_menu"
+msgstr "快捷菜单"
+
+msgid "quick_save"
+msgstr "快速存档"
+
+msgid "quick_load"
+msgstr "快速读档"
+
+msgid "archive_page"
+msgstr "存档页面"
+
+msgid "continue_game"
+msgstr "继续游戏"

@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.global_gesture = void 0;
+exports.global_gesture = global_gesture;
 const ui_1 = __importDefault(require("@zos/ui"));
 const system_1 = require("../../system");
 function global_gesture(core) {
@@ -29,4 +29,3 @@ function global_gesture(core) {
         addTouchPad(layerInstance);
     });
 }
-exports.global_gesture = global_gesture;

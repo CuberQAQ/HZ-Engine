@@ -1,0 +1,10 @@
+{
+    "name": "template project",
+    "version": "1.0.0",
+    "author": "Unknown",
+    "description": "template project",
+
+    "hz": {
+        "version": "1.0.0"
+    }
+}

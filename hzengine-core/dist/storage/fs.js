@@ -26,7 +26,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.readFileAssetsSync = exports.writeFileAssetsSync = exports.isFileAssetsSync = exports.isFileDataSync = exports.readdirAssetsSync = void 0;
+exports.readdirAssetsSync = readdirAssetsSync;
+exports.isFileDataSync = isFileDataSync;
+exports.isFileAssetsSync = isFileAssetsSync;
+exports.writeFileAssetsSync = writeFileAssetsSync;
+exports.readFileAssetsSync = readFileAssetsSync;
 const hmApp = __importStar(require("@zos/app"));
 const hmFS = __importStar(require("@zos/fs"));
 const path_polyfill_1 = __importDefault(require("@cuberqaq/path-polyfill"));
@@ -56,7 +60,6 @@ function readdirAssetsSync(option) {
         path: fromDataToAssetsPath(option.path),
     });
 }
-exports.readdirAssetsSync = readdirAssetsSync;
 function isFileDataSync(option) {
     let code = hmFS.openSync({ path: option.path });
     if (code >= 0) {
@@ -67,7 +70,6 @@ function isFileDataSync(option) {
         return false;
     }
 }
-exports.isFileDataSync = isFileDataSync;
 function isFileAssetsSync(option) {
     // console.log("path=" + option.path);
     let code = hmFS.openAssetsSync({ path: option.path });
@@ -79,7 +81,6 @@ function isFileAssetsSync(option) {
         return false;
     }
 }
-exports.isFileAssetsSync = isFileAssetsSync;
 /**
  * 将基于assets的文件路径转换为基于data的文件路径
  */
@@ -104,7 +105,6 @@ function writeFileAssetsSync(opt) {
     hmFS.closeSync({ fd });
     return res;
 }
-exports.writeFileAssetsSync = writeFileAssetsSync;
 function readFileAssetsSync(opt) {
     // console.log("read path="+opt.path);
     let fd = hmFS.openAssetsSync({ path: opt.path, flag: hmFS.O_RDONLY });
@@ -122,4 +122,3 @@ function readFileAssetsSync(opt) {
         return arrbuf;
     }
 }
-exports.readFileAssetsSync = readFileAssetsSync;

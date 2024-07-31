@@ -1,6 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ArchiveStateSetterWithDeserializer = exports.ArchiveStateSetter = exports.ArchiveStateGetterWithSerializer = exports.ArchiveStateGetter = exports.ArchiveStateAccessorWithSerializer = exports.ArchiveStateAccessor = void 0;
+exports.ArchiveStateAccessor = ArchiveStateAccessor;
+exports.ArchiveStateAccessorWithSerializer = ArchiveStateAccessorWithSerializer;
+exports.ArchiveStateGetter = ArchiveStateGetter;
+exports.ArchiveStateGetterWithSerializer = ArchiveStateGetterWithSerializer;
+exports.ArchiveStateSetter = ArchiveStateSetter;
+exports.ArchiveStateSetterWithDeserializer = ArchiveStateSetterWithDeserializer;
 const async_1 = require("../async");
 /**
  * 存档属性装饰器
@@ -40,7 +45,6 @@ function ArchiveStateAccessor(store_key) {
         };
     };
 }
-exports.ArchiveStateAccessor = ArchiveStateAccessor;
 /**
  * 存档属性装饰器
  * @param store_key 保存数据到存档数据对象的key
@@ -79,7 +83,6 @@ function ArchiveStateAccessorWithSerializer(store_key, serializer, deserializer)
         };
     };
 }
-exports.ArchiveStateAccessorWithSerializer = ArchiveStateAccessorWithSerializer;
 function ArchiveStateGetter(store_key) {
     return (target, context) => {
         context.addInitializer(function () {
@@ -102,7 +105,6 @@ function ArchiveStateGetter(store_key) {
         };
     };
 }
-exports.ArchiveStateGetter = ArchiveStateGetter;
 function ArchiveStateGetterWithSerializer(store_key, serializer) {
     return (target, context) => {
         if (context.kind !== "getter") {
@@ -125,7 +127,6 @@ function ArchiveStateGetterWithSerializer(store_key, serializer) {
         };
     };
 }
-exports.ArchiveStateGetterWithSerializer = ArchiveStateGetterWithSerializer;
 /**
  * 存档属性装饰器
  * @param store_key 保存数据到存档数据对象的key
@@ -151,7 +152,6 @@ function ArchiveStateSetter(store_key) {
         };
     };
 }
-exports.ArchiveStateSetter = ArchiveStateSetter;
 function ArchiveStateSetterWithDeserializer(store_key, deserializer) {
     return (target, context) => {
         if (context.kind !== "setter") {
@@ -172,7 +172,6 @@ function ArchiveStateSetterWithDeserializer(store_key, deserializer) {
         };
     };
 }
-exports.ArchiveStateSetterWithDeserializer = ArchiveStateSetterWithDeserializer;
 /**
  * 存档属性装饰器
  * @param store_key 保存数据到存档数据对象的key

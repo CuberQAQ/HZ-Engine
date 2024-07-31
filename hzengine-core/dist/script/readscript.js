@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.readline = void 0;
+exports.readline = readline;
 const fs_1 = require("../storage/fs");
 let cache = new Map();
 function readline(path, line_index) {
@@ -16,4 +16,3 @@ function readline(path, line_index) {
     cache.set(path, file);
     return file[line_index];
 }
-exports.readline = readline;

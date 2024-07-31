@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.eval_module = void 0;
+exports.eval_module = eval_module;
 function eval_module(core) {
     // single line eval command
     // syntax: eval <code>
@@ -68,4 +68,3 @@ function eval_module(core) {
             return next();
     }, true);
 }
-exports.eval_module = eval_module;

@@ -1,4 +1,5 @@
 import { HZEngineCore, UI } from "../..";
+import { $_command } from "./$";
 import { basic_commands } from "./basic";
 import { character_command } from "./character";
 import { conditional } from "./conditional";
@@ -11,6 +12,7 @@ export function basic_command(core: HZEngineCore) {
   character_command(core)
   menu_statement(core)
   decorator_module(core)
+  $_command(core)
   eval_module(core)
   conditional(core)
 }

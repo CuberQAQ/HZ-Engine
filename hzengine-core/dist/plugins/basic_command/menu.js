@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.menu_statement = void 0;
+exports.menu_statement = menu_statement;
 function menu_statement(core) {
     // menu statement start
     core.script.use((ctx, next) => {
@@ -141,4 +141,3 @@ function menu_statement(core) {
         return { itemList: parsed_item_list };
     }
 }
-exports.menu_statement = menu_statement;

@@ -3,7 +3,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sayAction = exports.basic_commands = void 0;
+exports.basic_commands = basic_commands;
+exports.sayAction = sayAction;
 const ui_1 = __importDefault(require("@zos/ui"));
 function basic_commands(core) {
     // jump command
@@ -196,7 +197,6 @@ function basic_commands(core) {
             core.system.pause();
     });
 }
-exports.basic_commands = basic_commands;
 function sayAction(core, who, what) {
     const say_view_tag = "hzengine.say";
     const say_view_name = "say";
@@ -217,4 +217,3 @@ function sayAction(core, who, what) {
         router.update(message);
     }
 }
-exports.sayAction = sayAction;

@@ -15,13 +15,6 @@ var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (
 }) : function(o, v) {
     o["default"] = v;
 });
-var __runInitializers = (this && this.__runInitializers) || function (thisArg, initializers, value) {
-    var useValue = arguments.length > 2;
-    for (var i = 0; i < initializers.length; i++) {
-        value = useValue ? initializers[i].call(thisArg, value) : initializers[i].call(thisArg);
-    }
-    return useValue ? value : void 0;
-};
 var __esDecorate = (this && this.__esDecorate) || function (ctor, descriptorIn, decorators, contextIn, initializers, extraInitializers) {
     function accept(f) { if (f !== void 0 && typeof f !== "function") throw new TypeError("Function expected"); return f; }
     var kind = contextIn.kind, key = kind === "getter" ? "get" : kind === "setter" ? "set" : "value";
@@ -49,6 +42,13 @@ var __esDecorate = (this && this.__esDecorate) || function (ctor, descriptorIn, 
     if (target) Object.defineProperty(target, contextIn.name, descriptor);
     done = true;
 };
+var __runInitializers = (this && this.__runInitializers) || function (thisArg, initializers, value) {
+    var useValue = arguments.length > 2;
+    for (var i = 0; i < initializers.length; i++) {
+        value = useValue ? initializers[i].call(thisArg, value) : initializers[i].call(thisArg);
+    }
+    return useValue ? value : void 0;
+};
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
@@ -74,18 +74,21 @@ const decorator_1 = require("../storage/decorator");
 const hmUI = __importStar(require("@zos/ui"));
 let UI = (() => {
     var _a, _UI__layerList_accessor_storage, _UI__routerMap_accessor_storage;
-    let _instanceExtraInitializers = [];
     let __layerList_decorators;
     let __layerList_initializers = [];
+    let __layerList_extraInitializers = [];
     let __routerMap_decorators;
     let __routerMap_initializers = [];
+    let __routerMap_extraInitializers = [];
     return _a = class UI {
             constructor(_core) {
-                this._core = (__runInitializers(this, _instanceExtraInitializers), _core);
+                this._core = _core;
                 _UI__layerList_accessor_storage.set(this, __runInitializers(this, __layerList_initializers, new Map()));
                 // View
-                this._viewClassMap = new Map();
+                this._viewClassMap = (__runInitializers(this, __layerList_extraInitializers), new Map());
                 _UI__routerMap_accessor_storage.set(this, __runInitializers(this, __routerMap_initializers, new Map()));
+                __runInitializers(this, __routerMap_extraInitializers);
+                this._core = _core;
                 this.addLayer("bg", 1);
                 this.addLayer("fg", 2);
                 this.addLayer("ct", 3);
@@ -192,8 +195,8 @@ let UI = (() => {
                     }
                     return newRouterMap;
                 })];
-            __esDecorate(_a, null, __layerList_decorators, { kind: "accessor", name: "_layerList", static: false, private: false, access: { has: obj => "_layerList" in obj, get: obj => obj._layerList, set: (obj, value) => { obj._layerList = value; } }, metadata: _metadata }, __layerList_initializers, _instanceExtraInitializers);
-            __esDecorate(_a, null, __routerMap_decorators, { kind: "accessor", name: "_routerMap", static: false, private: false, access: { has: obj => "_routerMap" in obj, get: obj => obj._routerMap, set: (obj, value) => { obj._routerMap = value; } }, metadata: _metadata }, __routerMap_initializers, _instanceExtraInitializers);
+            __esDecorate(_a, null, __layerList_decorators, { kind: "accessor", name: "_layerList", static: false, private: false, access: { has: obj => "_layerList" in obj, get: obj => obj._layerList, set: (obj, value) => { obj._layerList = value; } }, metadata: _metadata }, __layerList_initializers, __layerList_extraInitializers);
+            __esDecorate(_a, null, __routerMap_decorators, { kind: "accessor", name: "_routerMap", static: false, private: false, access: { has: obj => "_routerMap" in obj, get: obj => obj._routerMap, set: (obj, value) => { obj._routerMap = value; } }, metadata: _metadata }, __routerMap_initializers, __routerMap_extraInitializers);
             if (_metadata) Object.defineProperty(_a, Symbol.metadata, { enumerable: true, configurable: true, writable: true, value: _metadata });
         })(),
         _a;

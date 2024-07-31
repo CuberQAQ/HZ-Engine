@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.conditional = void 0;
+exports.conditional = conditional;
 function conditional(core) {
     // if ... [elif] ... [else] ... end if
     // syntax:
@@ -261,4 +261,3 @@ function conditional(core) {
         ctx.statementStack.splice(resIndex + 1, ctx.statementStack.length - resIndex - 1);
     });
 }
-exports.conditional = conditional;

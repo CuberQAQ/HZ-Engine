@@ -18,18 +18,22 @@
   "license": "Apache-2.0",
   "dependencies": {
     "chalk": "^5.3.0",
+    "child_process": "^1.0.2",
     "clear": "^0.1.0",
     "commander": "^12.1.0",
     "configstore": "^7.0.0",
     "ejs": "^3.1.10",
+    "fflate": "^0.8.2",
     "figlet": "^1.7.0",
     "fs-extra": "^11.2.0",
-    "inquirer": "^10.1.2"
+    "inquirer": "^10.1.2",
+    "unzip": "^0.1.11"
   },
   "devDependencies": {
     "@types/clear": "^0.1.4",
     "@types/configstore": "^6.0.2",
     "@types/figlet": "^1.5.8",
-    "@types/fs-extra": "^11.0.4"
+    "@types/fs-extra": "^11.0.4",
+    "@types/unzip": "^0.1.4"
   }
 }

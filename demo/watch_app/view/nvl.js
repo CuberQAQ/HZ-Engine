@@ -1,8 +1,8 @@
 import * as hmUI from "@zos/ui";
 import { getDeviceInfo, SCREEN_SHAPE_SQUARE } from "@zos/device";
 import { UI } from "hzengine-core";
-import { px } from "@zos/utils";
 import { Fx } from "../shared/fx.js";
+import { px } from "../shared/dynamic_px.js";
 const { width, height, screenShape } = getDeviceInfo();
 export { CustomSayView as SayView, FgImgView, BgImgView, MenuView };
 /**

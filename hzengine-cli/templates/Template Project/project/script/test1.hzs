@@ -1,0 +1,41 @@
+*ciallo
+    # show girl hazukashii
+    girl "Ciallo～(∠・ω< )⌒★"
+    call cafe
+    return
+
+*cafe
+    show girl normal
+    girl "歡迎來到星光咖啡館！"
+    # show girl amazed
+    call menu_test
+    
+    return
+
+*menu_test
+    girl "你想喝點什麽呢"
+    menu
+    @"冰美式"
+        [REAL] show girl amazed
+        girl "美式？那種苦苦的東西難道真是給人喝的？！"
+    @"卡布奇诺"
+        [REAL] show girl kowai
+        girl "来，给阿姨倒一杯卡布奇诺"
+        [REAL] show girl amazed
+        girl "炸它！漂亮~"
+    @"酱香拿铁"
+        [REAL] show girl normal
+        girl "好嘞，拿铁加面硬加咸蔬菜加倍蒜末和油多多！！"
+    @"你"
+        [REAL] show girl kowai
+        girl "什麽？！你要..."
+        [REAL] show girl angry
+        girl "那是不可能的..."
+        [REAL] show girl hazukashii
+        girl "私の０７２１を見てください！"
+    @"还是不喝了"
+        [REAL] show girl normal
+        girl "好哒~欢迎下次光临~"
+        return
+    end menu
+    jump menu_test

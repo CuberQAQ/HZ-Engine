@@ -1,0 +1,10 @@
+{
+    "name": "Template Project",
+    "version": "1.0.0",
+    "author": "Unknown",
+    "description": "HZ Engine 0.1.0 Template Project",
+
+    "hz": {
+        "version": "1.0.0"
+    }
+}

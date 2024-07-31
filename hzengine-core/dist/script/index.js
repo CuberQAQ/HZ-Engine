@@ -1,11 +1,4 @@
 "use strict";
-var __runInitializers = (this && this.__runInitializers) || function (thisArg, initializers, value) {
-    var useValue = arguments.length > 2;
-    for (var i = 0; i < initializers.length; i++) {
-        value = useValue ? initializers[i].call(thisArg, value) : initializers[i].call(thisArg);
-    }
-    return useValue ? value : void 0;
-};
 var __esDecorate = (this && this.__esDecorate) || function (ctor, descriptorIn, decorators, contextIn, initializers, extraInitializers) {
     function accept(f) { if (f !== void 0 && typeof f !== "function") throw new TypeError("Function expected"); return f; }
     var kind = contextIn.kind, key = kind === "getter" ? "get" : kind === "setter" ? "set" : "value";
@@ -33,6 +26,13 @@ var __esDecorate = (this && this.__esDecorate) || function (ctor, descriptorIn, 
     if (target) Object.defineProperty(target, contextIn.name, descriptor);
     done = true;
 };
+var __runInitializers = (this && this.__runInitializers) || function (thisArg, initializers, value) {
+    var useValue = arguments.length > 2;
+    for (var i = 0; i < initializers.length; i++) {
+        value = useValue ? initializers[i].call(thisArg, value) : initializers[i].call(thisArg);
+    }
+    return useValue ? value : void 0;
+};
 var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {
     if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
@@ -51,21 +51,23 @@ const readscript_1 = require("./readscript");
 const decorator_1 = require("../storage/decorator");
 let Script = (() => {
     var _a, _Script__callStack_accessor_storage, _Script__statementStack_accessor_storage, _Script__nextRunPosition_accessor_storage;
-    let _instanceExtraInitializers = [];
     let __callStack_decorators;
     let __callStack_initializers = [];
+    let __callStack_extraInitializers = [];
     let __statementStack_decorators;
     let __statementStack_initializers = [];
+    let __statementStack_extraInitializers = [];
     let __nextRunPosition_decorators;
     let __nextRunPosition_initializers = [];
+    let __nextRunPosition_extraInitializers = [];
     return _a = class Script {
             constructor(_core) {
-                this._core = (__runInitializers(this, _instanceExtraInitializers), _core);
+                this._core = _core;
                 _Script__callStack_accessor_storage.set(this, __runInitializers(this, __callStack_initializers, []));
-                _Script__statementStack_accessor_storage.set(this, __runInitializers(this, __statementStack_initializers, []));
-                _Script__nextRunPosition_accessor_storage.set(this, __runInitializers(this, __nextRunPosition_initializers, null));
+                _Script__statementStack_accessor_storage.set(this, (__runInitializers(this, __callStack_extraInitializers), __runInitializers(this, __statementStack_initializers, [])));
+                _Script__nextRunPosition_accessor_storage.set(this, (__runInitializers(this, __statementStack_extraInitializers), __runInitializers(this, __nextRunPosition_initializers, null)));
                 // Middleware
-                this._middlewares = [];
+                this._middlewares = (__runInitializers(this, __nextRunPosition_extraInitializers), []);
                 // Statement Analyse
                 this._statementAnalyseStack = [];
                 this._analyseStatementMiddlewares = [];
@@ -350,9 +352,9 @@ let Script = (() => {
             __callStack_decorators = [(0, decorator_1.ArchiveStateAccessor)("script.callStack")];
             __statementStack_decorators = [(0, decorator_1.ArchiveStateAccessor)("script.statementStack")];
             __nextRunPosition_decorators = [(0, decorator_1.ArchiveStateAccessor)("script.nextRunPosition")];
-            __esDecorate(_a, null, __callStack_decorators, { kind: "accessor", name: "_callStack", static: false, private: false, access: { has: obj => "_callStack" in obj, get: obj => obj._callStack, set: (obj, value) => { obj._callStack = value; } }, metadata: _metadata }, __callStack_initializers, _instanceExtraInitializers);
-            __esDecorate(_a, null, __statementStack_decorators, { kind: "accessor", name: "_statementStack", static: false, private: false, access: { has: obj => "_statementStack" in obj, get: obj => obj._statementStack, set: (obj, value) => { obj._statementStack = value; } }, metadata: _metadata }, __statementStack_initializers, _instanceExtraInitializers);
-            __esDecorate(_a, null, __nextRunPosition_decorators, { kind: "accessor", name: "_nextRunPosition", static: false, private: false, access: { has: obj => "_nextRunPosition" in obj, get: obj => obj._nextRunPosition, set: (obj, value) => { obj._nextRunPosition = value; } }, metadata: _metadata }, __nextRunPosition_initializers, _instanceExtraInitializers);
+            __esDecorate(_a, null, __callStack_decorators, { kind: "accessor", name: "_callStack", static: false, private: false, access: { has: obj => "_callStack" in obj, get: obj => obj._callStack, set: (obj, value) => { obj._callStack = value; } }, metadata: _metadata }, __callStack_initializers, __callStack_extraInitializers);
+            __esDecorate(_a, null, __statementStack_decorators, { kind: "accessor", name: "_statementStack", static: false, private: false, access: { has: obj => "_statementStack" in obj, get: obj => obj._statementStack, set: (obj, value) => { obj._statementStack = value; } }, metadata: _metadata }, __statementStack_initializers, __statementStack_extraInitializers);
+            __esDecorate(_a, null, __nextRunPosition_decorators, { kind: "accessor", name: "_nextRunPosition", static: false, private: false, access: { has: obj => "_nextRunPosition" in obj, get: obj => obj._nextRunPosition, set: (obj, value) => { obj._nextRunPosition = value; } }, metadata: _metadata }, __nextRunPosition_initializers, __nextRunPosition_extraInitializers);
             if (_metadata) Object.defineProperty(_a, Symbol.metadata, { enumerable: true, configurable: true, writable: true, value: _metadata });
         })(),
         _a;

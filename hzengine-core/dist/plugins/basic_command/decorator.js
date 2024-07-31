@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.decorator_module = void 0;
+exports.decorator_module = decorator_module;
 const strtools_1 = require("../../script/strtools");
 function decorator_module(core) {
     core.script.use((ctx, next) => {
@@ -25,4 +25,3 @@ function decorator_module(core) {
         return next();
     }, true);
 }
-exports.decorator_module = decorator_module;

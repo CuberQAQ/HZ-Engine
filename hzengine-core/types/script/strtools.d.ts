@@ -5,8 +5,8 @@
  */
 export declare function splitStr2Objs(str: string): {
     str: string;
-    isQuoted?: boolean | undefined;
-    isSquared?: boolean | undefined;
+    isQuoted?: boolean;
+    isSquared?: boolean;
 }[];
 export declare function splitStr2Strs(str: string): string[];
 /**

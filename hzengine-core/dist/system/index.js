@@ -1,11 +1,4 @@
 "use strict";
-var __runInitializers = (this && this.__runInitializers) || function (thisArg, initializers, value) {
-    var useValue = arguments.length > 2;
-    for (var i = 0; i < initializers.length; i++) {
-        value = useValue ? initializers[i].call(thisArg, value) : initializers[i].call(thisArg);
-    }
-    return useValue ? value : void 0;
-};
 var __esDecorate = (this && this.__esDecorate) || function (ctor, descriptorIn, decorators, contextIn, initializers, extraInitializers) {
     function accept(f) { if (f !== void 0 && typeof f !== "function") throw new TypeError("Function expected"); return f; }
     var kind = contextIn.kind, key = kind === "getter" ? "get" : kind === "setter" ? "set" : "value";
@@ -33,6 +26,13 @@ var __esDecorate = (this && this.__esDecorate) || function (ctor, descriptorIn, 
     if (target) Object.defineProperty(target, contextIn.name, descriptor);
     done = true;
 };
+var __runInitializers = (this && this.__runInitializers) || function (thisArg, initializers, value) {
+    var useValue = arguments.length > 2;
+    for (var i = 0; i < initializers.length; i++) {
+        value = useValue ? initializers[i].call(thisArg, value) : initializers[i].call(thisArg);
+    }
+    return useValue ? value : void 0;
+};
 var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {
     if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
@@ -49,13 +49,15 @@ exports.System = void 0;
 const decorator_1 = require("../storage/decorator");
 let System = (() => {
     var _a, _System_condition_accessor_storage;
-    let _instanceExtraInitializers = [];
     let _condition_decorators;
     let _condition_initializers = [];
+    let _condition_extraInitializers = [];
     return _a = class System {
             constructor(_core) {
-                this._core = (__runInitializers(this, _instanceExtraInitializers), _core);
+                this._core = _core;
                 _System_condition_accessor_storage.set(this, __runInitializers(this, _condition_initializers, _a.Condition.Free));
+                __runInitializers(this, _condition_extraInitializers);
+                this._core = _core;
             }
             get condition() { return __classPrivateFieldGet(this, _System_condition_accessor_storage, "f"); }
             set condition(value) { __classPrivateFieldSet(this, _System_condition_accessor_storage, value, "f"); }
@@ -114,7 +116,7 @@ let System = (() => {
         (() => {
             const _metadata = typeof Symbol === "function" && Symbol.metadata ? Object.create(null) : void 0;
             _condition_decorators = [(0, decorator_1.ArchiveStateAccessor)("system.condition")];
-            __esDecorate(_a, null, _condition_decorators, { kind: "accessor", name: "condition", static: false, private: false, access: { has: obj => "condition" in obj, get: obj => obj.condition, set: (obj, value) => { obj.condition = value; } }, metadata: _metadata }, _condition_initializers, _instanceExtraInitializers);
+            __esDecorate(_a, null, _condition_decorators, { kind: "accessor", name: "condition", static: false, private: false, access: { has: obj => "condition" in obj, get: obj => obj.condition, set: (obj, value) => { obj.condition = value; } }, metadata: _metadata }, _condition_initializers, _condition_extraInitializers);
             if (_metadata) Object.defineProperty(_a, Symbol.metadata, { enumerable: true, configurable: true, writable: true, value: _metadata });
         })(),
         _a;

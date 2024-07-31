@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.character_command = void 0;
+exports.character_command = character_command;
 const basic_1 = require("./basic");
 function character_command(core) {
     // character command
@@ -98,4 +98,3 @@ function character_command(core) {
         return next();
     });
 }
-exports.character_command = character_command;

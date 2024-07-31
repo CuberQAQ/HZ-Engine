@@ -1,7 +1,8 @@
 import * as hmUI from "@zos/ui";
 import { getDeviceInfo } from "@zos/device";
 import { UI } from "hzengine-core";
-import { px } from "@zos/utils";
+import { px } from "../shared/dynamic_px.js";
+
 import { getText } from "@zos/i18n";
 const { width, height, screenShape } = getDeviceInfo();
 /**

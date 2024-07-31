@@ -1,6 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.parseInterpolatedStr = exports.transformStr = exports.splitStr2Strs = exports.splitStr2Objs = void 0;
+exports.splitStr2Objs = splitStr2Objs;
+exports.splitStr2Strs = splitStr2Strs;
+exports.transformStr = transformStr;
+exports.parseInterpolatedStr = parseInterpolatedStr;
 /**
  * 将一行字符串切割为(str,quoted)[]的形式
  * @param str
@@ -71,11 +74,9 @@ function splitStr2Objs(str) {
     }
     return res;
 }
-exports.splitStr2Objs = splitStr2Objs;
 function splitStr2Strs(str) {
     return splitStr2Objs(str).map((obj) => obj.isQuoted ? `"${obj.str}"` : obj.str);
 }
-exports.splitStr2Strs = splitStr2Strs;
 /**
  * 转义一遍字符串，使其中\n等变成对应字符（可能报错）
  * @param str
@@ -84,7 +85,6 @@ exports.splitStr2Strs = splitStr2Strs;
 function transformStr(str) {
     return JSON.parse(`"${str}"`);
 }
-exports.transformStr = transformStr;
 // 翻译hzengine script插值字符串
 // 语法："...[expression]..."
 // 如果希望在字符串中显示`[`，请使用两个`[`，如`"[[正常显示而不被当作表达式的文字]]"`
@@ -132,4 +132,3 @@ function parseInterpolatedStr(str) {
         res.push({ str: str.slice(left, right), isExpression: false });
     return res;
 }
-exports.parseInterpolatedStr = parseInterpolatedStr;

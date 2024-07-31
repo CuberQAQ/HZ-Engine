@@ -1,4 +1,3 @@
-/// <reference types="@zeppos/device-types" />
 import { HZEngineCore } from "..";
 export declare class Storage {
     private _core;
