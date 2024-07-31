@@ -15,6 +15,7 @@ declare class HZEngineCore {
     constructor();
     loadProject(projectPath: string): void;
     start(callback?: () => unknown): void;
+    end(): void;
     loadPlugin(name: string, plugin: Plugin): void;
     on(event: string, cb: Function): void;
     off(event: string, cb: Function): boolean;

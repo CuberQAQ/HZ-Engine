@@ -73,17 +73,17 @@ program
         fs.copySync(templatePath, projectPath);
         console.log(chalk.greenBright(`Project ${project_name} created!`));
         // 安装依赖
-        console.log(chalk.greenBright(`Installing dependencies...`));
-        npmInstall(projectPath)
-          .then(() => {
-            console.log(chalk.greenBright(`Dependencies installed!`));
-            console.log(chalk.greenBright(`Project ${project_name} created!`));
-          })
-          .catch((error) => {
-            program.error(
-              chalk.redBright(`Failed to install dependencies: \n${error}`)
-            );
-          });
+        // console.log(chalk.greenBright(`Installing dependencies...`));
+        // npmInstall(projectPath)
+        //   .then(() => {
+        //     console.log(chalk.greenBright(`Dependencies installed!`));
+        //     console.log(chalk.greenBright(`Project ${project_name} created!`));
+        //   })
+        //   .catch((error) => {
+        //     program.error(
+        //       chalk.redBright(`Failed to install dependencies: \n${error}`)
+        //     );
+        //   });
       });
   });
 
@@ -120,10 +120,15 @@ program
       path.join(process.cwd(), "build", ".cache", "converted")
     );
 
+
+    let project_info = readHzProject(process.cwd());
+    let zip_file_name = `${project_info.name}-${project_info.version}-${Date.now()}.zip`;
+
+
     // build launcher
     packApp(
       path.join(process.cwd(), "build", ".cache", "converted"),
-      path.join(process.cwd(), "build", "game-zeppos-device.zip")
+      path.join(process.cwd(), "build", zip_file_name)
     );
 
     // delete converted image

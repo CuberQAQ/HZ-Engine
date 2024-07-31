@@ -42,7 +42,29 @@ class HZEngineCore {
             this.ui.getRouter("page").push("title", {
                 title,
             });
+            // this.on("gameEnd", () => {
+            //   let router = this.ui.getRouter("page")!;
+            //   if (router.length > 0) return;
+            //   router.push("title", {
+            //     title,
+            //   });
+            // });
             callback === null || callback === void 0 ? void 0 : callback();
+        });
+    }
+    end() {
+        var _a;
+        console.log("[HZEngine] Game End, return to title");
+        let title = (_a = this.storage.packageData) === null || _a === void 0 ? void 0 : _a.name;
+        if (title == null) {
+            throw `[HZEngine] project name is null, please loadProject first or check your project.json format`;
+        }
+        this.system.condition = system_1.System.Condition.Free;
+        this.ui.resetUI();
+        if (this.ui.getRouter("page").length > 0)
+            return;
+        this.ui.getRouter("page").push("title", {
+            title,
         });
     }
     // Load Plugin

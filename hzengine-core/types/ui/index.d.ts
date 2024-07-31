@@ -3,6 +3,9 @@ import { Storage } from "../storage/index";
 export declare class UI {
     _core: HZEngineCore;
     constructor(_core: HZEngineCore);
+    private _initUI;
+    private _cleanUI;
+    resetUI(): void;
     private accessor _layerList;
     get layerList(): Map<string, UI.Layer>;
     addLayer(name: string, z_index: number): void;

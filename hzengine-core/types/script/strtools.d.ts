@@ -16,6 +16,7 @@ export declare function splitStr2Strs(str: string): string[];
  */
 export declare function transformStr(str: string): any;
 export declare function parseInterpolatedStr(str: string): ParsedInterpolationItem[];
+export declare function removeComment(str: string): string;
 type ParsedInterpolationItem = {
     str: string;
     isExpression: boolean;

@@ -6,11 +6,28 @@ import * as hmUI from "@zos/ui";
 import {} from "@zos/ui";
 export class UI {
   constructor(public _core: HZEngineCore) {
+    this._initUI()
+  }
+
+  private _initUI() {
     this.addLayer("bg", 1);
     this.addLayer("fg", 2);
     this.addLayer("ct", 3);
     this.addLayer("overlay", 4);
     this.addRouter("page", "overlay", false);
+  }
+
+  private _cleanUI() {
+    for (let [key, value] of this.layerList) {
+      value.destroy();
+    }
+    this.layerList.clear();
+    this._routerMap.clear();
+  }
+
+  resetUI() {
+    this._cleanUI();
+    this._initUI();
   }
 
   // Layer

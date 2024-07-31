@@ -5,7 +5,7 @@ import * as hmApp from "@zos/app";
 import path from "@cuberqaq/path-polyfill";
 import { HzsInfo, Storage } from "../storage";
 import { readFileAssetsSync } from "../storage/fs";
-import { parseInterpolatedStr, splitStr2Objs } from "./strtools";
+import { parseInterpolatedStr, removeComment, splitStr2Objs } from "./strtools";
 import { readline } from "./readscript";
 import { ArchiveStateAccessor } from "../storage/decorator";
 export class Script {
@@ -19,7 +19,6 @@ export class Script {
     position: [path: string, index: number] | null;
     statementStack: Script.StatementStack;
   }[] = [];
-  
 
   /**
    * 语句栈
@@ -33,7 +32,8 @@ export class Script {
    * 注意：存储该值的时候应总是拷贝赋值而非直接引用赋值
    */
   @ArchiveStateAccessor("script.nextRunPosition")
-  private accessor _nextRunPosition: [path: string, index: number] | null = null;
+  private accessor _nextRunPosition: [path: string, index: number] | null =
+    null;
 
   // Script Run
 
@@ -41,13 +41,22 @@ export class Script {
    * 执行_nextRunPosition，并返回下一行_nextRunPosition是否不为null
    */
   runSingleLine(): boolean {
-    if (!this._nextRunPosition) throw "Run but _nextPosition is null";
+    if (!this._nextRunPosition) {
+      // 文件尾隐式执行 return
+      this.return();
+      return false;
+    }
     let nowRunPosition: [path: string, index: number] = [
       ...this._nextRunPosition,
     ];
     this.incrementNextPosition();
 
     let rawCommand = readline(nowRunPosition[0], nowRunPosition[1])!;
+    
+    // remove comment
+
+    rawCommand = removeComment(rawCommand);
+
     if (rawCommand.trim().length && !rawCommand.trim().startsWith("#")) {
       if (rawCommand.trim().startsWith("*")) {
         if (this._statementStack.length) {
@@ -112,7 +121,6 @@ export class Script {
 
   return() {
     // console.log(`pending to return, stack=${JSON.stringify(this._routeStack)}`);
-
     let stackItem = this._callStack.pop();
     if (stackItem) {
       this._statementStack = stackItem.statementStack;
@@ -120,6 +128,9 @@ export class Script {
     } else {
       this._nextRunPosition = null;
       this._statementStack = [];
+
+      // Game End
+      this._core.end();
     }
 
     // console.log(`finished return, stack=${JSON.stringify(this._routeStack)}`);
@@ -129,7 +140,6 @@ export class Script {
     this._nextRunPosition = null;
     this._callStack = [];
   }
-
 
   private _locateLabel(labelName: string) {
     if (this._core.storage.preloadedData == null)
@@ -422,7 +432,9 @@ export namespace Script {
         throw `the last statement in the stack is not ${identifier}, at file [${
           this.currentPath
         }] line [${this.currentLineIndex + 1}]`;
-      return this._statementStack.pop()![2] as NonNullable<Storage.Saveable<unknown>>;
+      return this._statementStack.pop()![2] as NonNullable<
+        Storage.Saveable<unknown>
+      >;
     }
     get statementStack() {
       return this._statementStack;
@@ -440,7 +452,7 @@ export namespace Script {
         "statement_data",
         this.currentPath
       ) as Record<string, NonNullable<Storage.Saveable<unknown>>>;
-      if (!statement_data_in_file[""+this.currentLineIndex]) {
+      if (!statement_data_in_file["" + this.currentLineIndex]) {
         this._core.script.analyseStatement(this);
         statement_data_in_file = this._core.storage.getSaveableData(
           this._core.storage.globalData,
@@ -469,7 +481,7 @@ export namespace Script {
         "statement_data",
         start_position[0]
       ) as Record<string, NonNullable<Storage.Saveable<unknown>>>;
-      statement_data_in_file[""+start_position[1]] = statement_data;
+      statement_data_in_file["" + start_position[1]] = statement_data;
       this._core.storage.saveGlobalData();
     }
   }
@@ -494,7 +506,7 @@ export namespace Script {
         "statement_data",
         this.currentPath
       ) as Record<string, NonNullable<Storage.Saveable<unknown>>>;
-      statement_data_in_file[""+this.currentLineIndex] = statement_data;
+      statement_data_in_file["" + this.currentLineIndex] = statement_data;
       this._core.storage.saveGlobalData();
       return statement_data;
     }
@@ -515,4 +527,3 @@ export namespace Script {
   export type StatementStack = StatementStackItem[];
   export type StatementData = NonNullable<Storage.JSONValue>;
 }
-

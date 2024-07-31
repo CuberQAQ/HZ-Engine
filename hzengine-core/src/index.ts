@@ -1,6 +1,6 @@
 /**
  * HZEngineCore
- * @copyright Copyright (c) 2024 CuberQAQ. All rights reserved. 
+ * @copyright Copyright (c) 2024 CuberQAQ. All rights reserved.
  */
 
 import { Async } from "./async";
@@ -36,7 +36,33 @@ class HZEngineCore {
       this.ui.getRouter("page")!.push("title", {
         title,
       });
+
+      // this.on("gameEnd", () => {
+      //   let router = this.ui.getRouter("page")!;
+      //   if (router.length > 0) return;
+      //   router.push("title", {
+      //     title,
+      //   });
+      // });
       callback?.();
+    });
+  }
+
+  end() {
+    console.log("[HZEngine] Game End, return to title");
+    
+    let title = this.storage.packageData?.name;
+    if (title == null) {
+      throw `[HZEngine] project name is null, please loadProject first or check your project.json format`;
+    }
+
+    this.system.condition = System.Condition.Free
+
+    this.ui.resetUI()
+
+    if(this.ui.getRouter("page")!.length > 0) return;
+    this.ui.getRouter("page")!.push("title", {
+      title,
     });
   }
 

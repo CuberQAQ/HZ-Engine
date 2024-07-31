@@ -97,10 +97,9 @@ let System = (() => {
             }
             run() {
                 this.condition = _a.Condition.Gaming;
-                let isRunnable = true;
-                while (isRunnable && this.condition === _a.Condition.Gaming) {
+                while (this.condition === _a.Condition.Gaming) {
                     // console.log("Run Single Line");
-                    isRunnable = this._core.script.runSingleLine();
+                    this._core.script.runSingleLine();
                 }
             }
             start(initLabel = "start") {

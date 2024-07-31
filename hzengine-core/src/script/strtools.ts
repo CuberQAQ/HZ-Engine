@@ -38,13 +38,6 @@ export function splitStr2Objs(str: string) {
       }
       if (q >= len) throw "square brackets not completed";
       let resstr = str.slice(p + 1, q);
-      //   console.log(`Transformed[${res.length}]:\n${transformStr(resstr)}`);
-      // let transformedStr;
-      // try {
-      //   transformedStr = transformStr(resstr);
-      // } catch (e) {
-      //   throw "该字符串中的转义字符有错误：" + resstr;
-      // }
       res.push({ str: resstr, isSquared: true });
       p = q + 1;
     } else {
@@ -117,6 +110,23 @@ export function parseInterpolatedStr(str: string): ParsedInterpolationItem[] {
   if(left < right) res.push({ str: str.slice(left, right), isExpression: false });
   return res
 
+}
+
+export function removeComment(str: string) {
+  let quoteNotClosed = false
+  let len = str.length
+  for(let i = 0; i < len; ++i) {
+    if(quoteNotClosed && str[i] === `\\`) {
+      ++i
+    }
+    else if(str[i] === `"`) {
+      quoteNotClosed = !quoteNotClosed
+    }
+    else if(str[i] === '#' && !quoteNotClosed) {
+      return str.slice(0, i)
+    }
+  }
+  return str
 }
 
 type ParsedInterpolationItem = {

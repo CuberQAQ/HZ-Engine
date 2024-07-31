@@ -95,13 +95,18 @@ let Script = (() => {
              * 执行_nextRunPosition，并返回下一行_nextRunPosition是否不为null
              */
             runSingleLine() {
-                if (!this._nextRunPosition)
-                    throw "Run but _nextPosition is null";
+                if (!this._nextRunPosition) {
+                    // 文件尾隐式执行 return
+                    this.return();
+                    return false;
+                }
                 let nowRunPosition = [
                     ...this._nextRunPosition,
                 ];
                 this.incrementNextPosition();
                 let rawCommand = (0, readscript_1.readline)(nowRunPosition[0], nowRunPosition[1]);
+                // remove comment
+                rawCommand = (0, strtools_1.removeComment)(rawCommand);
                 if (rawCommand.trim().length && !rawCommand.trim().startsWith("#")) {
                     if (rawCommand.trim().startsWith("*")) {
                         if (this._statementStack.length) {
@@ -166,6 +171,8 @@ let Script = (() => {
                 else {
                     this._nextRunPosition = null;
                     this._statementStack = [];
+                    // Game End
+                    this._core.end();
                 }
                 // console.log(`finished return, stack=${JSON.stringify(this._routeStack)}`);
             }

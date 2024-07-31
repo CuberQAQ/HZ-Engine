@@ -120,6 +120,9 @@ export function imageConvert(src_path, dst_path) {
     }
   }
   
+  // fill empty folder to unziped workspace
+  fillEmptyProjectFolder(path.join(__dirname, "zeus-project", "dist", "unzip", "device", "unzip", "assets", "workspace"));
+
   // copy workspace to dst
   fs.copySync(
     path.join(__dirname, "zeus-project", "dist", "unzip", "device", "unzip", "assets", "workspace"),
@@ -140,3 +143,15 @@ export function imageConvert(src_path, dst_path) {
 //   "D:\\Something\\WatchDev\\HZ-Engine\\demo\\watch_app\\assets\\raw\\project",
 //   "./test_convert"
 // );
+
+/**
+ * 因為zeus build會清空空文件夾，要創建回去一些必要的文件夾
+ * @param {*} dir 
+ */
+function fillEmptyProjectFolder(dir) {
+  fs.mkdirSync(path.join(dir, "image"), {recursive: true})
+  fs.mkdirSync(path.join(dir, "script"), {recursive: true})
+  fs.mkdirSync(path.join(dir, "animation"), {recursive: true})
+  fs.mkdirSync(path.join(dir, "gui"), {recursive: true})
+  fs.mkdirSync(path.join(dir, "audio"), {recursive: true})
+}

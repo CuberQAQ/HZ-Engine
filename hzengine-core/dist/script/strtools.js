@@ -4,6 +4,7 @@ exports.splitStr2Objs = splitStr2Objs;
 exports.splitStr2Strs = splitStr2Strs;
 exports.transformStr = transformStr;
 exports.parseInterpolatedStr = parseInterpolatedStr;
+exports.removeComment = removeComment;
 /**
  * 将一行字符串切割为(str,quoted)[]的形式
  * @param str
@@ -52,13 +53,6 @@ function splitStr2Objs(str) {
             if (q >= len)
                 throw "square brackets not completed";
             let resstr = str.slice(p + 1, q);
-            //   console.log(`Transformed[${res.length}]:\n${transformStr(resstr)}`);
-            // let transformedStr;
-            // try {
-            //   transformedStr = transformStr(resstr);
-            // } catch (e) {
-            //   throw "该字符串中的转义字符有错误：" + resstr;
-            // }
             res.push({ str: resstr, isSquared: true });
             p = q + 1;
         }
@@ -131,4 +125,20 @@ function parseInterpolatedStr(str) {
     if (left < right)
         res.push({ str: str.slice(left, right), isExpression: false });
     return res;
+}
+function removeComment(str) {
+    let quoteNotClosed = false;
+    let len = str.length;
+    for (let i = 0; i < len; ++i) {
+        if (quoteNotClosed && str[i] === `\\`) {
+            ++i;
+        }
+        else if (str[i] === `"`) {
+            quoteNotClosed = !quoteNotClosed;
+        }
+        else if (str[i] === '#' && !quoteNotClosed) {
+            return str.slice(0, i);
+        }
+    }
+    return str;
 }

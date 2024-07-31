@@ -42,10 +42,9 @@ export class System {
 
   run() {
     this.condition = System.Condition.Gaming;
-    let isRunnable = true;
-    while (isRunnable && this.condition === System.Condition.Gaming) {
+    while (this.condition === System.Condition.Gaming) {
       // console.log("Run Single Line");
-      isRunnable = this._core.script.runSingleLine();
+      this._core.script.runSingleLine();
     }
   }
 

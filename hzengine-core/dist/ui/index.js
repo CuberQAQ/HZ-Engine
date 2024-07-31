@@ -89,11 +89,25 @@ let UI = (() => {
                 _UI__routerMap_accessor_storage.set(this, __runInitializers(this, __routerMap_initializers, new Map()));
                 __runInitializers(this, __routerMap_extraInitializers);
                 this._core = _core;
+                this._initUI();
+            }
+            _initUI() {
                 this.addLayer("bg", 1);
                 this.addLayer("fg", 2);
                 this.addLayer("ct", 3);
                 this.addLayer("overlay", 4);
                 this.addRouter("page", "overlay", false);
+            }
+            _cleanUI() {
+                for (let [key, value] of this.layerList) {
+                    value.destroy();
+                }
+                this.layerList.clear();
+                this._routerMap.clear();
+            }
+            resetUI() {
+                this._cleanUI();
+                this._initUI();
             }
             // Layer
             get _layerList() { return __classPrivateFieldGet(this, _UI__layerList_accessor_storage, "f"); }
