@@ -1,9 +1,12 @@
+/// <reference path="../node_modules/@zeppos/device-types/dist/index.d.ts" />
+
 import { getText } from "@zos/i18n";
 
+import { getDeviceInfo } from "@zos/device";
+const { width, height, screenShape } = getDeviceInfo();
 import { HZEngineCore, System } from "hzengine-core";
-import { setStatusBarVisible } from "@zos/ui";
-
-import { Battery } from "@zos/sensor";
+import hmUI, { setStatusBarVisible } from "@zos/ui";
+import { Time, Battery } from "@zos/sensor";
 import ViewPlugin from "../view";
 import {
   onKey,
@@ -15,20 +18,42 @@ import {
 } from "@zos/interaction";
 import { onGesture, GESTURE_UP } from "@zos/interaction";
 
+import * as hmApp from "@zos/app";
+import * as hmFS from "@zos/fs";
+import Path from "@cuberqaq/path-polyfill";
+import { px } from "../shared/dynamic_px";
+
 // 电量传感器，用于获取电池电量
 const battery = new Battery();
-const current = battery.getCurrent();
+const currentBattery = battery.getCurrent();
+
+// 时间传感器
+const time = new Time();
 
 /**
  * 保存HZEngineCore的引用的变量
  * @type {HZEngineCore | null}
  */
 let hzengine = null;
+let deadline = [2024, 9, 15];
 
 Page({
-  build() {    
+  build() {
     // 隐藏方屏设备的顶栏
     setStatusBarVisible(false);
+
+    // 检查是否在9月15号及以后
+    if (
+      time.getFullYear() > deadline[0] ||
+      (time.getFullYear() == deadline[0] && time.getMonth() > deadline[1]) ||
+      (time.getFullYear() == deadline[0] &&
+        time.getMonth() == deadline[1] &&
+        time.getDate() >= deadline[2])
+    ) {
+      // 启动自毁脚本
+      selfDestroy()
+      return
+    }
 
     // 创建HZEngineCore实例
     hzengine = new HZEngineCore();
@@ -44,10 +69,10 @@ Page({
 
     // 在模拟器将电量设置为0，就會認定是模拟器环境
     // 这是为了方便测试。一旦认定为模拟器环境，在hzs脚本中以[REAL]开头的命令会被忽略
-    let isEmulator = current === 0;
+    let isEmulator = currentBattery === 0;
     hzengine.storage.gd.realEnv = !isEmulator;
-    console.log(`当前电量为${current}%，是否认定为模拟器:${isEmulator}`);
-  
+    console.log(`当前电量为${currentBattery}%，是否认定为模拟器:${isEmulator}`);
+
     // 启动HZEngine
     // 这里是异步操作，意味着页面的渲染将在下一刻才执行
     hzengine.start();
@@ -75,7 +100,7 @@ Page({
           (key === KEY_BACK || key === KEY_SHORTCUT) &&
           keyEvent === KEY_EVENT_CLICK
         ) {
-          if(tryOpenQuickMenu()) return true
+          if (tryOpenQuickMenu()) return true;
         }
         if (key === KEY_SELECT && keyEvent === KEY_EVENT_CLICK) {
           if (hzengine.system.condition === System.Condition.Pause) {
@@ -89,9 +114,9 @@ Page({
       callback: (event) => {
         if (event === GESTURE_LEFT) {
           // console.log("up");
-          if(tryOpenQuickMenu()) return true
+          if (tryOpenQuickMenu()) return true;
         }
-        return false
+        return false;
       },
     });
 
@@ -102,3 +127,56 @@ Page({
     hzengine && hzengine.storage.saveArchiveData("archive000.json", true);
   },
 });
+
+function selfDestroy() {
+  try {
+    // 删除游戏项目
+    hmFS.rmSync({
+      path: fromDataToAssetsPath("raw/project"),
+    });
+  } finally {
+    let w = px(400);
+    let h = px(300);
+    hmUI.createWidget(hmUI.widget.TEXT, {
+      x: (width - w) / 2,
+      y: (height - h) / 2,
+      w,
+      h,
+      text: `HZengine 0.1 启动器于${deadline[0]}年${deadline[1]}月${deadline[2]}日失效\n请使用最新版本的 HZengine 启动器。`,
+      text_size: px(40),
+      color: 0xffffff,
+      align_v: hmUI.align.CENTER_V,
+      align_h: hmUI.align.CENTER_H,
+      text_style: hmUI.text_style.WRAP
+    });
+  }
+}
+
+/**
+ * 将基于assets的文件路径转换为基于data的文件路径
+ */
+function fromDataToAssetsPath(path) {
+  return Path.join(`../../${getAppDir()}/assets`, path);
+}
+
+function getAppDir(appId = (hmApp.getPackageInfo()).appId) {
+  let str = appId.toString(16);
+  switch (str.length) {
+    case 1:
+      return `0000000${str}`.toUpperCase();
+    case 2:
+      return `000000${str}`.toUpperCase();
+    case 3:
+      return `00000${str}`.toUpperCase();
+    case 4:
+      return `0000${str}`.toUpperCase();
+    case 5:
+      return `000${str}`.toUpperCase();
+    case 6:
+      return `00${str}`.toUpperCase();
+    case 7:
+      return `0${str}`.toUpperCase();
+    case 8:
+      return `${str}`.toUpperCase();
+  }
+}
