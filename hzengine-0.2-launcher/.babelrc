@@ -1,0 +1,8 @@
+{
+  "presets": [
+    [
+      "solid",
+      { "moduleName": "@cuberqaq/asuka-solid", "generate": "universal" }
+    ]
+  ]
+}

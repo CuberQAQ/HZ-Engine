@@ -1,0 +1,27 @@
+{
+  "name": "empty",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "tsc --watch"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@rollup/plugin-babel": "^6.0.4",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@zeppos/device-types": "^3.0.0",
+    "babel-preset-solid": "^1.8.19",
+    "rollup-plugin-typescript2": "^0.36.0",
+    "tslib": "^2.6.3"
+  },
+  "dependencies": {
+    "@cuberqaq/asuka-solid": "^1.0.1",
+    "@cuberqaq/asuka-ui": "^1.0.1",
+    "@zeppos/zml": "^0.0.29",
+    "hzengine-core": "file:../hzengine-core"
+  }
+}

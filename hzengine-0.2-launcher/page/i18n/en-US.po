@@ -1,0 +1,47 @@
+msgid "example"
+msgstr "This is an example in device"
+
+msgid "start_game"
+msgstr "Start Game"
+
+msgid "load_archive"
+msgstr "Load Archive"
+
+msgid "gallery"
+msgstr "Gallery"
+
+msgid "settings"
+msgstr "Settings"
+
+msgid "quick_menu"
+msgstr "Quick Menu"
+
+msgid "quick_save"
+msgstr "Quick Save"
+
+msgid "quick_load"
+msgstr "Quick Load"
+
+msgid "archive_page"
+msgstr "Archive Page"
+
+msgid "continue_game"
+msgstr "Continue Game"
+
+msgid "home.button_list.text"
+msgstr "Projects List"
+
+msgid "home.button_transfer.text"
+msgstr "Project Transfer"
+
+msgid "home.button_settings.text"
+msgstr "Settings"
+
+msgid "urls.project_list"
+msgstr "page/project_list"
+
+msgid "urls.settings"
+msgstr "page/settings"
+
+msgid "urls.transfer"
+msgstr "page/transfer"

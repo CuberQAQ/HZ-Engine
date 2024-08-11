@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "module": "ES6",
+    "moduleResolution": "Node10",
+    "checkJs": true,
+    "jsx": "preserve",
+    "jsxImportSource": "@cuberqaq/asuka-solid"
+  },
+  "exclude": ["node_modules", "**/node_modules/*"],
+  "files": ["node_modules/@zeppos/device-types/dist/index.d.ts"]
+}

@@ -1,4 +1,5 @@
-import path from "@cuberqaq/path-polyfill";
+// import path from "@cuberqaq/path-polyfill";\
+import path from 'path'
 import fs from "fs-extra";
 
 export function isHzProject(root_dir) {

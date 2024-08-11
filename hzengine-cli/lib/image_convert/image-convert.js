@@ -10,11 +10,14 @@ let __filename = fileURLToPath(import.meta.url);
 let __dirname = path.dirname(__filename);
 // child_process.execSync("zeus build", {cwd: path.join(__dirname, "zeus-project")})
 
-export function imageConvert(src_path, dst_path) {
+export function imageConvert(src_path, dst_path, tmp_path) {
+  // copy zeus-project to tmp folder
+  fs.removeSync(tmp_path);
+  fs.mkdirSync(tmp_path);
+  fs.copySync(path.join(__dirname, "zeus-project"), tmp_path);
   // clean workspace
   let workspace_path = path.join(
-    __dirname,
-    "zeus-project",
+    tmp_path,
     "assets",
     "nxp",
     "workspace"
@@ -29,17 +32,18 @@ export function imageConvert(src_path, dst_path) {
   // convert (build zeus project)
   console.log(chalk.greenBright("Converting image..."));
   child_process.execSync("zeus build", {
-    cwd: path.join(__dirname, "zeus-project"),
+    cwd: tmp_path,
+    stdio: "inherit",
   });
 
   // unzip zpk
   let zpk_name = fs.readdirSync(
-    path.join(__dirname, "zeus-project", "dist")
+    path.join(tmp_path, "dist")
   )[0];
-  let zpk_path = path.join(__dirname, "zeus-project", "dist", zpk_name);
+  let zpk_path = path.join(tmp_path, "dist", zpk_name);
   let zpk = fs.readFileSync(zpk_path);
   let unziped = fflate.unzipSync(zpk);
-  let unzip_path = path.join(__dirname, "zeus-project", "dist", "unzip");
+  let unzip_path = path.join(tmp_path, "dist", "unzip");
   for (let file in unziped) {
     fs.mkdirSync(path.join(unzip_path, path.dirname(file)), {
       recursive: true,
@@ -51,11 +55,10 @@ export function imageConvert(src_path, dst_path) {
 
   // unzip xx.zpk
   let device_zip_name = fs
-    .readdirSync(path.join(__dirname, "zeus-project", "dist", "unzip"))
+    .readdirSync(path.join(tmp_path, "dist", "unzip"))
     .find((name) => name.endsWith(".zpk"));
   let device_zip_path = path.join(
-    __dirname,
-    "zeus-project",
+    tmp_path,
     "dist",
     "unzip",
     device_zip_name
@@ -63,8 +66,7 @@ export function imageConvert(src_path, dst_path) {
   let device_zip = fs.readFileSync(device_zip_path);
   let unzip_device = fflate.unzipSync(device_zip);
   let unzip_device_path = path.join(
-    __dirname,
-    "zeus-project",
+    tmp_path,
     "dist",
     "unzip",
     "device"
@@ -82,12 +84,11 @@ export function imageConvert(src_path, dst_path) {
   {
     let device_name = fs
       .readdirSync(
-        path.join(__dirname, "zeus-project", "dist", "unzip", "device")
+        path.join(tmp_path, "dist", "unzip", "device")
       )
       .find((name) => name.endsWith("device.zip"));
     let device_path = path.join(
-      __dirname,
-      "zeus-project",
+      tmp_path,
       "dist",
       "unzip",
       "device",
@@ -96,8 +97,7 @@ export function imageConvert(src_path, dst_path) {
     let device = fs.readFileSync(device_path);
     let unzip_device = fflate.unzipSync(device);
     let unzip_device_path = path.join(
-      __dirname,
-      "zeus-project",
+      tmp_path,
       "dist",
       "unzip",
       "device",
@@ -121,11 +121,11 @@ export function imageConvert(src_path, dst_path) {
   }
   
   // fill empty folder to unziped workspace
-  fillEmptyProjectFolder(path.join(__dirname, "zeus-project", "dist", "unzip", "device", "unzip", "assets", "workspace"));
+  fillEmptyProjectFolder(path.join(tmp_path, "dist", "unzip", "device", "unzip", "assets", "workspace"));
 
   // copy workspace to dst
   fs.copySync(
-    path.join(__dirname, "zeus-project", "dist", "unzip", "device", "unzip", "assets", "workspace"),
+    path.join(tmp_path, "dist", "unzip", "device", "unzip", "assets", "workspace"),
     dst_path
   );
 
@@ -134,6 +134,9 @@ export function imageConvert(src_path, dst_path) {
 
   // delete workspace
   fs.removeSync(path.join(__dirname, "zeus-project", "assets", "nxp", "workspace"));
+
+  // delete tmp
+  fs.removeSync(tmp_path);
 
   console.log(chalk.greenBright("Image converted!"));
 

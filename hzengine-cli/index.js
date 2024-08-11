@@ -14,7 +14,7 @@ import { isHzProject, readHzProject } from "./lib/hzproject.js";
 import { imageConvert } from "./lib/image_convert/image-convert.js";
 import { packApp } from "./lib/pack_app/pack_app.js";
 import { buildHzpk_v1 } from "./lib/hzpk-1.0.0.js";
-const version = "1.0.0";
+const version = "0.1.5-dev";
 
 program
   .name("hzengine-cli")
@@ -117,7 +117,8 @@ program
     });
     imageConvert(
       path.join(process.cwd(), "project"),
-      path.join(process.cwd(), "build", ".cache", "converted")
+      path.join(process.cwd(), "build", ".cache", "converted"),
+      path.join(process.cwd(), "build", ".cache", "converting")
     );
 
 
