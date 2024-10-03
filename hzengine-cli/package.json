@@ -1,6 +1,6 @@
 {
   "name": "hzengine-cli",
-  "version": "0.1.6-dev",
+  "version": "0.2.0-beta",
   "description": "HZ-Engine CLI",
   "type": "module",
   "bin": {
