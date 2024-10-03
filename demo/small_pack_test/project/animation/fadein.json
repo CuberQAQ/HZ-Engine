@@ -1,0 +1,10 @@
+[
+  {
+    "value": { "alpha": 0 }
+  },
+  {
+    "time": 0.5,
+    "wrapper": "easein",
+    "value": { "alpha": 1 }
+  }
+]

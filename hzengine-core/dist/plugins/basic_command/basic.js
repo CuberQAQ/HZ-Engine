@@ -87,12 +87,7 @@ function basic_commands(core) {
             core.ui.addRouter(tag_prefixed, "fg");
             router = core.ui.getRouter(tag_prefixed);
         }
-        if (!router.length) {
-            router.push(show_view_name, prop);
-        }
-        else {
-            router.update(prop);
-        }
+        router.replace(show_view_name, prop);
     }
     // hide command
     core.script.use((ctx, next) => {

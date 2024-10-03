@@ -13,6 +13,6 @@
     "@zeppos/device-types": "^3.0.0"
   },
   "dependencies": {
-    "hzengine-core": "^0.1.0-dev"
+    "hzengine-core": "file:../../hzengine-core"
   }
 }

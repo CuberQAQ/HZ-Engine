@@ -4,15 +4,17 @@ import path from "path";
 const info_version = "1.0.0";
 export function buildInfo_v1({
   name,
+  uuid,
   author,
   description,
   version,
   files_info,
 }) {
   return {
-    version,
+    version: info_version,
     data: {
       name,
+      uuid,
       author,
       description,
       version,

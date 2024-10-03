@@ -4,6 +4,7 @@
  */
 
 import { Async } from "./async";
+import { Debug } from "./debug";
 import { basic_command } from "./plugins/basic_command";
 import { global_gesture } from "./plugins/global_gesture";
 import { Script } from "./script";
@@ -11,20 +12,23 @@ import { Storage } from "./storage";
 import { System } from "./system";
 import { UI } from "./ui";
 
+
 class HZEngineCore {
   // 請不要調整這裡的初始化順序，不然會有問題（裝飾器裡有時候要用到前面初始化的東西）
   private _eventCallbacks: Map<string, Set<Function>> = new Map();
   storage = new Storage(this);
+  async = new Async(this);
   ui = new UI(this);
   script = new Script(this);
   system = new System(this);
+  debug = new Debug(this);
   constructor() {
     // internal plugin
     this.loadPlugin("global_gesture", global_gesture);
     this.loadPlugin("basic_command", basic_command);
   }
-  loadProject(projectPath: string) {
-    this.storage.loadProject(projectPath);
+  loadProject(options: { projectPath: string, cachePath: string, savePath: string }) {
+    this.storage.loadProject(options);
   }
   start(callback?: () => unknown) {
     // this.system.start()
@@ -50,17 +54,17 @@ class HZEngineCore {
 
   end() {
     console.log("[HZEngine] Game End, return to title");
-    
+
     let title = this.storage.packageData?.name;
     if (title == null) {
       throw `[HZEngine] project name is null, please loadProject first or check your project.json format`;
     }
 
-    this.system.condition = System.Condition.Free
+    this.system.condition = System.Condition.Free;
 
-    this.ui.resetUI()
+    this.ui.resetUI();
 
-    if(this.ui.getRouter("page")!.length > 0) return;
+    if (this.ui.getRouter("page")!.length > 0) return;
     this.ui.getRouter("page")!.push("title", {
       title,
     });

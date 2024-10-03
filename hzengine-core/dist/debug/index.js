@@ -5,5 +5,8 @@ class Debug {
     constructor(_core) {
         this._core = _core;
     }
+    log(...args) {
+        console.log(...args);
+    }
 }
 exports.Debug = Debug;

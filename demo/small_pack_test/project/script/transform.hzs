@@ -1,0 +1,32 @@
+*transform_test
+
+    transform move_to_right_easeout
+        frame time 1.0 type linear 
+        xanchor 0.0
+        xalign 1.0
+    end transform
+
+
+    transform fadein
+        alpha 0.0
+        frame time 1.0 type easein
+        alpha 1.0
+    end transform
+
+    transform fadeout
+        alpha 0.0
+        frame time 1.0 type easein
+        alpha 1.0
+    end transform
+
+    transition fade = fadein fadeout 
+
+    show girl normal
+    girl "你今天下午去哪了"
+
+    "无可奉告"
+
+    show girl angry with fade
+    girl "无耻之人！！"
+
+    hide girl normal at move_to_right_easeout, fadeout

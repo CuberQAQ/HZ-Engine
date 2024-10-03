@@ -1,12 +1,15 @@
 import { HZEngineCore } from "..";
-import { ArchiveStateAccessorWithSerializer } from "../storage/decorator";
+import {
+  ArchiveStateAccessor,
+  ArchiveStateAccessorWithSerializer,
+} from "../storage/decorator";
 import { Storage } from "../storage/index";
 /// <reference path="node_modules/@zeppos/device-types/dist/index.d.ts" />
 import * as hmUI from "@zos/ui";
 import {} from "@zos/ui";
 export class UI {
   constructor(public _core: HZEngineCore) {
-    this._initUI()
+    this._initUI();
   }
 
   private _initUI() {
@@ -74,7 +77,7 @@ export class UI {
     return this.layerList.get(name);
   }
 
-  // View
+  // View Class
   private _viewClassMap: Map<string, UI.ViewClass<Storage.Saveable<unknown>>> =
     new Map();
   // _activeViewList: [name: string, layer: string, instance: UI.View<unknown>][] =
@@ -86,28 +89,82 @@ export class UI {
   ): void {
     this._viewClassMap.set(name, cls);
   }
+
+  // View
+  @ArchiveStateAccessor("ui.nextViewId")
+  private accessor _nextViewId: number = 50;
+
+  @ArchiveStateAccessorWithSerializer(
+    "ui.viewMap",
+    function serializer(viewMap) {
+      let obj: Record<string, UI.View.Serialized> = {};
+      for (let [id, view] of viewMap) {
+        // 注意viewMap中的id是number，而obj中的id會自動轉成string
+        if (view.isSave) obj[id] = view.serialize();
+      }
+      return obj;
+    },
+    function deserializer(obj) {
+      let newViewMap = new Map<number, UI.View<Storage.Saveable<unknown>>>();
+      for (let key in obj) {
+        let item = obj[key] as UI.View.Serialized;
+        let view = this._produceViewWithId(
+          item.name,
+          item.layer,
+          item.prop,
+          Number(key)
+        );
+        view.isSave = true;
+        newViewMap.set(Number(key), view);
+      }
+      return newViewMap;
+    }
+  )
+  private accessor _viewMap: Map<number, UI.View<Storage.Saveable<unknown>>> =
+    new Map();
+
+  getView(id: number): UI.View<Storage.Saveable<unknown>> | null {
+    return this._viewMap.get(id) ?? null;
+  }
+
   createView<T extends Storage.Saveable<T>>(
     name: string,
     layer: string,
-    prop: T
+    prop: T,
+    isSave: boolean
   ): UI.View<T> {
-    if (!this._viewClassMap.get(name)) {
-      throw "要创建的View不存在";
-    }
-    let _ViewFactory = this._viewClassMap.get(name);
-    let viewInstance = new _ViewFactory!(layer, this._core);
-    viewInstance.onCreate(prop);
-    // this._activeViewList.push([name, layer, viewInstance]);
+    let id = this._nextViewId++;
+    let viewInstance = this._produceViewWithId(name, layer, prop, id);
+    viewInstance.isSave = isSave;
+    this._viewMap.set(id, viewInstance);
     return viewInstance;
   }
   updateView<T extends Storage.Saveable<T>>(
     viewInstance: UI.View<T>,
     new_prop: T
   ) {
-    viewInstance.onCommit(new_prop);
+    viewInstance.commit(new_prop);
   }
   destroyView(viewInstance: UI.View<Storage.Saveable<unknown>>) {
-    viewInstance.onDestroy();
+    if (viewInstance.id != null) this._viewMap.delete(viewInstance.id);
+    viewInstance.destroy();
+  }
+  /**由調用者提供id，創建一個View，不會處理isSave，也不會更新viewMap */
+  private _produceViewWithId<T extends Storage.Saveable<T>>(
+    name: string,
+    layer: string,
+    prop: T,
+    id: number
+  ): UI.View<T> {
+    if (!this._viewClassMap.get(name)) {
+      throw "要创建的View不存在";
+    }
+    let _ViewFactory = this._viewClassMap.get(name);
+    let viewInstance = new _ViewFactory!(layer, this._core) as UI.View<T>;
+    viewInstance.id = id;
+    viewInstance.name = name;
+    viewInstance.create(prop);
+    return viewInstance;
   }
 
   @ArchiveStateAccessorWithSerializer(
@@ -121,20 +178,23 @@ export class UI {
       return obj;
     },
     function deserializer(obj) {
-      // reshow not save router
       let newRouterMap = new Map<string, UI.Router>();
+      // reshow not save router
       for (let [name, router] of this._routerMap) {
         if (!router.isSave) {
           if (router.length > 0) {
+            // TODO 因爲讀檔的時候會重置整個ui系統，所以要重新創建activeViewInstance  這裏感覺有點問題
             router.activeViewInstance = this._core.ui.createView(
               router.viewStack[0][0],
               router.layer,
-              router.viewStack[0][1]
+              router.viewStack[0][1],
+              router.isSave
             );
           }
           newRouterMap.set(name, router);
         }
       }
+      // reshow save router
       for (let key in obj) {
         newRouterMap.set(key, UI.Router.deserialize(this, obj[key]));
       }
@@ -162,10 +222,51 @@ export namespace UI {
   };
 
   export abstract class View<T extends Storage.Saveable<T>> {
+    public id: number | null = null;
+    public name: string | null = null;
+    public isSave: boolean = true;
+    private _prop: T | null = null;
+    public get prop(): T | null {
+      return this._prop;
+    }
+    private set prop(prop: T | null) {
+      this._prop = prop;
+    }
     constructor(public layer: string, public core: HZEngineCore) {}
-    abstract onCreate(prop: T): void;
-    abstract onCommit(prop: T): void;
-    abstract onDestroy(): void;
+    create(prop: T) {
+      this.prop = prop;
+      this.onCreate(prop);
+    }
+    protected abstract onCreate(prop: T): void;
+    commit(prop: T) {
+      this.prop = prop;
+      this.onCommit(prop);
+    }
+    protected abstract onCommit(prop: T): void;
+    destroy() {
+      this.onDestroy();
+      this.prop = null;
+      this.id = null;
+    }
+    protected abstract onDestroy(): void;
+
+    serialize(): View.Serialized {
+      if (this.name == null)
+        throw new Error("View name is null when serialize");
+      return {
+        name: this.name,
+        layer: this.layer,
+        prop: this.prop,
+      };
+    }
+  }
+
+  export namespace View {
+    export interface Serialized {
+      name: string;
+      layer: string;
+      prop: Storage.Saveable<unknown>;
+    }
   }
 
   export interface Message {
@@ -242,17 +343,29 @@ export namespace UI {
         layer: this.layer,
         isSave: this.isSave,
         viewStack: this.viewStack,
+        activeViewId: this.activeViewInstance?.id ?? null,
       };
     }
+    static defaultRouteStrategy: Router.RouteStrategy = {
+      destroy(viewInstance, ui) {
+        ui.destroyView(viewInstance);
+      },
+      create(viewName, layer, prop, ui, isSave) {
+        return ui.createView(viewName, layer, prop, isSave);
+      },
+      update(viewInstance, prop, ui) {
+        ui.updateView(viewInstance, prop);
+      },
+    };
     static deserialize(ui: UI, data: Router.Serialized) {
       let router = new Router(ui, data.tag, data.layer, data.isSave);
       router.viewStack = data.viewStack;
-      if (router.viewStack.length)
-        router.activeViewInstance = ui.createView(
-          data.viewStack[0][0],
-          data.layer,
-          data.viewStack[0][1]
-        );
+      if (data.activeViewId != null) {
+        let viewInstance = ui.getView(data.activeViewId);
+        if (!viewInstance)
+          throw `View [${data.activeViewId}] not found when deserialize`;
+        router.activeViewInstance = viewInstance;
+      }
       return router;
     }
     viewStack: [view_name: string, prop: Storage.Saveable<unknown>][] = [];
@@ -260,19 +373,36 @@ export namespace UI {
       return this.viewStack.length;
     }
     activeViewInstance: View<Storage.Saveable<unknown>> | null = null;
-    push<T extends Storage.Saveable<T>>(view_name: string, prop: T) {
+    push<T extends Storage.Saveable<T>>(
+      view_name: string,
+      prop: T,
+      strategy?: Router.RouteStrategy
+    ) {
+      if (this.activeViewInstance) {
+        // this._ui.destroyView(this.activeViewInstance);
+        (strategy?.destroy ?? Router.defaultRouteStrategy.destroy!)(
+          this.activeViewInstance,
+          this._ui
+        );
+        this.activeViewInstance = null;
+      }
       let layerInstance = this._ui.getLayer(this.layer);
       if (!layerInstance) throw `Layer [${this.layer}] not found`;
-      this.activeViewInstance = this._ui.createView(
-        view_name,
-        this.layer,
-        prop
-      );
+      this.activeViewInstance = (
+        strategy?.create ?? Router.defaultRouteStrategy.create!
+      )(view_name, this.layer, prop, this._ui, this.isSave);
       this.viewStack.push([view_name, prop]);
     }
-    pop<T extends Storage.Saveable<T>>(back_prop?: T) {
+    pop<T extends Storage.Saveable<T>>(
+      back_prop?: T,
+      strategy?: Router.RouteStrategy
+    ) {
       if (this.activeViewInstance) {
-        this._ui.destroyView(this.activeViewInstance);
+        // this._ui.destroyView(this.activeViewInstance);
+        (strategy?.destroy ?? Router.defaultRouteStrategy.destroy!)(
+          this.activeViewInstance,
+          this._ui
+        );
         this.activeViewInstance = null;
       }
       this.viewStack.pop();
@@ -281,48 +411,86 @@ export namespace UI {
         let backViewInfo = this.viewStack[this.viewStack.length - 1];
         let layerInstance = this._ui.getLayer(this.layer);
         if (!layerInstance) throw `Layer [${this.layer}] not found`;
-        this.activeViewInstance = this._ui.createView(
+        this.activeViewInstance = (
+          strategy?.create ?? Router.defaultRouteStrategy.create!
+        )(
           backViewInfo[0],
           this.layer,
-          back_prop ?? backViewInfo[1]
+          back_prop ?? backViewInfo[1],
+          this._ui,
+          this.isSave
         );
       }
     }
-    replace<T extends Storage.Saveable<T>>(view_name: string, prop: T) {
+    replace<T extends Storage.Saveable<T>>(
+      view_name: string,
+      prop: T,
+      strategy?: Router.RouteStrategy
+    ) {
       if (this.activeViewInstance) {
-        this._ui.destroyView(this.activeViewInstance);
+        // this._ui.destroyView(this.activeViewInstance);
+        (strategy?.destroy ?? Router.defaultRouteStrategy.destroy!)(
+          this.activeViewInstance,
+          this._ui
+        );
         this.activeViewInstance = null;
       }
       this.viewStack.pop();
 
       let layerInstance = this._ui.getLayer(this.layer);
       if (!layerInstance) throw `Layer [${this.layer}] not found`;
-      this.activeViewInstance = this._ui.createView(
-        view_name,
-        this.layer,
-        prop
-      );
+      this.activeViewInstance = (
+        strategy?.create ?? Router.defaultRouteStrategy.create!
+      )(view_name, this.layer, prop, this._ui, this.isSave);
       this.viewStack.push([view_name, prop]);
     }
-    update<T extends Storage.Saveable<T>>(prop: T) {
+    update<T extends Storage.Saveable<T>>(
+      prop: T,
+      strategy?: Router.RouteStrategy
+    ) {
       if (!this.activeViewInstance)
         throw `Update View but activeViewInstance is null`;
       this.viewStack[this.viewStack.length - 1][1] = prop;
-      this._ui.updateView(this.activeViewInstance, prop);
+      (strategy?.update ?? Router.defaultRouteStrategy.update!)(
+        this.activeViewInstance,
+        prop,
+        this._ui
+      );
     }
-    clear() {
+    clear(strategy?: Router.RouteStrategy) {
       if (this.activeViewInstance) {
-        this._ui.destroyView(this.activeViewInstance);
+        (strategy?.destroy ?? Router.defaultRouteStrategy.destroy!)(
+          this.activeViewInstance,
+          this._ui
+        );
+        this.activeViewInstance = null;
       }
       this.viewStack = [];
     }
   }
   export namespace Router {
-    export type Serialized = {
+    export interface Serialized {
       tag: string;
       layer: string;
       isSave: boolean;
       viewStack: [view_name: string, prop: Storage.Saveable<unknown>][];
-    };
+      activeViewId: number | null;
+    }
+
+    // 实现自定义路由策略，允许接管Router对View的创建和销毁，实现例如动画等功能
+    export interface RouteStrategy<
+      T extends Storage.Saveable<T> = Storage.Saveable<unknown>
+    > {
+      destroy?(viewInstance: View<T>, ui: UI): void;
+      create?(
+        viewName: string,
+        layer: string,
+        prop: T,
+        ui: UI,
+        isSave: boolean
+      ): View<Storage.Saveable<T>>;
+
+      update?(viewInstance: View<T>, prop: T, ui: UI): void;
+    }
   }
 }

@@ -6,6 +6,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.System = exports.Script = exports.Storage = exports.UI = exports.HZEngineCore = void 0;
 const async_1 = require("./async");
+const debug_1 = require("./debug");
 const basic_command_1 = require("./plugins/basic_command");
 const global_gesture_1 = require("./plugins/global_gesture");
 const script_1 = require("./script");
@@ -21,15 +22,17 @@ class HZEngineCore {
         // 請不要調整這裡的初始化順序，不然會有問題（裝飾器裡有時候要用到前面初始化的東西）
         this._eventCallbacks = new Map();
         this.storage = new storage_1.Storage(this);
+        this.async = new async_1.Async(this);
         this.ui = new ui_1.UI(this);
         this.script = new script_1.Script(this);
         this.system = new system_1.System(this);
+        this.debug = new debug_1.Debug(this);
         // internal plugin
         this.loadPlugin("global_gesture", global_gesture_1.global_gesture);
         this.loadPlugin("basic_command", basic_command_1.basic_command);
     }
-    loadProject(projectPath) {
-        this.storage.loadProject(projectPath);
+    loadProject(options) {
+        this.storage.loadProject(options);
     }
     start(callback) {
         // this.system.start()

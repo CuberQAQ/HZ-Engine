@@ -12,9 +12,14 @@ export declare class UI {
     getLayer(name: string): UI.Layer | undefined;
     private _viewClassMap;
     registerView<T extends Storage.Saveable<T>>(name: string, cls: UI.ViewClass<T>): void;
-    createView<T extends Storage.Saveable<T>>(name: string, layer: string, prop: T): UI.View<T>;
+    private accessor _nextViewId;
+    private accessor _viewMap;
+    getView(id: number): UI.View<Storage.Saveable<unknown>> | null;
+    createView<T extends Storage.Saveable<T>>(name: string, layer: string, prop: T, isSave: boolean): UI.View<T>;
     updateView<T extends Storage.Saveable<T>>(viewInstance: UI.View<T>, new_prop: T): void;
     destroyView(viewInstance: UI.View<Storage.Saveable<unknown>>): void;
+    /**由調用者提供id，創建一個View，不會處理isSave，也不會更新viewMap */
+    private _produceViewWithId;
     private accessor _routerMap;
     getRouter(tag: string): UI.Router | undefined;
     addRouter(tag: string, layer: string, isSave?: boolean): UI.Router;
@@ -26,10 +31,27 @@ export declare namespace UI {
     abstract class View<T extends Storage.Saveable<T>> {
         layer: string;
         core: HZEngineCore;
+        id: number | null;
+        name: string | null;
+        isSave: boolean;
+        private _prop;
+        get prop(): T | null;
+        private set prop(value);
         constructor(layer: string, core: HZEngineCore);
-        abstract onCreate(prop: T): void;
-        abstract onCommit(prop: T): void;
-        abstract onDestroy(): void;
+        create(prop: T): void;
+        protected abstract onCreate(prop: T): void;
+        commit(prop: T): void;
+        protected abstract onCommit(prop: T): void;
+        destroy(): void;
+        protected abstract onDestroy(): void;
+        serialize(): View.Serialized;
+    }
+    namespace View {
+        interface Serialized {
+            name: string;
+            layer: string;
+            prop: Storage.Saveable<unknown>;
+        }
     }
     interface Message {
         who: string;
@@ -95,22 +117,29 @@ export declare namespace UI {
         isSave: boolean;
         constructor(_ui: UI, tag: string, layer: string, isSave?: boolean);
         serialize(): Router.Serialized;
+        static defaultRouteStrategy: Router.RouteStrategy;
         static deserialize(ui: UI, data: Router.Serialized): Router;
         viewStack: [view_name: string, prop: Storage.Saveable<unknown>][];
         get length(): number;
         activeViewInstance: View<Storage.Saveable<unknown>> | null;
-        push<T extends Storage.Saveable<T>>(view_name: string, prop: T): void;
-        pop<T extends Storage.Saveable<T>>(back_prop?: T): void;
-        replace<T extends Storage.Saveable<T>>(view_name: string, prop: T): void;
-        update<T extends Storage.Saveable<T>>(prop: T): void;
-        clear(): void;
+        push<T extends Storage.Saveable<T>>(view_name: string, prop: T, strategy?: Router.RouteStrategy): void;
+        pop<T extends Storage.Saveable<T>>(back_prop?: T, strategy?: Router.RouteStrategy): void;
+        replace<T extends Storage.Saveable<T>>(view_name: string, prop: T, strategy?: Router.RouteStrategy): void;
+        update<T extends Storage.Saveable<T>>(prop: T, strategy?: Router.RouteStrategy): void;
+        clear(strategy?: Router.RouteStrategy): void;
     }
     namespace Router {
-        type Serialized = {
+        interface Serialized {
             tag: string;
             layer: string;
             isSave: boolean;
             viewStack: [view_name: string, prop: Storage.Saveable<unknown>][];
-        };
+            activeViewId: number | null;
+        }
+        interface RouteStrategy<T extends Storage.Saveable<T> = Storage.Saveable<unknown>> {
+            destroy?(viewInstance: View<T>, ui: UI): void;
+            create?(viewName: string, layer: string, prop: T, ui: UI, isSave: boolean): View<Storage.Saveable<T>>;
+            update?(viewInstance: View<T>, prop: T, ui: UI): void;
+        }
     }
 }

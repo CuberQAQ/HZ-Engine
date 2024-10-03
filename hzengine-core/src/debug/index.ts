@@ -5,5 +5,7 @@ export class Debug {
 
     }
 
-    
+    log(...args: any[]) {
+        console.log(...args);
+    }
 }

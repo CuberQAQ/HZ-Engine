@@ -121,10 +121,10 @@ program
       path.join(process.cwd(), "build", ".cache", "converting")
     );
 
-
     let project_info = readHzProject(process.cwd());
-    let zip_file_name = `${project_info.name}-${project_info.version}-${Date.now()}.zip`;
-
+    let zip_file_name = `${project_info.name}-${
+      project_info.version
+    }-${Date.now()}.zip`;
 
     // build launcher
     packApp(
@@ -152,17 +152,33 @@ program
     let project_info = readHzProject(process.cwd());
     let hzpk_file_name = `${project_info.name}-${project_info.version}.hzpk`;
 
-    fs.mkdirSync(path.join(process.cwd(), "build"), { recursive: true });
+    // convert image
+    fs.removeSync(path.join(process.cwd(), "build", ".cache"));
+    fs.mkdirSync(path.join(process.cwd(), "build", ".cache", "converted"), {
+      recursive: true,
+    });
+    imageConvert(
+      path.join(process.cwd(), "project"),
+      path.join(process.cwd(), "build", ".cache", "converted"),
+      path.join(process.cwd(), "build", ".cache", "converting")
+    );
+
     fs.writeFileSync(
       path.join(process.cwd(), "build", hzpk_file_name),
       buildHzpk_v1({
         name: project_info.name,
+        uuid: project_info.uuid,
         author: project_info.author,
         description: project_info.description,
         version: project_info.version,
-        root_dir: path.join(process.cwd(), "project"),
+        root_dir: path.join(process.cwd(), "build", ".cache", "converted"),
       })
     );
+
+    // delete converted image
+    fs.removeSync(path.join(process.cwd(), "build", ".cache", "converted"));
+
+    console.log(chalk.greenBright(`Project packed!`));
 
     // unpackHzpk_v1(
     //   readFileSync("test.hzpk"),

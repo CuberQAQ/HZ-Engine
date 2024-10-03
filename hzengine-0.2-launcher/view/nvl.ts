@@ -3,7 +3,7 @@ import { getDeviceInfo, SCREEN_SHAPE_SQUARE } from "@zos/device";
 import { HZEngineCore, UI } from "hzengine-core";
 import { px } from "../shared/dynamic_px.js";
 import { Fx } from "../shared/fx.js";
-
+import path from '../shared/path.js'
 const { width, height, screenShape } = getDeviceInfo();
 
 export { CustomSayView as SayView, FgImgView, BgImgView, MenuView };
@@ -28,7 +28,7 @@ class CustomSayView extends UI.MessageView {
         y: height / 2,
         w,
         h,
-        src: "raw/project/gui/say_bg.png",
+        src: path.join(this.core.storage.projectRoot!, "gui", "say_bg.png"),
         auto_scale: true,
         // alpha: 128, // only 3.0 support
       }),

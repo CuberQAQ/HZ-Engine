@@ -3,9 +3,15 @@ export declare class Storage {
     private _core;
     constructor(_core: HZEngineCore);
     projectRoot: string | null;
+    cacheRoot: string | null;
+    saveRoot: string | null;
     preloadedData: NonNullable<any> | null;
     packageData: NonNullable<any> | null;
-    loadProject(path: string): void;
+    loadProject(options: {
+        projectPath: string;
+        cachePath: string;
+        savePath: string;
+    }): void;
     loadPackageData(): void;
     /**
      * 全局数据
@@ -36,14 +42,14 @@ export declare class Storage {
      */
     private _saveGlobalDataTimerId;
     saveGlobalData(): void;
-    loadArchiveData(archivePath?: string): void;
+    loadArchiveData(archiveFile?: string): void;
     _saveArchiveDataTimerId: number | null;
     /**
      * 保存存档数据
      * 可以多次調用，實際上會異步儲存，也就是在一個宏任務中即使調用多次，也只會在宏任務結束後儲存一次
-     * @param archivePath 存档文件目錄及名字
+     * @param archiveFile 存档文件目錄及名字
      */
-    saveArchiveData(archivePath: string, immediate?: boolean): void;
+    saveArchiveData(archiveFile: string, immediate?: boolean): void;
     getSaveableData(data: Storage.JSONValue, auto_correct: boolean, ...key_chain: string[]): NonNullable<Storage.JSONValue>;
     setSaveableData(data: Storage.JSONValue, auto_correct: boolean, value: Storage.JSONValue, ...key_chain: string[]): void;
     checkSaveableData(data: Storage.JSONValue, ...key_chain: string[]): NonNullable<Storage.JSONValue>;

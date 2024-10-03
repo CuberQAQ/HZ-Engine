@@ -2,11 +2,11 @@ import { existsSync, readFileSync, writeFileSync } from "fs";
 import { packProjectFiles_v1, buildInfo_v1, isInfo_v1, unpackProjectFiles_v1 } from "./hzpk-compress-1.0.0.js";
 import { buildHeader_v1, isHeader_v1, tryReadInfo_v1 } from "./hzpk-header-1.0.0.js";
 
-export function buildHzpk_v1({ name, author, description, version, root_dir }) {
+export function buildHzpk_v1({ name, uuid, author, description, version, root_dir }) {
     // build files info
     const { buffer, files_info ,} = packProjectFiles_v1( root_dir );
     // build header
-    const header = buildHeader_v1(buildInfo_v1({ name, author, description, version, files_info  }));
+    const header = buildHeader_v1(buildInfo_v1({ name, uuid, author, description, version, files_info  }));
     // concat header and body
     return Buffer.concat([header, buffer]);
 }

@@ -1,25 +1,28 @@
 /// <reference path="../../../../node_modules/@zeppos/device-types/dist/index.d.ts" />
 import { HZEngineCore } from "..";
 import * as hmFS from "@zos/fs";
-import {
-  isFileAssetsSync,
-  readdirAssetsSync,
-  readFileAssetsSync,
-  writeFileAssetsSync,
-} from "./fs";
-import Path from "@cuberqaq/path-polyfill";
+import Path from "../utils/path";
+import { isFileSync } from "./fs";
 
 export class Storage {
   constructor(private _core: HZEngineCore) {}
 
   projectRoot: string | null = null;
+  cacheRoot: string | null = null;
+  saveRoot: string | null = null;
   preloadedData: NonNullable<any> | null = null;
   packageData: NonNullable<any> | null = null;
-  loadProject(path: string) {
-    if (!readdirAssetsSync({ path })) {
+  loadProject(options: {
+    projectPath: string;
+    cachePath: string;
+    savePath: string;
+  }) {
+    if (!hmFS.readdirSync({ path: options.projectPath })) {
       throw "Dir not exist";
     }
-    this.projectRoot = path;
+    this.projectRoot = options.projectPath;
+    this.cacheRoot = options.cachePath;
+    this.saveRoot = options.savePath;
 
     this.loadPackageData();
     this.preload();
@@ -27,19 +30,23 @@ export class Storage {
 
   loadPackageData() {
     if (!this.projectRoot) throw "projectDir is null";
+    console.log(`loadPackageData ${this.projectRoot} ${Path.join(this.projectRoot, "hz_package.json")}`);
+    
     if (
-      !hmFS.statAssetsSync({
+      !hmFS.statSync({
         path: Path.join(this.projectRoot, "hz_package.json"),
       })
     ) {
       throw "HZEngine Package File (hz_package.json) not exist";
     }
+    console.log("start 1");
     this.packageData = JSON.parse(
-      readFileAssetsSync({
+      hmFS.readFileSync({
         path: Path.join(this.projectRoot, "hz_package.json"),
         options: { encoding: "utf8" },
       }) as string
     );
+    console.log("end 1");
   }
 
   // Storage Data
@@ -85,18 +92,18 @@ export class Storage {
   }
 
   loadGlobalData() {
-    if (!this.projectRoot) {
-      throw "projectDir is null, please loadProject first";
+    if (!this.saveRoot) {
+      throw "saveDir is null, please loadProject first";
     }
     this._core.emit("beforeLoadGlobalData");
     if (
-      hmFS.statAssetsSync({
-        path: Path.join(this.projectRoot, "globalData.json"),
+      hmFS.statSync({
+        path: Path.join(this.saveRoot, "globalData.json"),
       })
     ) {
       this._globalData = JSON.parse(
-        readFileAssetsSync({
-          path: Path.join(this.projectRoot, "globalData.json"),
+        hmFS.readFileSync({
+          path: Path.join(this.saveRoot, "globalData.json"),
           options: {
             encoding: "utf8",
           },
@@ -109,8 +116,8 @@ export class Storage {
     } else {
       console.log(`[HZEngine] globalData.json not exist, create it.`);
       this._globalData = {}; // Initial GlobalData value
-      writeFileAssetsSync({
-        path: Path.join(this.projectRoot, "globalData.json"),
+      hmFS.writeFileSync({
+        path: Path.join(this.saveRoot, "globalData.json"),
         data: JSON.stringify(this._globalData),
       });
       this._core.emit("afterLoadGlobalData");
@@ -133,32 +140,31 @@ export class Storage {
         throw "projectDir is null, please loadProject first";
       }
       this._core.emit("beforeSaveGlobalData");
-      let res = writeFileAssetsSync({
+      let res = hmFS.writeFileSync({
         path: Path.join(this.projectRoot, "globalData.json"),
         data: JSON.stringify(this._globalData),
-      });
+      }) as unknown as number; // TODO
       if (res < 0)
         throw `[HZEngine] save globalData to globalData.json failed, code = ${res}`;
       console.log(`[HZEngine] save globalData to globalData.json`);
       this._core.emit("afterSaveGlobalData");
-    }, 0);
+    }, 0) as unknown as number;
   }
 
-  loadArchiveData(archivePath?: string) {
+  loadArchiveData(archiveFile?: string) {
     this._core.emit("beforeLoadArchive");
-    if (archivePath) {
-      if (!this.projectRoot)
-        throw `projectDir is null, please loadProject first`;
+    if (archiveFile) {
+      if (!this.saveRoot) throw `saveRoot is null, please loadProject first`;
       if (
-        !hmFS.statAssetsSync({
-          path: Path.join(this.projectRoot, archivePath),
+        !hmFS.statSync({
+          path: Path.join(this.saveRoot, archiveFile),
         })
       ) {
-        throw `Archive [${archivePath}] not exist`;
+        throw `Archive [${archiveFile}] not exist`;
       }
       let archiveData: Storage.JSONValue = JSON.parse(
-        readFileAssetsSync({
-          path: Path.join(this.projectRoot, archivePath),
+        hmFS.readFileSync({
+          path: Path.join(this.saveRoot, archiveFile),
           options: {
             encoding: "utf8",
           },
@@ -166,7 +172,7 @@ export class Storage {
       );
       if (archiveData == null) throw `[HZEngine] ArchiveData is null`;
       this._archiveData = archiveData;
-      console.log(`[HZEngine] load archiveData from ${archivePath}`);
+      console.log(`[HZEngine] load archiveData from ${archiveFile}`);
       this._core.emit("afterLoadArchive");
     } else {
       console.log(`[HZEngine] load archiveData from empty template`);
@@ -179,24 +185,23 @@ export class Storage {
   /**
    * 保存存档数据
    * 可以多次調用，實際上會異步儲存，也就是在一個宏任務中即使調用多次，也只會在宏任務結束後儲存一次
-   * @param archivePath 存档文件目錄及名字
+   * @param archiveFile 存档文件目錄及名字
    */
-  saveArchiveData(archivePath: string, immediate = false) {
-    if (!this.projectRoot) throw `projectDir is null, please loadProject first`;
+  saveArchiveData(archiveFile: string, immediate = false) {
+    if (!this.saveRoot) throw `saveRoot is null, please loadProject first`;
     this._core.emit("beforeSaveArchive");
-    console.log("[HZEngine] will save archiveData to " + archivePath);
+    console.log("[HZEngine] will save archiveData to " + archiveFile);
     let saveFunc = () => {
-      console.log("[HZEngine] saving archiveData to " + archivePath);
+      console.log("[HZEngine] saving archiveData to " + archiveFile);
 
-      if (!this.projectRoot)
-        throw `projectDir is null, please loadProject first`;
-      let res = writeFileAssetsSync({
-        path: Path.join(this.projectRoot, archivePath),
+      if (!this.saveRoot) throw `projectDir is null, please loadProject first`;
+      let res = hmFS.writeFileSync({
+        path: Path.join(this.saveRoot, archiveFile),
         data: JSON.stringify(this._archiveData),
-      });
+      }) as unknown as number; //TODO
       if (res < 0)
-        throw `[HZEngine] save archiveData to ${archivePath} failed, code = ${res}`;
-      console.log(`[HZEngine] save archiveData to ${archivePath}`);
+        throw `[HZEngine] save archiveData to ${archiveFile} failed, code = ${res}`;
+      console.log(`[HZEngine] save archiveData to ${archiveFile}`);
 
       this._core.emit("afterSaveArchive");
     };
@@ -210,7 +215,7 @@ export class Storage {
       this._saveArchiveDataTimerId = setTimeout(() => {
         this._saveArchiveDataTimerId = null;
         saveFunc();
-      }, 0);
+      }, 0) as unknown as number;
   }
 
   getSaveableData(
@@ -271,19 +276,21 @@ export class Storage {
   // Preload
 
   preload() {
-    if (!this.projectRoot) {
-      throw "projectDir is null, please loadProject first";
+    if (!this.cacheRoot) {
+      throw "cacheRoot is null, please loadProject first";
     }
 
+    // writeFileSync({path: "data://test.json", data: "awa", options: {encoding: "utf8"}});
+
     if (
-      hmFS.statAssetsSync({
-        path: Path.join(this.projectRoot, "preloaded.json"),
+      hmFS.statSync({
+        path: Path.join(this.cacheRoot, "preloaded.json"),
       })
     ) {
       // 已经预加载过了，退出
       this.preloadedData = JSON.parse(
-        readFileAssetsSync({
-          path: Path.join(this.projectRoot, "preloaded.json"),
+        hmFS.readFileSync({
+          path: Path.join(this.cacheRoot, "preloaded.json"),
           options: {
             encoding: "utf8",
           },
@@ -307,13 +314,13 @@ export class Storage {
 
     // console.log(JSON.stringify(this.preloadedData));
 
-    writeFileAssetsSync({
-      path: Path.join(this.projectRoot, "preloaded.json"),
+    hmFS.writeFileSync({
+      path: Path.join(this.cacheRoot, "preloaded.json"),
       data: JSON.stringify(this.preloadedData),
     });
 
     // console.log(
-    //   `${Path.join(this.projectDir, "preloaded.json")} = ${readFileAssetsSync({
+    //   `${Path.join(this.projectDir, "preloaded.json")} = ${readFileSync({
     //     path: Path.join(this.projectDir, "preloaded.json"),
     //     options:{encoding:"utf8"}
     //   })}`
@@ -332,18 +339,18 @@ export class Storage {
 
     let hzsInfoMap: Record<string, HzsInfo> =
       this.preloadedData.script.hzsInfoMap;
-    if (!readdirAssetsSync({ path: scriptDir }))
+    if (!hmFS.readdirSync({ path: scriptDir }))
       throw "项目文件夹中script文件夹不存在";
 
     // 遍历所有hzs文件
     traverseScript(scriptDir);
     function traverseScript(path: string) {
-      let dirs = readdirAssetsSync({ path });
+      let dirs = hmFS.readdirSync({ path });
       // console.log(dirs);
 
       for (let dir of dirs!) {
         let subpath = Path.join(path, dir);
-        if (isFileAssetsSync({ path: subpath })) {
+        if (isFileSync({ path: subpath })) {
           // 是文件
           if (dir.endsWith(".hzs")) {
             preloadHzs(subpath);
@@ -360,9 +367,9 @@ export class Storage {
      * 2. 记录所有脚本文件的行数
      */
     function preloadHzs(path: string) {
-      let fd = hmFS.openAssetsSync({ path });
+      let fd = hmFS.openSync({ path });
       if (fd < 0) throw "Fd<0";
-      let size = hmFS.statAssetsSync({ path })!.size;
+      let size = hmFS.statSync({ path })!.size;
       let arrbuf = new ArrayBuffer(size);
       hmFS.readSync({ fd, buffer: arrbuf });
       let buffer = Buffer.from(arrbuf);
@@ -400,24 +407,22 @@ at [${labelMap[label][0]}(line ${labelMap[label][1]})] \
    * 遍历所有png文件，计算对应的name key，建立map
    */
   preloadImage() {
-    // 记录脚本label的位置
-    // 这里的index是以0开始计数的行数
     let nameMap: Record<string, [path: string]> =
       this.preloadedData.image.nameMap;
     let imageDir = Path.join(this.projectRoot!, "image");
 
-    if (!readdirAssetsSync({ path: imageDir }))
+    if (!hmFS.readdirSync({ path: imageDir }))
       throw "项目文件夹中image文件夹不存在";
 
     // 遍历所有hzs文件
     traverseImage(imageDir);
     function traverseImage(path: string) {
-      let dirs = readdirAssetsSync({ path });
+      let dirs = hmFS.readdirSync({ path });
       // console.log(dirs);
 
       for (let dir of dirs!) {
         let subpath = Path.join(path, dir);
-        if (isFileAssetsSync({ path: subpath })) {
+        if (isFileSync({ path: subpath })) {
           // 是文件
           if (dir.endsWith(".png")) {
             preloadImage(subpath);

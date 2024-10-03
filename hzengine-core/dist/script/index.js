@@ -321,7 +321,7 @@ let Script = (() => {
             // eval
             evalScope(code) {
                 try {
-                    return new Function("sd", "gd", `${code}`)(this._core.storage.sd, this._core.storage.gd);
+                    return new Function("sd", "gd", "hz", `${code}`)(this._core.storage.sd, this._core.storage.gd, this._core);
                 }
                 catch (e) {
                     console.log(`Error in evalScope: ${e}`);
@@ -330,7 +330,7 @@ let Script = (() => {
             evalExpression(code) {
                 console.log(`[HZEngine] evalExpression: ${code}`);
                 try {
-                    return new Function("sd", "gd", `return (${code})`)(this._core.storage.sd, this._core.storage.gd);
+                    return new Function("sd", "gd", "hz", `return (${code})`)(this._core.storage.sd, this._core.storage.gd, this._core);
                 }
                 catch (e) {
                     console.log(`Error in evalExpression: ${e}`);

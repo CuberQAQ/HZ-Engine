@@ -73,10 +73,16 @@ const decorator_1 = require("../storage/decorator");
 /// <reference path="node_modules/@zeppos/device-types/dist/index.d.ts" />
 const hmUI = __importStar(require("@zos/ui"));
 let UI = (() => {
-    var _a, _UI__layerList_accessor_storage, _UI__routerMap_accessor_storage;
+    var _a, _UI__layerList_accessor_storage, _UI__nextViewId_accessor_storage, _UI__viewMap_accessor_storage, _UI__routerMap_accessor_storage;
     let __layerList_decorators;
     let __layerList_initializers = [];
     let __layerList_extraInitializers = [];
+    let __nextViewId_decorators;
+    let __nextViewId_initializers = [];
+    let __nextViewId_extraInitializers = [];
+    let __viewMap_decorators;
+    let __viewMap_initializers = [];
+    let __viewMap_extraInitializers = [];
     let __routerMap_decorators;
     let __routerMap_initializers = [];
     let __routerMap_extraInitializers = [];
@@ -84,9 +90,11 @@ let UI = (() => {
             constructor(_core) {
                 this._core = _core;
                 _UI__layerList_accessor_storage.set(this, __runInitializers(this, __layerList_initializers, new Map()));
-                // View
+                // View Class
                 this._viewClassMap = (__runInitializers(this, __layerList_extraInitializers), new Map());
-                _UI__routerMap_accessor_storage.set(this, __runInitializers(this, __routerMap_initializers, new Map()));
+                _UI__nextViewId_accessor_storage.set(this, __runInitializers(this, __nextViewId_initializers, 50));
+                _UI__viewMap_accessor_storage.set(this, (__runInitializers(this, __nextViewId_extraInitializers), __runInitializers(this, __viewMap_initializers, new Map())));
+                _UI__routerMap_accessor_storage.set(this, (__runInitializers(this, __viewMap_extraInitializers), __runInitializers(this, __routerMap_initializers, new Map())));
                 __runInitializers(this, __routerMap_extraInitializers);
                 this._core = _core;
                 this._initUI();
@@ -131,21 +139,41 @@ let UI = (() => {
             registerView(name, cls) {
                 this._viewClassMap.set(name, cls);
             }
-            createView(name, layer, prop) {
+            // View
+            get _nextViewId() { return __classPrivateFieldGet(this, _UI__nextViewId_accessor_storage, "f"); }
+            set _nextViewId(value) { __classPrivateFieldSet(this, _UI__nextViewId_accessor_storage, value, "f"); }
+            get _viewMap() { return __classPrivateFieldGet(this, _UI__viewMap_accessor_storage, "f"); }
+            set _viewMap(value) { __classPrivateFieldSet(this, _UI__viewMap_accessor_storage, value, "f"); }
+            getView(id) {
+                var _b;
+                return (_b = this._viewMap.get(id)) !== null && _b !== void 0 ? _b : null;
+            }
+            createView(name, layer, prop, isSave) {
+                let id = this._nextViewId++;
+                let viewInstance = this._produceViewWithId(name, layer, prop, id);
+                viewInstance.isSave = isSave;
+                this._viewMap.set(id, viewInstance);
+                return viewInstance;
+            }
+            updateView(viewInstance, new_prop) {
+                viewInstance.commit(new_prop);
+            }
+            destroyView(viewInstance) {
+                if (viewInstance.id != null)
+                    this._viewMap.delete(viewInstance.id);
+                viewInstance.destroy();
+            }
+            /**由調用者提供id，創建一個View，不會處理isSave，也不會更新viewMap */
+            _produceViewWithId(name, layer, prop, id) {
                 if (!this._viewClassMap.get(name)) {
                     throw "要创建的View不存在";
                 }
                 let _ViewFactory = this._viewClassMap.get(name);
                 let viewInstance = new _ViewFactory(layer, this._core);
-                viewInstance.onCreate(prop);
-                // this._activeViewList.push([name, layer, viewInstance]);
+                viewInstance.id = id;
+                viewInstance.name = name;
+                viewInstance.create(prop);
                 return viewInstance;
-            }
-            updateView(viewInstance, new_prop) {
-                viewInstance.onCommit(new_prop);
-            }
-            destroyView(viewInstance) {
-                viewInstance.onDestroy();
             }
             get _routerMap() { return __classPrivateFieldGet(this, _UI__routerMap_accessor_storage, "f"); }
             set _routerMap(value) { __classPrivateFieldSet(this, _UI__routerMap_accessor_storage, value, "f"); }
@@ -161,6 +189,8 @@ let UI = (() => {
             }
         },
         _UI__layerList_accessor_storage = new WeakMap(),
+        _UI__nextViewId_accessor_storage = new WeakMap(),
+        _UI__viewMap_accessor_storage = new WeakMap(),
         _UI__routerMap_accessor_storage = new WeakMap(),
         (() => {
             const _metadata = typeof Symbol === "function" && Symbol.metadata ? Object.create(null) : void 0;
@@ -185,6 +215,25 @@ let UI = (() => {
                     }
                     return newLayerList;
                 })];
+            __nextViewId_decorators = [(0, decorator_1.ArchiveStateAccessor)("ui.nextViewId")];
+            __viewMap_decorators = [(0, decorator_1.ArchiveStateAccessorWithSerializer)("ui.viewMap", function serializer(viewMap) {
+                    let obj = {};
+                    for (let [id, view] of viewMap) {
+                        // 注意viewMap中的id是number，而obj中的id會自動轉成string
+                        if (view.isSave)
+                            obj[id] = view.serialize();
+                    }
+                    return obj;
+                }, function deserializer(obj) {
+                    let newViewMap = new Map();
+                    for (let key in obj) {
+                        let item = obj[key];
+                        let view = this._produceViewWithId(item.name, item.layer, item.prop, Number(key));
+                        view.isSave = true;
+                        newViewMap.set(Number(key), view);
+                    }
+                    return newViewMap;
+                })];
             __routerMap_decorators = [(0, decorator_1.ArchiveStateAccessorWithSerializer)("ui.routerMap", function serializer(routerMap) {
                     let obj = {};
                     for (let [key, value] of routerMap) {
@@ -194,22 +243,26 @@ let UI = (() => {
                     }
                     return obj;
                 }, function deserializer(obj) {
-                    // reshow not save router
                     let newRouterMap = new Map();
+                    // reshow not save router
                     for (let [name, router] of this._routerMap) {
                         if (!router.isSave) {
                             if (router.length > 0) {
-                                router.activeViewInstance = this._core.ui.createView(router.viewStack[0][0], router.layer, router.viewStack[0][1]);
+                                // TODO 因爲讀檔的時候會重置整個ui系統，所以要重新創建activeViewInstance  這裏感覺有點問題
+                                router.activeViewInstance = this._core.ui.createView(router.viewStack[0][0], router.layer, router.viewStack[0][1], router.isSave);
                             }
                             newRouterMap.set(name, router);
                         }
                     }
+                    // reshow save router
                     for (let key in obj) {
                         newRouterMap.set(key, UI.Router.deserialize(this, obj[key]));
                     }
                     return newRouterMap;
                 })];
             __esDecorate(_a, null, __layerList_decorators, { kind: "accessor", name: "_layerList", static: false, private: false, access: { has: obj => "_layerList" in obj, get: obj => obj._layerList, set: (obj, value) => { obj._layerList = value; } }, metadata: _metadata }, __layerList_initializers, __layerList_extraInitializers);
+            __esDecorate(_a, null, __nextViewId_decorators, { kind: "accessor", name: "_nextViewId", static: false, private: false, access: { has: obj => "_nextViewId" in obj, get: obj => obj._nextViewId, set: (obj, value) => { obj._nextViewId = value; } }, metadata: _metadata }, __nextViewId_initializers, __nextViewId_extraInitializers);
+            __esDecorate(_a, null, __viewMap_decorators, { kind: "accessor", name: "_viewMap", static: false, private: false, access: { has: obj => "_viewMap" in obj, get: obj => obj._viewMap, set: (obj, value) => { obj._viewMap = value; } }, metadata: _metadata }, __viewMap_initializers, __viewMap_extraInitializers);
             __esDecorate(_a, null, __routerMap_decorators, { kind: "accessor", name: "_routerMap", static: false, private: false, access: { has: obj => "_routerMap" in obj, get: obj => obj._routerMap, set: (obj, value) => { obj._routerMap = value; } }, metadata: _metadata }, __routerMap_initializers, __routerMap_extraInitializers);
             if (_metadata) Object.defineProperty(_a, Symbol.metadata, { enumerable: true, configurable: true, writable: true, value: _metadata });
         })(),
@@ -218,9 +271,41 @@ let UI = (() => {
 exports.UI = UI;
 (function (UI) {
     class View {
+        get prop() {
+            return this._prop;
+        }
+        set prop(prop) {
+            this._prop = prop;
+        }
         constructor(layer, core) {
             this.layer = layer;
             this.core = core;
+            this.id = null;
+            this.name = null;
+            this.isSave = true;
+            this._prop = null;
+        }
+        create(prop) {
+            this.prop = prop;
+            this.onCreate(prop);
+        }
+        commit(prop) {
+            this.prop = prop;
+            this.onCommit(prop);
+        }
+        destroy() {
+            this.onDestroy();
+            this.prop = null;
+            this.id = null;
+        }
+        serialize() {
+            if (this.name == null)
+                throw new Error("View name is null when serialize");
+            return {
+                name: this.name,
+                layer: this.layer,
+                prop: this.prop,
+            };
         }
     }
     UI.View = View;
@@ -260,33 +345,47 @@ exports.UI = UI;
             this.activeViewInstance = null;
         }
         serialize() {
+            var _a, _b;
             return {
                 tag: this.tag,
                 layer: this.layer,
                 isSave: this.isSave,
                 viewStack: this.viewStack,
+                activeViewId: (_b = (_a = this.activeViewInstance) === null || _a === void 0 ? void 0 : _a.id) !== null && _b !== void 0 ? _b : null,
             };
         }
         static deserialize(ui, data) {
             let router = new Router(ui, data.tag, data.layer, data.isSave);
             router.viewStack = data.viewStack;
-            if (router.viewStack.length)
-                router.activeViewInstance = ui.createView(data.viewStack[0][0], data.layer, data.viewStack[0][1]);
+            if (data.activeViewId != null) {
+                let viewInstance = ui.getView(data.activeViewId);
+                if (!viewInstance)
+                    throw `View [${data.activeViewId}] not found when deserialize`;
+                router.activeViewInstance = viewInstance;
+            }
             return router;
         }
         get length() {
             return this.viewStack.length;
         }
-        push(view_name, prop) {
+        push(view_name, prop, strategy) {
+            var _a, _b;
+            if (this.activeViewInstance) {
+                // this._ui.destroyView(this.activeViewInstance);
+                ((_a = strategy === null || strategy === void 0 ? void 0 : strategy.destroy) !== null && _a !== void 0 ? _a : Router.defaultRouteStrategy.destroy)(this.activeViewInstance, this._ui);
+                this.activeViewInstance = null;
+            }
             let layerInstance = this._ui.getLayer(this.layer);
             if (!layerInstance)
                 throw `Layer [${this.layer}] not found`;
-            this.activeViewInstance = this._ui.createView(view_name, this.layer, prop);
+            this.activeViewInstance = ((_b = strategy === null || strategy === void 0 ? void 0 : strategy.create) !== null && _b !== void 0 ? _b : Router.defaultRouteStrategy.create)(view_name, this.layer, prop, this._ui, this.isSave);
             this.viewStack.push([view_name, prop]);
         }
-        pop(back_prop) {
+        pop(back_prop, strategy) {
+            var _a, _b;
             if (this.activeViewInstance) {
-                this._ui.destroyView(this.activeViewInstance);
+                // this._ui.destroyView(this.activeViewInstance);
+                ((_a = strategy === null || strategy === void 0 ? void 0 : strategy.destroy) !== null && _a !== void 0 ? _a : Router.defaultRouteStrategy.destroy)(this.activeViewInstance, this._ui);
                 this.activeViewInstance = null;
             }
             this.viewStack.pop();
@@ -295,33 +394,49 @@ exports.UI = UI;
                 let layerInstance = this._ui.getLayer(this.layer);
                 if (!layerInstance)
                     throw `Layer [${this.layer}] not found`;
-                this.activeViewInstance = this._ui.createView(backViewInfo[0], this.layer, back_prop !== null && back_prop !== void 0 ? back_prop : backViewInfo[1]);
+                this.activeViewInstance = ((_b = strategy === null || strategy === void 0 ? void 0 : strategy.create) !== null && _b !== void 0 ? _b : Router.defaultRouteStrategy.create)(backViewInfo[0], this.layer, back_prop !== null && back_prop !== void 0 ? back_prop : backViewInfo[1], this._ui, this.isSave);
             }
         }
-        replace(view_name, prop) {
+        replace(view_name, prop, strategy) {
+            var _a, _b;
             if (this.activeViewInstance) {
-                this._ui.destroyView(this.activeViewInstance);
+                // this._ui.destroyView(this.activeViewInstance);
+                ((_a = strategy === null || strategy === void 0 ? void 0 : strategy.destroy) !== null && _a !== void 0 ? _a : Router.defaultRouteStrategy.destroy)(this.activeViewInstance, this._ui);
                 this.activeViewInstance = null;
             }
             this.viewStack.pop();
             let layerInstance = this._ui.getLayer(this.layer);
             if (!layerInstance)
                 throw `Layer [${this.layer}] not found`;
-            this.activeViewInstance = this._ui.createView(view_name, this.layer, prop);
+            this.activeViewInstance = ((_b = strategy === null || strategy === void 0 ? void 0 : strategy.create) !== null && _b !== void 0 ? _b : Router.defaultRouteStrategy.create)(view_name, this.layer, prop, this._ui, this.isSave);
             this.viewStack.push([view_name, prop]);
         }
-        update(prop) {
+        update(prop, strategy) {
+            var _a;
             if (!this.activeViewInstance)
                 throw `Update View but activeViewInstance is null`;
             this.viewStack[this.viewStack.length - 1][1] = prop;
-            this._ui.updateView(this.activeViewInstance, prop);
+            ((_a = strategy === null || strategy === void 0 ? void 0 : strategy.update) !== null && _a !== void 0 ? _a : Router.defaultRouteStrategy.update)(this.activeViewInstance, prop, this._ui);
         }
-        clear() {
+        clear(strategy) {
+            var _a;
             if (this.activeViewInstance) {
-                this._ui.destroyView(this.activeViewInstance);
+                ((_a = strategy === null || strategy === void 0 ? void 0 : strategy.destroy) !== null && _a !== void 0 ? _a : Router.defaultRouteStrategy.destroy)(this.activeViewInstance, this._ui);
+                this.activeViewInstance = null;
             }
             this.viewStack = [];
         }
     }
+    Router.defaultRouteStrategy = {
+        destroy(viewInstance, ui) {
+            ui.destroyView(viewInstance);
+        },
+        create(viewName, layer, prop, ui, isSave) {
+            return ui.createView(viewName, layer, prop, isSave);
+        },
+        update(viewInstance, prop, ui) {
+            ui.updateView(viewInstance, prop);
+        },
+    };
     UI.Router = Router;
 })(UI || (exports.UI = UI = {}));

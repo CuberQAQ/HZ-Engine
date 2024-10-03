@@ -27,9 +27,10 @@ export function basic_commands(core: HZEngineCore) {
     let strArr = ctx.rawtext.trim().split(/ +/);
     if (strArr.length === 0 || strArr[0].toLowerCase() !== "return")
       return next();
-    if (strArr.length !== 1) throw "Return Command: this command can not have args";
+    if (strArr.length !== 1)
+      throw "Return Command: this command can not have args";
     console.log(`Return Command: return`);
-    core.script.return()
+    core.script.return();
   });
 
   // (debug) echo command
@@ -83,11 +84,7 @@ export function basic_commands(core: HZEngineCore) {
       core.ui.addRouter(tag_prefixed, "fg");
       router = core.ui.getRouter(tag_prefixed)!;
     }
-    if (!router.length) {
-      router.push<UI.FgImgViewProp>(show_view_name, prop);
-    } else {
-      router.update<UI.FgImgViewProp>(prop);
-    }
+    router.replace<UI.FgImgViewProp>(show_view_name, prop);
   }
 
   // hide command
@@ -100,18 +97,16 @@ export function basic_commands(core: HZEngineCore) {
     hideAction(tag);
   });
 
-  
   function hideAction(tag: string) {
     const show_view_tag_prefix = "hzengine.fg_img";
 
     let tag_prefixed = `${show_view_tag_prefix}.${tag}`;
     let router = core.ui.getRouter(tag_prefixed);
     if (!router) {
-        throw `Hide Command: router with tag [${tag}] not found `
+      throw `Hide Command: router with tag [${tag}] not found `;
     }
-    router.clear()
+    router.clear();
   }
-
 
   // scene command
   core.script.use((ctx, next) => {
@@ -135,7 +130,6 @@ export function basic_commands(core: HZEngineCore) {
 
     sceneAction(tag, path, size);
   });
-
 
   function sceneAction(tag: string, path: string, size: UI.Size) {
     const scene_view_tag_prefix = "hzengine.bg_img";
@@ -171,7 +165,7 @@ export function basic_commands(core: HZEngineCore) {
     if (ctx.slicedArgs.length > 2 || ctx.slicedArgs.length < 1) {
       throw `Say Command: incorrect amount of args`;
     }
-    
+
     if (ctx.slicedArgs.length === 1) {
       console.log(`[SAY] ${ctx.slicedArgs[0].str}`);
       sayAction(core, "", ctx.slicedArgs[0].str);

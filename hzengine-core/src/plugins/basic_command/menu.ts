@@ -1,4 +1,3 @@
-import path from "@cuberqaq/path-polyfill";
 import { HZEngineCore, Storage, UI } from "../..";
 
 export function menu_statement(core: HZEngineCore) {

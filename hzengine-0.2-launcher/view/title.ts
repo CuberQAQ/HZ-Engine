@@ -3,7 +3,6 @@ import { getDeviceInfo, SCREEN_SHAPE_SQUARE } from "@zos/device";
 import { HZEngineCore, UI } from "hzengine-core";
 import { px } from "../shared/dynamic_px.js";
 
-import path from "@cuberqaq/path-polyfill";
 import { getText } from "@zos/i18n";
 const { width, height, screenShape } = getDeviceInfo();
 

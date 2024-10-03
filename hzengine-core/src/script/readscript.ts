@@ -1,12 +1,11 @@
-import { readFileAssetsSync } from "../storage/fs";
-
+import * as hmFS from '@zos/fs'
 let cache = new Map();
 export function readline(path: string, line_index: number): string | undefined {
   if (cache.has(path)) {
     return cache.get(path)[line_index];
   }
     // Get Command
-    let hzsContent = readFileAssetsSync({
+    let hzsContent = hmFS.readFileSync({
         path,
         options: { encoding: "utf8" },
       }) as string;

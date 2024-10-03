@@ -1,10 +1,6 @@
 import { HZEngineCore } from "..";
 
-import * as hmFS from "@zos/fs";
-import * as hmApp from "@zos/app";
-import path from "@cuberqaq/path-polyfill";
 import { HzsInfo, Storage } from "../storage";
-import { readFileAssetsSync } from "../storage/fs";
 import { parseInterpolatedStr, removeComment, splitStr2Objs } from "./strtools";
 import { readline } from "./readscript";
 import { ArchiveStateAccessor } from "../storage/decorator";
@@ -340,9 +336,10 @@ export class Script {
   // eval
   evalScope(code: string) {
     try {
-      return new Function("sd", "gd", `${code}`)(
+      return new Function("sd", "gd", "hz", `${code}`)(
         this._core.storage.sd,
-        this._core.storage.gd
+        this._core.storage.gd,
+        this._core
       );
     } catch (e) {
       console.log(`Error in evalScope: ${e}`);
@@ -352,9 +349,10 @@ export class Script {
     console.log(`[HZEngine] evalExpression: ${code}`);
 
     try {
-      return new Function("sd", "gd", `return (${code})`)(
+      return new Function("sd", "gd", "hz", `return (${code})`)(
         this._core.storage.sd,
-        this._core.storage.gd
+        this._core.storage.gd,
+        this._core
       );
     } catch (e) {
       console.log(`Error in evalExpression: ${e}`);

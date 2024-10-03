@@ -28,12 +28,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Storage = void 0;
 const hmFS = __importStar(require("@zos/fs"));
+const path_1 = __importDefault(require("../utils/path"));
 const fs_1 = require("./fs");
-const path_polyfill_1 = __importDefault(require("@cuberqaq/path-polyfill"));
 class Storage {
     constructor(_core) {
         this._core = _core;
         this.projectRoot = null;
+        this.cacheRoot = null;
+        this.saveRoot = null;
         this.preloadedData = null;
         this.packageData = null;
         // Storage Data
@@ -59,26 +61,31 @@ class Storage {
         this._archiveStateSetterRegisteredList = new Set();
         this._archiveStateGetterRegisteredList = new Set();
     }
-    loadProject(path) {
-        if (!(0, fs_1.readdirAssetsSync)({ path })) {
+    loadProject(options) {
+        if (!hmFS.readdirSync({ path: options.projectPath })) {
             throw "Dir not exist";
         }
-        this.projectRoot = path;
+        this.projectRoot = options.projectPath;
+        this.cacheRoot = options.cachePath;
+        this.saveRoot = options.savePath;
         this.loadPackageData();
         this.preload();
     }
     loadPackageData() {
         if (!this.projectRoot)
             throw "projectDir is null";
-        if (!hmFS.statAssetsSync({
-            path: path_polyfill_1.default.join(this.projectRoot, "hz_package.json"),
+        console.log(`loadPackageData ${this.projectRoot} ${path_1.default.join(this.projectRoot, "hz_package.json")}`);
+        if (!hmFS.statSync({
+            path: path_1.default.join(this.projectRoot, "hz_package.json"),
         })) {
             throw "HZEngine Package File (hz_package.json) not exist";
         }
-        this.packageData = JSON.parse((0, fs_1.readFileAssetsSync)({
-            path: path_polyfill_1.default.join(this.projectRoot, "hz_package.json"),
+        console.log("start 1");
+        this.packageData = JSON.parse(hmFS.readFileSync({
+            path: path_1.default.join(this.projectRoot, "hz_package.json"),
             options: { encoding: "utf8" },
         }));
+        console.log("end 1");
     }
     get globalData() {
         if (!this._globalData) {
@@ -109,15 +116,15 @@ class Storage {
         return this.archiveData;
     }
     loadGlobalData() {
-        if (!this.projectRoot) {
-            throw "projectDir is null, please loadProject first";
+        if (!this.saveRoot) {
+            throw "saveDir is null, please loadProject first";
         }
         this._core.emit("beforeLoadGlobalData");
-        if (hmFS.statAssetsSync({
-            path: path_polyfill_1.default.join(this.projectRoot, "globalData.json"),
+        if (hmFS.statSync({
+            path: path_1.default.join(this.saveRoot, "globalData.json"),
         })) {
-            this._globalData = JSON.parse((0, fs_1.readFileAssetsSync)({
-                path: path_polyfill_1.default.join(this.projectRoot, "globalData.json"),
+            this._globalData = JSON.parse(hmFS.readFileSync({
+                path: path_1.default.join(this.saveRoot, "globalData.json"),
                 options: {
                     encoding: "utf8",
                 },
@@ -130,8 +137,8 @@ class Storage {
         else {
             console.log(`[HZEngine] globalData.json not exist, create it.`);
             this._globalData = {}; // Initial GlobalData value
-            (0, fs_1.writeFileAssetsSync)({
-                path: path_polyfill_1.default.join(this.projectRoot, "globalData.json"),
+            hmFS.writeFileSync({
+                path: path_1.default.join(this.saveRoot, "globalData.json"),
                 data: JSON.stringify(this._globalData),
             });
             this._core.emit("afterLoadGlobalData");
@@ -149,28 +156,28 @@ class Storage {
                 throw "projectDir is null, please loadProject first";
             }
             this._core.emit("beforeSaveGlobalData");
-            let res = (0, fs_1.writeFileAssetsSync)({
-                path: path_polyfill_1.default.join(this.projectRoot, "globalData.json"),
+            let res = hmFS.writeFileSync({
+                path: path_1.default.join(this.projectRoot, "globalData.json"),
                 data: JSON.stringify(this._globalData),
-            });
+            }); // TODO
             if (res < 0)
                 throw `[HZEngine] save globalData to globalData.json failed, code = ${res}`;
             console.log(`[HZEngine] save globalData to globalData.json`);
             this._core.emit("afterSaveGlobalData");
         }, 0);
     }
-    loadArchiveData(archivePath) {
+    loadArchiveData(archiveFile) {
         this._core.emit("beforeLoadArchive");
-        if (archivePath) {
-            if (!this.projectRoot)
-                throw `projectDir is null, please loadProject first`;
-            if (!hmFS.statAssetsSync({
-                path: path_polyfill_1.default.join(this.projectRoot, archivePath),
+        if (archiveFile) {
+            if (!this.saveRoot)
+                throw `saveRoot is null, please loadProject first`;
+            if (!hmFS.statSync({
+                path: path_1.default.join(this.saveRoot, archiveFile),
             })) {
-                throw `Archive [${archivePath}] not exist`;
+                throw `Archive [${archiveFile}] not exist`;
             }
-            let archiveData = JSON.parse((0, fs_1.readFileAssetsSync)({
-                path: path_polyfill_1.default.join(this.projectRoot, archivePath),
+            let archiveData = JSON.parse(hmFS.readFileSync({
+                path: path_1.default.join(this.saveRoot, archiveFile),
                 options: {
                     encoding: "utf8",
                 },
@@ -178,7 +185,7 @@ class Storage {
             if (archiveData == null)
                 throw `[HZEngine] ArchiveData is null`;
             this._archiveData = archiveData;
-            console.log(`[HZEngine] load archiveData from ${archivePath}`);
+            console.log(`[HZEngine] load archiveData from ${archiveFile}`);
             this._core.emit("afterLoadArchive");
         }
         else {
@@ -190,24 +197,24 @@ class Storage {
     /**
      * 保存存档数据
      * 可以多次調用，實際上會異步儲存，也就是在一個宏任務中即使調用多次，也只會在宏任務結束後儲存一次
-     * @param archivePath 存档文件目錄及名字
+     * @param archiveFile 存档文件目錄及名字
      */
-    saveArchiveData(archivePath, immediate = false) {
-        if (!this.projectRoot)
-            throw `projectDir is null, please loadProject first`;
+    saveArchiveData(archiveFile, immediate = false) {
+        if (!this.saveRoot)
+            throw `saveRoot is null, please loadProject first`;
         this._core.emit("beforeSaveArchive");
-        console.log("[HZEngine] will save archiveData to " + archivePath);
+        console.log("[HZEngine] will save archiveData to " + archiveFile);
         let saveFunc = () => {
-            console.log("[HZEngine] saving archiveData to " + archivePath);
-            if (!this.projectRoot)
+            console.log("[HZEngine] saving archiveData to " + archiveFile);
+            if (!this.saveRoot)
                 throw `projectDir is null, please loadProject first`;
-            let res = (0, fs_1.writeFileAssetsSync)({
-                path: path_polyfill_1.default.join(this.projectRoot, archivePath),
+            let res = hmFS.writeFileSync({
+                path: path_1.default.join(this.saveRoot, archiveFile),
                 data: JSON.stringify(this._archiveData),
-            });
+            }); //TODO
             if (res < 0)
-                throw `[HZEngine] save archiveData to ${archivePath} failed, code = ${res}`;
-            console.log(`[HZEngine] save archiveData to ${archivePath}`);
+                throw `[HZEngine] save archiveData to ${archiveFile} failed, code = ${res}`;
+            console.log(`[HZEngine] save archiveData to ${archiveFile}`);
             this._core.emit("afterSaveArchive");
         };
         if (immediate) {
@@ -267,15 +274,16 @@ class Storage {
     }
     // Preload
     preload() {
-        if (!this.projectRoot) {
-            throw "projectDir is null, please loadProject first";
+        if (!this.cacheRoot) {
+            throw "cacheRoot is null, please loadProject first";
         }
-        if (hmFS.statAssetsSync({
-            path: path_polyfill_1.default.join(this.projectRoot, "preloaded.json"),
+        // writeFileSync({path: "data://test.json", data: "awa", options: {encoding: "utf8"}});
+        if (hmFS.statSync({
+            path: path_1.default.join(this.cacheRoot, "preloaded.json"),
         })) {
             // 已经预加载过了，退出
-            this.preloadedData = JSON.parse((0, fs_1.readFileAssetsSync)({
-                path: path_polyfill_1.default.join(this.projectRoot, "preloaded.json"),
+            this.preloadedData = JSON.parse(hmFS.readFileSync({
+                path: path_1.default.join(this.cacheRoot, "preloaded.json"),
                 options: {
                     encoding: "utf8",
                 },
@@ -294,12 +302,12 @@ class Storage {
         this.preloadScript();
         this.preloadImage();
         // console.log(JSON.stringify(this.preloadedData));
-        (0, fs_1.writeFileAssetsSync)({
-            path: path_polyfill_1.default.join(this.projectRoot, "preloaded.json"),
+        hmFS.writeFileSync({
+            path: path_1.default.join(this.cacheRoot, "preloaded.json"),
             data: JSON.stringify(this.preloadedData),
         });
         // console.log(
-        //   `${Path.join(this.projectDir, "preloaded.json")} = ${readFileAssetsSync({
+        //   `${Path.join(this.projectDir, "preloaded.json")} = ${readFileSync({
         //     path: Path.join(this.projectDir, "preloaded.json"),
         //     options:{encoding:"utf8"}
         //   })}`
@@ -313,18 +321,18 @@ class Storage {
         // 记录脚本label的位置
         // 这里的index是以0开始计数的行数
         let labelMap = this.preloadedData.script.labelMap;
-        let scriptDir = path_polyfill_1.default.join(this.projectRoot, "script");
+        let scriptDir = path_1.default.join(this.projectRoot, "script");
         let hzsInfoMap = this.preloadedData.script.hzsInfoMap;
-        if (!(0, fs_1.readdirAssetsSync)({ path: scriptDir }))
+        if (!hmFS.readdirSync({ path: scriptDir }))
             throw "项目文件夹中script文件夹不存在";
         // 遍历所有hzs文件
         traverseScript(scriptDir);
         function traverseScript(path) {
-            let dirs = (0, fs_1.readdirAssetsSync)({ path });
+            let dirs = hmFS.readdirSync({ path });
             // console.log(dirs);
             for (let dir of dirs) {
-                let subpath = path_polyfill_1.default.join(path, dir);
-                if ((0, fs_1.isFileAssetsSync)({ path: subpath })) {
+                let subpath = path_1.default.join(path, dir);
+                if ((0, fs_1.isFileSync)({ path: subpath })) {
                     // 是文件
                     if (dir.endsWith(".hzs")) {
                         preloadHzs(subpath);
@@ -341,10 +349,10 @@ class Storage {
          * 2. 记录所有脚本文件的行数
          */
         function preloadHzs(path) {
-            let fd = hmFS.openAssetsSync({ path });
+            let fd = hmFS.openSync({ path });
             if (fd < 0)
                 throw "Fd<0";
-            let size = hmFS.statAssetsSync({ path }).size;
+            let size = hmFS.statSync({ path }).size;
             let arrbuf = new ArrayBuffer(size);
             hmFS.readSync({ fd, buffer: arrbuf });
             let buffer = Buffer.from(arrbuf);
@@ -380,20 +388,18 @@ at [${labelMap[label][0]}(line ${labelMap[label][1]})] \
      * 遍历所有png文件，计算对应的name key，建立map
      */
     preloadImage() {
-        // 记录脚本label的位置
-        // 这里的index是以0开始计数的行数
         let nameMap = this.preloadedData.image.nameMap;
-        let imageDir = path_polyfill_1.default.join(this.projectRoot, "image");
-        if (!(0, fs_1.readdirAssetsSync)({ path: imageDir }))
+        let imageDir = path_1.default.join(this.projectRoot, "image");
+        if (!hmFS.readdirSync({ path: imageDir }))
             throw "项目文件夹中image文件夹不存在";
         // 遍历所有hzs文件
         traverseImage(imageDir);
         function traverseImage(path) {
-            let dirs = (0, fs_1.readdirAssetsSync)({ path });
+            let dirs = hmFS.readdirSync({ path });
             // console.log(dirs);
             for (let dir of dirs) {
-                let subpath = path_polyfill_1.default.join(path, dir);
-                if ((0, fs_1.isFileAssetsSync)({ path: subpath })) {
+                let subpath = path_1.default.join(path, dir);
+                if ((0, fs_1.isFileSync)({ path: subpath })) {
                     // 是文件
                     if (dir.endsWith(".png")) {
                         preloadImage(subpath);
@@ -410,7 +416,7 @@ at [${labelMap[label][0]}(line ${labelMap[label][1]})] \
          * 2. 记录所有image的name key和路径
          */
         function preloadImage(path) {
-            let raw_name = path_polyfill_1.default.parse(path).name;
+            let raw_name = path_1.default.parse(path).name;
             let name_key = raw_name
                 .trim()
                 .replace("_", " ")

@@ -40,7 +40,11 @@ Page({
     hzengine.loadPlugin("views", ViewPlugin);
 
     // 加载游戏项目，这里的"raw/project"是项目的根文件夹（相对于assets文件夹）
-    hzengine.loadProject("raw/project");
+    hzengine.loadProject({
+      projectPath: "assets://raw/project",
+      cachePath: "data://",
+      savePath: "data://",
+    });
 
     // 在模拟器将电量设置为0，就會認定是模拟器环境
     // 这是为了方便测试。一旦认定为模拟器环境，在hzs脚本中以[REAL]开头的命令会被忽略

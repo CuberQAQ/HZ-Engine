@@ -22,6 +22,7 @@ import * as hmApp from "@zos/app";
 import * as hmFS from "@zos/fs";
 import Path from "@cuberqaq/path-polyfill";
 import { px } from "../shared/dynamic_px";
+import { readFileAssetsSync } from "../../demo/watch_app/shared/fs.js";
 
 // 电量传感器，用于获取电池电量
 const battery = new Battery();
@@ -54,6 +55,11 @@ Page({
       selfDestroy()
       return
     }
+
+    // TODO test
+    console.log("[CTEST]", readFileAssetsSync({
+      path: "icon.png"
+    }))
 
     // 创建HZEngineCore实例
     hzengine = new HZEngineCore();
@@ -132,7 +138,7 @@ function selfDestroy() {
   try {
     // 删除游戏项目
     hmFS.rmSync({
-      path: fromDataToAssetsPath("raw/project"),
+      path: "assets://raw/project",
     });
   } finally {
     let w = px(400);
@@ -152,31 +158,3 @@ function selfDestroy() {
   }
 }
 
-/**
- * 将基于assets的文件路径转换为基于data的文件路径
- */
-function fromDataToAssetsPath(path) {
-  return Path.join(`../../${getAppDir()}/assets`, path);
-}
-
-function getAppDir(appId = (hmApp.getPackageInfo()).appId) {
-  let str = appId.toString(16);
-  switch (str.length) {
-    case 1:
-      return `0000000${str}`.toUpperCase();
-    case 2:
-      return `000000${str}`.toUpperCase();
-    case 3:
-      return `00000${str}`.toUpperCase();
-    case 4:
-      return `0000${str}`.toUpperCase();
-    case 5:
-      return `000${str}`.toUpperCase();
-    case 6:
-      return `00${str}`.toUpperCase();
-    case 7:
-      return `0${str}`.toUpperCase();
-    case 8:
-      return `${str}`.toUpperCase();
-  }
-}
