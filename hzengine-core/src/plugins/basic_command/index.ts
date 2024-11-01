@@ -5,6 +5,7 @@ import { character_command } from "./character";
 import { conditional } from "./conditional";
 import { decorator_module } from "./decorator";
 import { eval_module } from "./eval";
+import { img } from "./img";
 import { menu_statement } from "./menu";
 
 export function basic_command(core: HZEngineCore) {
@@ -15,4 +16,5 @@ export function basic_command(core: HZEngineCore) {
   $_command(core)
   eval_module(core)
   conditional(core)
+  img(core)
 }

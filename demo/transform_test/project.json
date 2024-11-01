@@ -1,0 +1,11 @@
+{
+    "name": "動畫係統測試",
+    "version": "1.0.1",
+    "author": "CuberQAQ",
+    "uuid": "f9c5b194-2f3e-4418-a454-4ab019d78666",
+    "description": "HZPK Transform test project",
+
+    "hz": {
+        "version": "1.0.0"
+    }
+}

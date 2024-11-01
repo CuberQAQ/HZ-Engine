@@ -107,6 +107,24 @@ export function character_command(core: HZEngineCore) {
     for (let key in characterMap) {
       // console.log(`Character Say Command: key=${key} sn=${short_name}`);
 
+      function parseSayCommandArgs() {
+        if (
+          ctx.slicedArgs.length > 0 &&
+          ctx.slicedArgs[ctx.slicedArgs.length - 1].str === "nowait"
+        ) {
+          ctx.slicedArgs = ctx.slicedArgs.slice(0, ctx.slicedArgs.length - 1);
+          return {
+            wait: false,
+          };
+        } else {
+          return {
+            wait: true,
+          };
+        }
+      }
+  
+      let parsed = parseSayCommandArgs();
+
       if (key === short_name) {
         if (ctx.slicedArgs.length != 2)
           throw `Character Say Command: incorrect amount of args`;
@@ -117,7 +135,7 @@ export function character_command(core: HZEngineCore) {
         );
 
         sayAction(core, characterMap[key].display_name, ctx.slicedArgs[1].str);
-        core.system.pause();
+        if(parsed.wait) core.system.pause();
         return;
       }
     }

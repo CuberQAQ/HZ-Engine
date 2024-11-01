@@ -53,6 +53,28 @@ export declare namespace UI {
             prop: Storage.Saveable<unknown>;
         }
     }
+    interface BasicUniversalProp {
+        alpha?: number;
+        xalign?: number;
+        yalign?: number;
+        xanchor?: number;
+        yanchor?: number;
+        xoffset?: number;
+        yoffset?: number;
+    }
+    function getScreenSize(): Size;
+    /**
+     * 根据 BasicUniversalProp 计算屏幕上的位置
+     * @param prop 包含 BasicUniversalProp 的 prop
+     * @param size (可选)图像的尺寸，若不指定，返回的anchor坐标和origin坐标一样
+     * @returns
+     */
+    function calcPosition(prop: BasicUniversalProp, size?: Size): {
+        /** 锚点（算上偏移）的屏幕位置 */
+        anchor: Coordinate;
+        /** 图像左上角的屏幕位置 */
+        origin: Coordinate;
+    };
     interface Message {
         who: string;
         what: string;
@@ -117,7 +139,7 @@ export declare namespace UI {
         isSave: boolean;
         constructor(_ui: UI, tag: string, layer: string, isSave?: boolean);
         serialize(): Router.Serialized;
-        static defaultRouteStrategy: Router.RouteStrategy;
+        defaultRouteStrategy: Router.RouteStrategy;
         static deserialize(ui: UI, data: Router.Serialized): Router;
         viewStack: [view_name: string, prop: Storage.Saveable<unknown>][];
         get length(): number;

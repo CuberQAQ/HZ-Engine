@@ -4,8 +4,9 @@
   "private": true,
   "description": "An Visual Novel Engine for Zepp OS",
   "main": "./dist/index",
-  "types": "./types/index",
+  "types": "./src/index",
   "type": "module",
+  
   "scripts": {
     "build": "tsc",
     "watch": "tsc --watch"

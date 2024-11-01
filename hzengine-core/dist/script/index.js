@@ -391,6 +391,12 @@ exports.Script = Script;
             this._rawtextChanged = false;
             return this._slicedArgs;
         }
+        // 注意只有在修改在触发slicedArgs的时候才会更新rawtext
+        set slicedArgs(slicedArgs) {
+            this._slicedArgs = JSON.parse(JSON.stringify(slicedArgs)); // TODO 深拷贝 性能
+            this._rawtext = (0, strtools_1.mergeObjs2Str)(slicedArgs);
+            // TODO this._rawtextChanged = true ???
+        }
         /**
          * 開始一個新的Statement，返回該Statement的數據
          * Start a new statement and return the data of the new statement
@@ -438,6 +444,70 @@ exports.Script = Script;
         }
     }
     Script.Context = Context;
+    let Utils;
+    (function (Utils) {
+        Utils.joinSlicedArgs = strtools_1.mergeObjs2Str;
+        Utils.splitRawtext = strtools_1.splitStr2Objs;
+        function splitCommas(rawtext) {
+            let slicedArgs = (0, strtools_1.splitStr2Objs)(rawtext);
+            console.log(`splitCommas rawtext: ${rawtext}, slicedArgs: ${JSON.stringify(slicedArgs)}`);
+            let res = [];
+            for (let i = 0; i < slicedArgs.length; i++) {
+                if (slicedArgs[i].isQuoted)
+                    res.push(`"${slicedArgs[i].str}"`);
+                else if (slicedArgs[i].isSquared)
+                    res.push(`[${slicedArgs[i].str}]`);
+                else if (slicedArgs[i].isRounded)
+                    res.push(`(${slicedArgs[i].str})`);
+                else {
+                    slicedArgs[i].str.split(",").forEach((str) => {
+                        str = str.trim();
+                        if (str)
+                            res.push(str);
+                    });
+                }
+            }
+            console.log(`splitCommas res: ${JSON.stringify(res)}`);
+            return res;
+        }
+        Utils.splitCommas = splitCommas;
+        function parseTuple(rawtext) {
+            if (rawtext.length < 2 ||
+                rawtext[0] !== "(" ||
+                rawtext[rawtext.length - 1] !== ")") {
+                throw `invalid tuple: ${rawtext}`;
+            }
+            rawtext = rawtext.slice(1, rawtext.length - 1);
+            console.log(`parseTuple rawtext: ${rawtext}`);
+            return parseHzsArgs(rawtext);
+        }
+        Utils.parseTuple = parseTuple;
+        function parseArray(rawtext) {
+            if (rawtext.length < 2 ||
+                rawtext[0] !== "[" ||
+                rawtext[rawtext.length - 1] !== "]") {
+                throw `invalid array: ${rawtext}`;
+            }
+            rawtext = rawtext.slice(1, rawtext.length - 1);
+            return parseHzsArgs(rawtext);
+        }
+        Utils.parseArray = parseArray;
+        function parseHzsArgs(rawtext) {
+            rawtext = rawtext.trim();
+            let arr = splitCommas(rawtext);
+            let res = arr.map((str) => {
+                if (str.startsWith("("))
+                    return parseTuple(str);
+                else if (str.startsWith("["))
+                    return parseArray(str);
+                else
+                    return str;
+            });
+            console.log(`parseHzsArgs from: "${rawtext}" ; res: ${JSON.stringify(res)}`);
+            return res;
+        }
+        Utils.parseHzsArgs = parseHzsArgs;
+    })(Utils = Script.Utils || (Script.Utils = {}));
     class ContextForAnalyseStatement extends Context {
         startStatement(identifier, data = {}) {
             return super.startStatement(identifier, data !== null && data !== void 0 ? data : {});

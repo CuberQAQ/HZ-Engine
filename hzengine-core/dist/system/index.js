@@ -56,20 +56,33 @@ let System = (() => {
             constructor(_core) {
                 this._core = _core;
                 _System_condition_accessor_storage.set(this, __runInitializers(this, _condition_initializers, _a.Condition.Free));
-                __runInitializers(this, _condition_extraInitializers);
-                this._core = _core;
+                this._pauseTimer = (__runInitializers(this, _condition_extraInitializers), null);
+                _core.on("system.continue", () => {
+                    this._pauseTimer = null;
+                    this.continue();
+                });
             }
             get condition() { return __classPrivateFieldGet(this, _System_condition_accessor_storage, "f"); }
             set condition(value) { __classPrivateFieldSet(this, _System_condition_accessor_storage, value, "f"); }
+            /**
+             * 暂停(可指定一段时间)
+             * 后调用的会覆盖之前pause的设定时间
+             * @param delayMs
+             */
             pause(delayMs) {
                 console.log(`[HZEngine] Pause`);
-                if (delayMs)
-                    throw `delayMs not implemented`;
                 if (this.condition === _a.Condition.Gaming) {
                     this.condition = _a.Condition.Pause;
                 }
                 else
                     throw `pause but condition error (todo)`; // TODO
+                if (this._pauseTimer) {
+                    this._core.async.removeTask(this._pauseTimer);
+                    this._pauseTimer = null;
+                }
+                if (delayMs !== undefined) {
+                    this._pauseTimer = this._core.async.addDelayTask("system.continue", [], delayMs);
+                }
             }
             /**
              * 继续由于pause中断的游戏
@@ -84,6 +97,8 @@ let System = (() => {
              * 阻塞
              */
             block() {
+                if (this.condition !== _a.Condition.Gaming)
+                    throw `block but condition error (todo)`;
                 this.condition = _a.Condition.Blocked;
             }
             /**

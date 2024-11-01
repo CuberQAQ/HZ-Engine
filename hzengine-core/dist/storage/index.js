@@ -57,11 +57,9 @@ class Storage {
          */
         this._saveGlobalDataTimerId = null;
         this._saveArchiveDataTimerId = null;
-        // Decorator Field
-        this._archiveStateSetterRegisteredList = new Set();
-        this._archiveStateGetterRegisteredList = new Set();
     }
     loadProject(options) {
+        this._core.emit("beforeLoadProject");
         if (!hmFS.readdirSync({ path: options.projectPath })) {
             throw "Dir not exist";
         }
@@ -70,6 +68,7 @@ class Storage {
         this.saveRoot = options.savePath;
         this.loadPackageData();
         this.preload();
+        this._core.emit("afterLoadProject");
     }
     loadPackageData() {
         if (!this.projectRoot)
@@ -298,9 +297,13 @@ class Storage {
             image: {
                 nameMap: {},
             },
+            animation: {
+                profileMap: {}
+            }
         };
         this.preloadScript();
         this.preloadImage();
+        this.preloadAnimation();
         // console.log(JSON.stringify(this.preloadedData));
         hmFS.writeFileSync({
             path: path_1.default.join(this.cacheRoot, "preloaded.json"),
@@ -429,6 +432,43 @@ at [${labelMap[label][0]}(line ${labelMap[label][1]})] \
         // console.log(
         //   `Preloaded image: ${JSON.stringify(this.preloadedData.image.nameMap)}`
         // );
+    }
+    /**
+     * 預加載動畫profile
+     * 遍歷animation文件夾下的所有json文件，以文件名為key，json内容為value
+     */
+    preloadAnimation() {
+        let profileMap = this.preloadedData.animation.profileMap;
+        let animationDir = path_1.default.join(this.projectRoot, "animation");
+        if (!hmFS.readdirSync({ path: animationDir }))
+            throw "项目文件夹中animation文件夹不存在";
+        traverseAnimation(animationDir);
+        function traverseAnimation(path) {
+            let dirs = hmFS.readdirSync({ path });
+            // console.log(dirs);
+            for (let dir of dirs) {
+                let subpath = path_1.default.join(path, dir);
+                if ((0, fs_1.isFileSync)({ path: subpath })) {
+                    // 是文件
+                    if (dir.endsWith(".json")) {
+                        preloadAnimation(subpath);
+                    }
+                }
+                else {
+                    // 是目录
+                    traverseAnimation(subpath);
+                }
+            }
+        }
+        function preloadAnimation(path) {
+            let raw_name = path_1.default.parse(path).name;
+            let name_key = raw_name
+                .trim()
+                .replace(/ +/, "_");
+            if (profileMap[name_key])
+                throw `Animation profile name key conflict [${name_key}], at file [${path}] and [${profileMap[name_key]}]`;
+            profileMap[name_key] = [path];
+        }
     }
 }
 exports.Storage = Storage;

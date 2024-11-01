@@ -7,6 +7,9 @@ import { Storage } from "../storage/index";
 /// <reference path="node_modules/@zeppos/device-types/dist/index.d.ts" />
 import * as hmUI from "@zos/ui";
 import {} from "@zos/ui";
+
+import { getDeviceInfo, SCREEN_SHAPE_SQUARE } from "@zos/device";
+const { width, height, screenShape } = getDeviceInfo();
 export class UI {
   constructor(public _core: HZEngineCore) {
     this._initUI();
@@ -135,6 +138,7 @@ export class UI {
   ): UI.View<T> {
     let id = this._nextViewId++;
     let viewInstance = this._produceViewWithId(name, layer, prop, id);
+    this._core.debug.log(`creating view ${viewInstance.name}`);
     viewInstance.isSave = isSave;
     this._viewMap.set(id, viewInstance);
     return viewInstance;
@@ -164,6 +168,7 @@ export class UI {
     viewInstance.id = id;
     viewInstance.name = name;
     viewInstance.create(prop);
+    this._core.debug.log(`producing view ${viewInstance.name}`);
     return viewInstance;
   }
 
@@ -269,6 +274,64 @@ export namespace UI {
     }
   }
 
+  export interface BasicUniversalProp {
+    // 透明度 [0, 1]
+    alpha?: number;
+    // 锚点对齐位置 [0, 1]； 在不指定的情况下，默认位于屏幕中心
+    xalign?: number;
+    yalign?: number;
+    // 锚点相对图像位置 [0, 1]； 在不指定的情况下，以图像中心作为锚点
+    xanchor?: number;
+    yanchor?: number;
+    // px； 不指定就是不偏移
+    xoffset?: number;
+    yoffset?: number;
+  }
+
+  export function getScreenSize(): Size {
+    return {
+      width,
+      height,
+    };
+  }
+
+  /**
+   * 根据 BasicUniversalProp 计算屏幕上的位置
+   * @param prop 包含 BasicUniversalProp 的 prop
+   * @param size (可选)图像的尺寸，若不指定，返回的anchor坐标和origin坐标一样
+   * @returns 
+   */
+  export function calcPosition(
+    prop: BasicUniversalProp,
+    size?: Size
+  ): {
+    /** 锚点（算上偏移）的屏幕位置 */
+    anchor: Coordinate;
+    /** 图像左上角的屏幕位置 */
+    origin: Coordinate;
+  } {
+    // 1. 确定 anchor
+    // 2. 通过 align 确定初始位置
+    // 3. offset
+    // 返回左上角的位置
+    let anchor_coord = {
+      x:
+        (width * ((prop.xalign ?? 0) + 1)) / 2 + // 根据 align 求出 anchor 位置
+        (prop.xoffset ?? 0), // offset
+      y:
+        (height * ((prop.yalign ?? 0) + 1)) / 2 + // 根据 align 求出 anchor 位置
+        (prop.yoffset ?? 0), // offset
+    };
+    let origin_coord = {
+      x: anchor_coord.x - (((prop.xanchor ?? 0) + 1) / 2) * (size?.width ?? 0),
+      y: anchor_coord.y - (((prop.yanchor ?? 0) + 1) / 2) * (size?.height ?? 0),
+    };
+    return {
+      anchor: anchor_coord,
+      origin: origin_coord,
+    };
+  }
+
   export interface Message {
     who: string;
     what: string;
@@ -346,14 +409,17 @@ export namespace UI {
         activeViewId: this.activeViewInstance?.id ?? null,
       };
     }
-    static defaultRouteStrategy: Router.RouteStrategy = {
-      destroy(viewInstance, ui) {
+    defaultRouteStrategy: Router.RouteStrategy = {
+      destroy: (viewInstance, ui) => {
+        this._ui._core.debug.log(`destroy view ${viewInstance.name}`);
         ui.destroyView(viewInstance);
       },
-      create(viewName, layer, prop, ui, isSave) {
+      create: (viewName, layer, prop, ui, isSave) => {
+        this._ui._core.debug.log(`create view ${viewName}`);
         return ui.createView(viewName, layer, prop, isSave);
       },
-      update(viewInstance, prop, ui) {
+      update: (viewInstance, prop, ui) => {
+        this._ui._core.debug.log(`update view ${viewInstance.name}`);
         ui.updateView(viewInstance, prop);
       },
     };
@@ -380,17 +446,39 @@ export namespace UI {
     ) {
       if (this.activeViewInstance) {
         // this._ui.destroyView(this.activeViewInstance);
-        (strategy?.destroy ?? Router.defaultRouteStrategy.destroy!)(
-          this.activeViewInstance,
-          this._ui
-        );
+        // (strategy?.destroy ?? this.defaultRouteStrategy.destroy!)(
+        //   this.activeViewInstance,
+        //   this._ui
+        // );
+        if (strategy?.destroy) {
+          strategy.destroy(this.activeViewInstance, this._ui);
+        } else {
+          this.defaultRouteStrategy.destroy!(this.activeViewInstance, this._ui);
+        }
         this.activeViewInstance = null;
       }
       let layerInstance = this._ui.getLayer(this.layer);
       if (!layerInstance) throw `Layer [${this.layer}] not found`;
-      this.activeViewInstance = (
-        strategy?.create ?? Router.defaultRouteStrategy.create!
-      )(view_name, this.layer, prop, this._ui, this.isSave);
+      // this.activeViewInstance = (
+      //   strategy?.create ?? this.defaultRouteStrategy.create!
+      // )(view_name, this.layer, prop, this._ui, this.isSave);
+      if (strategy?.create) {
+        this.activeViewInstance = strategy.create(
+          view_name,
+          this.layer,
+          prop,
+          this._ui,
+          this.isSave
+        );
+      } else {
+        this.activeViewInstance = this.defaultRouteStrategy.create!(
+          view_name,
+          this.layer,
+          prop,
+          this._ui,
+          this.isSave
+        );
+      }
       this.viewStack.push([view_name, prop]);
     }
     pop<T extends Storage.Saveable<T>>(
@@ -399,10 +487,15 @@ export namespace UI {
     ) {
       if (this.activeViewInstance) {
         // this._ui.destroyView(this.activeViewInstance);
-        (strategy?.destroy ?? Router.defaultRouteStrategy.destroy!)(
-          this.activeViewInstance,
-          this._ui
-        );
+        // (strategy?.destroy ?? this.defaultRouteStrategy.destroy!)(
+        //   this.activeViewInstance,
+        //   this._ui
+        // );
+        if (strategy?.destroy) {
+          strategy.destroy(this.activeViewInstance, this._ui);
+        } else {
+          this.defaultRouteStrategy.destroy!(this.activeViewInstance, this._ui);
+        }
         this.activeViewInstance = null;
       }
       this.viewStack.pop();
@@ -411,15 +504,32 @@ export namespace UI {
         let backViewInfo = this.viewStack[this.viewStack.length - 1];
         let layerInstance = this._ui.getLayer(this.layer);
         if (!layerInstance) throw `Layer [${this.layer}] not found`;
-        this.activeViewInstance = (
-          strategy?.create ?? Router.defaultRouteStrategy.create!
-        )(
-          backViewInfo[0],
-          this.layer,
-          back_prop ?? backViewInfo[1],
-          this._ui,
-          this.isSave
-        );
+        // this.activeViewInstance = (
+        //   strategy?.create ?? this.defaultRouteStrategy.create!
+        // )(
+        //   backViewInfo[0],
+        //   this.layer,
+        //   back_prop ?? backViewInfo[1],
+        //   this._ui,
+        //   this.isSave
+        // );
+        if (strategy?.create) {
+          this.activeViewInstance = strategy.create(
+            backViewInfo[0],
+            this.layer,
+            back_prop ?? backViewInfo[1],
+            this._ui,
+            this.isSave
+          );
+        } else {
+          this.activeViewInstance = this.defaultRouteStrategy.create!(
+            backViewInfo[0],
+            this.layer,
+            back_prop ?? backViewInfo[1],
+            this._ui,
+            this.isSave
+          );
+        }
       }
     }
     replace<T extends Storage.Saveable<T>>(
@@ -429,19 +539,41 @@ export namespace UI {
     ) {
       if (this.activeViewInstance) {
         // this._ui.destroyView(this.activeViewInstance);
-        (strategy?.destroy ?? Router.defaultRouteStrategy.destroy!)(
-          this.activeViewInstance,
-          this._ui
-        );
+        // (strategy?.destroy ?? this.defaultRouteStrategy.destroy!)(
+        //   this.activeViewInstance,
+        //   this._ui
+        // );
+        if (strategy?.destroy) {
+          strategy.destroy(this.activeViewInstance, this._ui);
+        } else {
+          this.defaultRouteStrategy.destroy!(this.activeViewInstance, this._ui);
+        }
         this.activeViewInstance = null;
       }
       this.viewStack.pop();
 
       let layerInstance = this._ui.getLayer(this.layer);
       if (!layerInstance) throw `Layer [${this.layer}] not found`;
-      this.activeViewInstance = (
-        strategy?.create ?? Router.defaultRouteStrategy.create!
-      )(view_name, this.layer, prop, this._ui, this.isSave);
+      // this.activeViewInstance = (
+      //   strategy?.create ?? this.defaultRouteStrategy.create!
+      // )(view_name, this.layer, prop, this._ui, this.isSave);
+      if (strategy?.create) {
+        this.activeViewInstance = strategy.create(
+          view_name,
+          this.layer,
+          prop,
+          this._ui,
+          this.isSave
+        );
+      } else {
+        this.activeViewInstance = this.defaultRouteStrategy.create!(
+          view_name,
+          this.layer,
+          prop,
+          this._ui,
+          this.isSave
+        );
+      }
       this.viewStack.push([view_name, prop]);
     }
     update<T extends Storage.Saveable<T>>(
@@ -451,18 +583,32 @@ export namespace UI {
       if (!this.activeViewInstance)
         throw `Update View but activeViewInstance is null`;
       this.viewStack[this.viewStack.length - 1][1] = prop;
-      (strategy?.update ?? Router.defaultRouteStrategy.update!)(
-        this.activeViewInstance,
-        prop,
-        this._ui
-      );
+      // (strategy?.update ?? this.defaultRouteStrategy.update!)(
+      //   this.activeViewInstance,
+      //   prop,
+      //   this._ui
+      // );
+      if (strategy?.update) {
+        strategy.update(this.activeViewInstance, prop, this._ui);
+      } else {
+        this.defaultRouteStrategy.update!(
+          this.activeViewInstance,
+          prop,
+          this._ui
+        );
+      }
     }
     clear(strategy?: Router.RouteStrategy) {
       if (this.activeViewInstance) {
-        (strategy?.destroy ?? Router.defaultRouteStrategy.destroy!)(
-          this.activeViewInstance,
-          this._ui
-        );
+        // (strategy?.destroy ?? this.defaultRouteStrategy.destroy!)(
+        //   this.activeViewInstance,
+        //   this._ui
+        // );
+        if (strategy?.destroy) {
+          strategy.destroy(this.activeViewInstance, this._ui);
+        } else {
+          this.defaultRouteStrategy.destroy!(this.activeViewInstance, this._ui);
+        }
         this.activeViewInstance = null;
       }
       this.viewStack = [];

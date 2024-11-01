@@ -3,6 +3,12 @@ export declare class System {
     _core: HZEngineCore;
     constructor(_core: HZEngineCore);
     accessor condition: System.Condition;
+    _pauseTimer: number | null;
+    /**
+     * 暂停(可指定一段时间)
+     * 后调用的会覆盖之前pause的设定时间
+     * @param delayMs
+     */
     pause(delayMs?: number): void;
     /**
      * 继续由于pause中断的游戏

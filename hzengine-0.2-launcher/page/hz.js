@@ -8,6 +8,7 @@ import { HZEngineCore, System } from "hzengine-core";
 import hmUI, { setStatusBarVisible } from "@zos/ui";
 import { Time, Battery } from "@zos/sensor";
 import ViewPlugin from "../view";
+import BlackTrans from "../plugins/black_trans";
 import {
   onKey,
   KEY_EVENT_CLICK,
@@ -78,6 +79,7 @@ Page({
     // 该实例项目的view文件夹就是这个ViewPlugin插件的根目录，
     // 你可以添加自己的页面组件，也可以修改view文件夹已有的页面组件
     hzengine.loadPlugin("views", ViewPlugin);
+    hzengine.loadPlugin("black_trans", BlackTrans);
 
     // 加载游戏项目，这里的"raw/project"是项目的根文件夹（相对于assets文件夹）
     hzengine.loadProject({
@@ -123,13 +125,13 @@ Page({
     // function evalTest(sd, gd, hz) {
     //   hz.debug.log("這裏是新架構驗證脚本")
     //   hz.debug.log(`sd=${JSON.stringify(sd)}`)
-      
+
     //   hz.async.addRepeatTask("newtest", [0], 2000, 5000)
     //   hz.debug.log("新ui架構測試完成")
     // }
     hzengine.on("test.log", (...args) => {
-      console.log("test.log", ...args)
-    })
+      console.log("test.log", ...args);
+    });
     // hzengine.async.addRepeatTask("newtest", [0], 2000, 5000)
     onKey({
       callback: (key, keyEvent) => {

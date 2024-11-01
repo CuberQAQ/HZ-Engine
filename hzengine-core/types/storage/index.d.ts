@@ -64,8 +64,11 @@ export declare class Storage {
      * 遍历所有png文件，计算对应的name key，建立map
      */
     preloadImage(): void;
-    _archiveStateSetterRegisteredList: Set<string>;
-    _archiveStateGetterRegisteredList: Set<string>;
+    /**
+     * 預加載動畫profile
+     * 遍歷animation文件夾下的所有json文件，以文件名為key，json内容為value
+     */
+    preloadAnimation(): void;
 }
 export declare type HzsInfo = {
     totalLines: number;

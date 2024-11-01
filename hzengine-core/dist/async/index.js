@@ -47,7 +47,6 @@ var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Async = void 0;
 const decorator_1 = require("../storage/decorator");
-const zeppos_timer_1 = require("./zeppos_timer");
 const sensor_1 = require("@zos/sensor");
 let Async = (() => {
     var _a, _Async__nextTimerId_accessor_storage, _Async__delayTasks_accessor_storage;
@@ -63,7 +62,7 @@ let Async = (() => {
                 if (this._nextTickTimerId == null) {
                     this._nextTickTimerId = setTimeout(() => {
                         this._nextTickTimerCallback();
-                    }, 0);
+                    }, 30);
                 }
             }
             static _nextTickTimerCallback() {
@@ -76,7 +75,7 @@ let Async = (() => {
             }
             constructor(_core) {
                 this._core = _core;
-                this._fps = 30;
+                this._fps = 45;
                 this._hmTime = new sensor_1.Time();
                 this._lastTime = this._hmTime.getTime();
                 _Async__nextTimerId_accessor_storage.set(this, __runInitializers(this, __nextTimerId_initializers, 50));
@@ -84,11 +83,14 @@ let Async = (() => {
                 __runInitializers(this, __delayTasks_extraInitializers);
                 this._core = _core;
                 // console.log("async init");
-                let timer = new zeppos_timer_1.ZeppTimer(() => {
-                    //   console.log(`async timer cb`);
+                // let timer = new ZeppTimer(() => {
+                // //   console.log(`async timer cb`);
+                //   this._scheduleTask();
+                // }, ~~(1000 / this._fps));
+                // timer.start();
+                setInterval(() => {
                     this._scheduleTask();
                 }, ~~(1000 / this._fps));
-                timer.start();
             }
             _scheduleTask() {
                 // TODO 沒有充分考慮存檔時產生的問題（this._delayTasks引用變化），及其它問題

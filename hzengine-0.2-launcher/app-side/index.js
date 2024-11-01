@@ -107,7 +107,7 @@ AppSideService(
         };
 
         task.onProgress = (data) => {
-          this.log("downloadTest progress", JSON.stringify(data));
+          // this.log("downloadTest progress", JSON.stringify(data));
           // settings.settingsStorage.setItem(
           //   "download.app_side.progress",
           //   "" + data.progress

@@ -4,7 +4,9 @@
  * @returns
  */
 export function splitStr2Objs(str: string) {
-  let res: { str: string; isQuoted?: boolean; isSquared?: boolean }[] = [];
+  console.log(`splitStr2Objs: ${str}`);
+  
+  let res: { str: string; isQuoted?: boolean; isSquared?: boolean, isRounded?: boolean }[] = [];
   let len = str.length;
   let p = 0;
   while (p < len) {
@@ -40,9 +42,22 @@ export function splitStr2Objs(str: string) {
       let resstr = str.slice(p + 1, q);
       res.push({ str: resstr, isSquared: true });
       p = q + 1;
-    } else {
+    } else if (str[p] === "(") {
+      // find next `)`
       let q = p + 1;
-      while (q < len && str[q] !== " " && str[q] !== '"') ++q; // find first space/quote after this
+      while (q < len && str[q] !== ")") {
+        // if (str[q] === "\\") q += 2;
+        // else ++q;
+        ++q;
+      }
+      if (q >= len) throw "round brackets not completed";
+      let resstr = str.slice(p + 1, q);
+      res.push({ str: resstr, isRounded: true });
+      p = q + 1;
+    }
+     else {
+      let q = p + 1;
+      while (q < len && str[q] !== " " && str[q] !== '"' && str[q] !== "(" && str[q] !== "[") ++q; // find first space/quote after this
       let resstr = str.slice(p, q);
       //   console.log(transformStr(resstr));
       res.push({ str: resstr, isQuoted: false });
@@ -50,6 +65,16 @@ export function splitStr2Objs(str: string) {
     }
   }
   return res;
+}
+
+export function mergeObjs2Str(
+  objs: { str: string; isQuoted?: boolean; isSquared?: boolean, isRounded?: boolean }[]
+) {
+  return objs
+    .map((obj) =>
+      obj.isQuoted ? `"${obj.str}"` : obj.isSquared ? `[${obj.str}]` : obj.isRounded ? `(${obj.str})` : obj.str
+    )
+    .join(" ");
 }
 
 export function splitStr2Strs(str: string) {
@@ -73,7 +98,7 @@ export function transformStr(str: string) {
 export function parseInterpolatedStr(str: string): ParsedInterpolationItem[] {
   let len = str.length;
   let p = 0;
-  let expr_record: [l: number, r: number][] = []
+  let expr_record: [l: number, r: number][] = [];
   while (p < len) {
     // 寻找第一个`[`
     while (p < len && str[p] !== "[") ++p;
@@ -99,37 +124,36 @@ export function parseInterpolatedStr(str: string): ParsedInterpolationItem[] {
     expr_record.push([p, q]);
     p = q + 1;
   }
-  let left = 0, right = len
-  let res: ParsedInterpolationItem[] = []
+  let left = 0,
+    right = len;
+  let res: ParsedInterpolationItem[] = [];
   for (let i = 0; i < expr_record.length; ++i) {
-    let [l, r] = expr_record[i]
-    if(l > left) res.push({ str: str.slice(left, l), isExpression: false });
+    let [l, r] = expr_record[i];
+    if (l > left) res.push({ str: str.slice(left, l), isExpression: false });
     res.push({ str: str.slice(l + 1, r), isExpression: true });
-    left = r + 1
+    left = r + 1;
   }
-  if(left < right) res.push({ str: str.slice(left, right), isExpression: false });
-  return res
-
+  if (left < right)
+    res.push({ str: str.slice(left, right), isExpression: false });
+  return res;
 }
 
 export function removeComment(str: string) {
-  let quoteNotClosed = false
-  let len = str.length
-  for(let i = 0; i < len; ++i) {
-    if(quoteNotClosed && str[i] === `\\`) {
-      ++i
-    }
-    else if(str[i] === `"`) {
-      quoteNotClosed = !quoteNotClosed
-    }
-    else if(str[i] === '#' && !quoteNotClosed) {
-      return str.slice(0, i)
+  let quoteNotClosed = false;
+  let len = str.length;
+  for (let i = 0; i < len; ++i) {
+    if (quoteNotClosed && str[i] === `\\`) {
+      ++i;
+    } else if (str[i] === `"`) {
+      quoteNotClosed = !quoteNotClosed;
+    } else if (str[i] === "#" && !quoteNotClosed) {
+      return str.slice(0, i);
     }
   }
-  return str
+  return str;
 }
 
 type ParsedInterpolationItem = {
   str: string;
   isExpression: boolean;
-} 
+};

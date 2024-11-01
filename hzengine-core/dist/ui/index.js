@@ -72,6 +72,8 @@ exports.UI = void 0;
 const decorator_1 = require("../storage/decorator");
 /// <reference path="node_modules/@zeppos/device-types/dist/index.d.ts" />
 const hmUI = __importStar(require("@zos/ui"));
+const device_1 = require("@zos/device");
+const { width, height, screenShape } = (0, device_1.getDeviceInfo)();
 let UI = (() => {
     var _a, _UI__layerList_accessor_storage, _UI__nextViewId_accessor_storage, _UI__viewMap_accessor_storage, _UI__routerMap_accessor_storage;
     let __layerList_decorators;
@@ -151,6 +153,7 @@ let UI = (() => {
             createView(name, layer, prop, isSave) {
                 let id = this._nextViewId++;
                 let viewInstance = this._produceViewWithId(name, layer, prop, id);
+                this._core.debug.log(`creating view ${viewInstance.name}`);
                 viewInstance.isSave = isSave;
                 this._viewMap.set(id, viewInstance);
                 return viewInstance;
@@ -173,6 +176,7 @@ let UI = (() => {
                 viewInstance.id = id;
                 viewInstance.name = name;
                 viewInstance.create(prop);
+                this._core.debug.log(`producing view ${viewInstance.name}`);
                 return viewInstance;
             }
             get _routerMap() { return __classPrivateFieldGet(this, _UI__routerMap_accessor_storage, "f"); }
@@ -309,6 +313,41 @@ exports.UI = UI;
         }
     }
     UI.View = View;
+    function getScreenSize() {
+        return {
+            width,
+            height,
+        };
+    }
+    UI.getScreenSize = getScreenSize;
+    /**
+     * 根据 BasicUniversalProp 计算屏幕上的位置
+     * @param prop 包含 BasicUniversalProp 的 prop
+     * @param size (可选)图像的尺寸，若不指定，返回的anchor坐标和origin坐标一样
+     * @returns
+     */
+    function calcPosition(prop, size) {
+        var _a, _b, _c, _d, _e, _f, _g, _h;
+        // 1. 确定 anchor
+        // 2. 通过 align 确定初始位置
+        // 3. offset
+        // 返回左上角的位置
+        let anchor_coord = {
+            x: (width * (((_a = prop.xalign) !== null && _a !== void 0 ? _a : 0) + 1)) / 2 + // 根据 align 求出 anchor 位置
+                ((_b = prop.xoffset) !== null && _b !== void 0 ? _b : 0), // offset
+            y: (height * (((_c = prop.yalign) !== null && _c !== void 0 ? _c : 0) + 1)) / 2 + // 根据 align 求出 anchor 位置
+                ((_d = prop.yoffset) !== null && _d !== void 0 ? _d : 0), // offset
+        };
+        let origin_coord = {
+            x: anchor_coord.x - ((((_e = prop.xanchor) !== null && _e !== void 0 ? _e : 0) + 1) / 2) * ((_f = size === null || size === void 0 ? void 0 : size.width) !== null && _f !== void 0 ? _f : 0),
+            y: anchor_coord.y - ((((_g = prop.yanchor) !== null && _g !== void 0 ? _g : 0) + 1) / 2) * ((_h = size === null || size === void 0 ? void 0 : size.height) !== null && _h !== void 0 ? _h : 0),
+        };
+        return {
+            anchor: anchor_coord,
+            origin: origin_coord,
+        };
+    }
+    UI.calcPosition = calcPosition;
     class MessageView extends View {
     }
     UI.MessageView = MessageView;
@@ -341,6 +380,20 @@ exports.UI = UI;
             this.tag = tag;
             this.layer = layer;
             this.isSave = isSave;
+            this.defaultRouteStrategy = {
+                destroy: (viewInstance, ui) => {
+                    this._ui._core.debug.log(`destroy view ${viewInstance.name}`);
+                    ui.destroyView(viewInstance);
+                },
+                create: (viewName, layer, prop, ui, isSave) => {
+                    this._ui._core.debug.log(`create view ${viewName}`);
+                    return ui.createView(viewName, layer, prop, isSave);
+                },
+                update: (viewInstance, prop, ui) => {
+                    this._ui._core.debug.log(`update view ${viewInstance.name}`);
+                    ui.updateView(viewInstance, prop);
+                },
+            };
             this.viewStack = [];
             this.activeViewInstance = null;
         }
@@ -369,23 +422,47 @@ exports.UI = UI;
             return this.viewStack.length;
         }
         push(view_name, prop, strategy) {
-            var _a, _b;
             if (this.activeViewInstance) {
                 // this._ui.destroyView(this.activeViewInstance);
-                ((_a = strategy === null || strategy === void 0 ? void 0 : strategy.destroy) !== null && _a !== void 0 ? _a : Router.defaultRouteStrategy.destroy)(this.activeViewInstance, this._ui);
+                // (strategy?.destroy ?? this.defaultRouteStrategy.destroy!)(
+                //   this.activeViewInstance,
+                //   this._ui
+                // );
+                if (strategy === null || strategy === void 0 ? void 0 : strategy.destroy) {
+                    strategy.destroy(this.activeViewInstance, this._ui);
+                }
+                else {
+                    this.defaultRouteStrategy.destroy(this.activeViewInstance, this._ui);
+                }
                 this.activeViewInstance = null;
             }
             let layerInstance = this._ui.getLayer(this.layer);
             if (!layerInstance)
                 throw `Layer [${this.layer}] not found`;
-            this.activeViewInstance = ((_b = strategy === null || strategy === void 0 ? void 0 : strategy.create) !== null && _b !== void 0 ? _b : Router.defaultRouteStrategy.create)(view_name, this.layer, prop, this._ui, this.isSave);
+            // this.activeViewInstance = (
+            //   strategy?.create ?? this.defaultRouteStrategy.create!
+            // )(view_name, this.layer, prop, this._ui, this.isSave);
+            if (strategy === null || strategy === void 0 ? void 0 : strategy.create) {
+                this.activeViewInstance = strategy.create(view_name, this.layer, prop, this._ui, this.isSave);
+            }
+            else {
+                this.activeViewInstance = this.defaultRouteStrategy.create(view_name, this.layer, prop, this._ui, this.isSave);
+            }
             this.viewStack.push([view_name, prop]);
         }
         pop(back_prop, strategy) {
-            var _a, _b;
             if (this.activeViewInstance) {
                 // this._ui.destroyView(this.activeViewInstance);
-                ((_a = strategy === null || strategy === void 0 ? void 0 : strategy.destroy) !== null && _a !== void 0 ? _a : Router.defaultRouteStrategy.destroy)(this.activeViewInstance, this._ui);
+                // (strategy?.destroy ?? this.defaultRouteStrategy.destroy!)(
+                //   this.activeViewInstance,
+                //   this._ui
+                // );
+                if (strategy === null || strategy === void 0 ? void 0 : strategy.destroy) {
+                    strategy.destroy(this.activeViewInstance, this._ui);
+                }
+                else {
+                    this.defaultRouteStrategy.destroy(this.activeViewInstance, this._ui);
+                }
                 this.activeViewInstance = null;
             }
             this.viewStack.pop();
@@ -394,49 +471,85 @@ exports.UI = UI;
                 let layerInstance = this._ui.getLayer(this.layer);
                 if (!layerInstance)
                     throw `Layer [${this.layer}] not found`;
-                this.activeViewInstance = ((_b = strategy === null || strategy === void 0 ? void 0 : strategy.create) !== null && _b !== void 0 ? _b : Router.defaultRouteStrategy.create)(backViewInfo[0], this.layer, back_prop !== null && back_prop !== void 0 ? back_prop : backViewInfo[1], this._ui, this.isSave);
+                // this.activeViewInstance = (
+                //   strategy?.create ?? this.defaultRouteStrategy.create!
+                // )(
+                //   backViewInfo[0],
+                //   this.layer,
+                //   back_prop ?? backViewInfo[1],
+                //   this._ui,
+                //   this.isSave
+                // );
+                if (strategy === null || strategy === void 0 ? void 0 : strategy.create) {
+                    this.activeViewInstance = strategy.create(backViewInfo[0], this.layer, back_prop !== null && back_prop !== void 0 ? back_prop : backViewInfo[1], this._ui, this.isSave);
+                }
+                else {
+                    this.activeViewInstance = this.defaultRouteStrategy.create(backViewInfo[0], this.layer, back_prop !== null && back_prop !== void 0 ? back_prop : backViewInfo[1], this._ui, this.isSave);
+                }
             }
         }
         replace(view_name, prop, strategy) {
-            var _a, _b;
             if (this.activeViewInstance) {
                 // this._ui.destroyView(this.activeViewInstance);
-                ((_a = strategy === null || strategy === void 0 ? void 0 : strategy.destroy) !== null && _a !== void 0 ? _a : Router.defaultRouteStrategy.destroy)(this.activeViewInstance, this._ui);
+                // (strategy?.destroy ?? this.defaultRouteStrategy.destroy!)(
+                //   this.activeViewInstance,
+                //   this._ui
+                // );
+                if (strategy === null || strategy === void 0 ? void 0 : strategy.destroy) {
+                    strategy.destroy(this.activeViewInstance, this._ui);
+                }
+                else {
+                    this.defaultRouteStrategy.destroy(this.activeViewInstance, this._ui);
+                }
                 this.activeViewInstance = null;
             }
             this.viewStack.pop();
             let layerInstance = this._ui.getLayer(this.layer);
             if (!layerInstance)
                 throw `Layer [${this.layer}] not found`;
-            this.activeViewInstance = ((_b = strategy === null || strategy === void 0 ? void 0 : strategy.create) !== null && _b !== void 0 ? _b : Router.defaultRouteStrategy.create)(view_name, this.layer, prop, this._ui, this.isSave);
+            // this.activeViewInstance = (
+            //   strategy?.create ?? this.defaultRouteStrategy.create!
+            // )(view_name, this.layer, prop, this._ui, this.isSave);
+            if (strategy === null || strategy === void 0 ? void 0 : strategy.create) {
+                this.activeViewInstance = strategy.create(view_name, this.layer, prop, this._ui, this.isSave);
+            }
+            else {
+                this.activeViewInstance = this.defaultRouteStrategy.create(view_name, this.layer, prop, this._ui, this.isSave);
+            }
             this.viewStack.push([view_name, prop]);
         }
         update(prop, strategy) {
-            var _a;
             if (!this.activeViewInstance)
                 throw `Update View but activeViewInstance is null`;
             this.viewStack[this.viewStack.length - 1][1] = prop;
-            ((_a = strategy === null || strategy === void 0 ? void 0 : strategy.update) !== null && _a !== void 0 ? _a : Router.defaultRouteStrategy.update)(this.activeViewInstance, prop, this._ui);
+            // (strategy?.update ?? this.defaultRouteStrategy.update!)(
+            //   this.activeViewInstance,
+            //   prop,
+            //   this._ui
+            // );
+            if (strategy === null || strategy === void 0 ? void 0 : strategy.update) {
+                strategy.update(this.activeViewInstance, prop, this._ui);
+            }
+            else {
+                this.defaultRouteStrategy.update(this.activeViewInstance, prop, this._ui);
+            }
         }
         clear(strategy) {
-            var _a;
             if (this.activeViewInstance) {
-                ((_a = strategy === null || strategy === void 0 ? void 0 : strategy.destroy) !== null && _a !== void 0 ? _a : Router.defaultRouteStrategy.destroy)(this.activeViewInstance, this._ui);
+                // (strategy?.destroy ?? this.defaultRouteStrategy.destroy!)(
+                //   this.activeViewInstance,
+                //   this._ui
+                // );
+                if (strategy === null || strategy === void 0 ? void 0 : strategy.destroy) {
+                    strategy.destroy(this.activeViewInstance, this._ui);
+                }
+                else {
+                    this.defaultRouteStrategy.destroy(this.activeViewInstance, this._ui);
+                }
                 this.activeViewInstance = null;
             }
             this.viewStack = [];
         }
     }
-    Router.defaultRouteStrategy = {
-        destroy(viewInstance, ui) {
-            ui.destroyView(viewInstance);
-        },
-        create(viewName, layer, prop, ui, isSave) {
-            return ui.createView(viewName, layer, prop, isSave);
-        },
-        update(viewInstance, prop, ui) {
-            ui.updateView(viewInstance, prop);
-        },
-    };
     UI.Router = Router;
 })(UI || (exports.UI = UI = {}));

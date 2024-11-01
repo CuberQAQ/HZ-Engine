@@ -17,6 +17,7 @@ export class Storage {
     cachePath: string;
     savePath: string;
   }) {
+    this._core.emit("beforeLoadProject");
     if (!hmFS.readdirSync({ path: options.projectPath })) {
       throw "Dir not exist";
     }
@@ -26,6 +27,8 @@ export class Storage {
 
     this.loadPackageData();
     this.preload();
+
+    this._core.emit("afterLoadProject");
   }
 
   loadPackageData() {
@@ -307,10 +310,14 @@ export class Storage {
       image: {
         nameMap: {},
       },
+      animation: {
+        profileMap: {}
+      }
     };
 
     this.preloadScript();
     this.preloadImage();
+    this.preloadAnimation();
 
     // console.log(JSON.stringify(this.preloadedData));
 
@@ -454,9 +461,50 @@ at [${labelMap[label][0]}(line ${labelMap[label][1]})] \
     // );
   }
 
+  /**
+   * 預加載動畫profile
+   * 遍歷animation文件夾下的所有json文件，以文件名為key，json内容為value
+   */
+  preloadAnimation() {
+    
+    let profileMap: Record<string, [path: string]> =
+      this.preloadedData.animation.profileMap;
+
+    let animationDir = Path.join(this.projectRoot!, "animation");
+    if (!hmFS.readdirSync({ path: animationDir }))
+      throw "项目文件夹中animation文件夹不存在";
+    traverseAnimation(animationDir);
+    function traverseAnimation(path: string) {
+      let dirs = hmFS.readdirSync({ path });
+      // console.log(dirs);
+
+      for (let dir of dirs!) {
+        let subpath = Path.join(path, dir);
+        if (isFileSync({ path: subpath })) {
+          // 是文件
+          if (dir.endsWith(".json")) {
+            preloadAnimation(subpath);
+          }
+        } else {
+          // 是目录
+          traverseAnimation(subpath);
+        }
+      }
+    }
+
+    function preloadAnimation(path: string) {
+      let raw_name = Path.parse(path).name;
+      let name_key = raw_name
+        .trim()
+        .replace(/ +/, "_")
+      if (profileMap[name_key])
+        throw `Animation profile name key conflict [${name_key}], at file [${path}] and [${profileMap[name_key]}]`;
+      profileMap[name_key] = [path];
+    }
+  }
   // Decorator Field
-  _archiveStateSetterRegisteredList: Set<string> = new Set();
-  _archiveStateGetterRegisteredList: Set<string> = new Set();
+  // _archiveStateSetterRegisteredList: Set<string> = new Set();
+  // _archiveStateGetterRegisteredList: Set<string> = new Set();
 }
 
 // 记录脚本文件信息

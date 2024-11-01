@@ -2,18 +2,42 @@ import { HZEngineCore } from "..";
 import { ArchiveStateAccessor } from "../storage/decorator";
 
 export class System {
-  constructor(public _core: HZEngineCore) {}
+  constructor(public _core: HZEngineCore) {
+    _core.on("system.continue", () => {
+      this._pauseTimer = null;
+      this.continue();
+    });
+  }
 
   @ArchiveStateAccessor("system.condition")
   accessor condition: System.Condition = System.Condition.Free;
 
+  _pauseTimer: number | null = null;
+
+  /**
+   * 暂停(可指定一段时间)
+   * 后调用的会覆盖之前pause的设定时间
+   * @param delayMs
+   */
   pause(delayMs?: number) {
     console.log(`[HZEngine] Pause`);
 
-    if (delayMs) throw `delayMs not implemented`;
     if (this.condition === System.Condition.Gaming) {
       this.condition = System.Condition.Pause;
     } else throw `pause but condition error (todo)`; // TODO
+
+    if (this._pauseTimer) {
+      this._core.async.removeTask(this._pauseTimer);
+      this._pauseTimer = null;
+    }
+
+    if (delayMs !== undefined) {
+      this._pauseTimer = this._core.async.addDelayTask(
+        "system.continue",
+        [],
+        delayMs
+      );
+    }
   }
 
   /**
@@ -29,6 +53,8 @@ export class System {
    * 阻塞
    */
   block() {
+    if (this.condition !== System.Condition.Gaming)
+      throw `block but condition error (todo)`;
     this.condition = System.Condition.Blocked;
   }
   /**
@@ -50,9 +76,9 @@ export class System {
 
   start(initLabel: string = "start") {
     // 初始化存档
-    this._core.storage.archiveData
+    this._core.storage.archiveData;
     console.log("ciallo");
-    
+
     this._core.script.clear();
     this._core.script.jumpLabel(initLabel);
     this.run();

@@ -1,5 +1,6 @@
 import { HZEngineCore } from "..";
 import { Storage } from "../storage";
+import { mergeObjs2Str as joinObjs2Str, splitStr2Objs } from "./strtools";
 export declare class Script {
     _core: HZEngineCore;
     constructor(_core: HZEngineCore);
@@ -76,6 +77,7 @@ export declare namespace Script {
         private _rawtextChanged;
         private _slicedArgs;
         get slicedArgs(): Context.SlicedArg[];
+        set slicedArgs(slicedArgs: Context.SlicedArg[]);
         /**
          * 開始一個新的Statement，返回該Statement的數據
          * Start a new statement and return the data of the new statement
@@ -87,6 +89,16 @@ export declare namespace Script {
         get statementStack(): StatementStack;
         getStatementData(): NonNullable<Storage.Saveable<unknown>>;
         setStatementData(statement_data: NonNullable<Storage.Saveable<unknown>>, start_position: [path: string, index: number]): void;
+    }
+    namespace Utils {
+        export const joinSlicedArgs: typeof joinObjs2Str;
+        export const splitRawtext: typeof splitStr2Objs;
+        export function splitCommas(rawtext: string): string[];
+        export function parseTuple(rawtext: string): TupleOrArr;
+        export function parseArray(rawtext: string): TupleOrArr;
+        export function parseHzsArgs(rawtext: string): TupleOrArr;
+        type TupleOrArr = (string | TupleOrArr)[];
+        export {};
     }
     type MiddlewareForAnalyseStatement = (ctx: ContextForAnalyseStatement, next: () => void) => void;
     class ContextForAnalyseStatement extends Context {

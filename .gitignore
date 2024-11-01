@@ -14,3 +14,5 @@ selenium-debug.log
 *.njsproj
 *.sln
 local_test
+__test__
+__local__

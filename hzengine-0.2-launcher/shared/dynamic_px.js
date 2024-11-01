@@ -8,5 +8,5 @@ var designWidth = 480;
  * @param {number} raw 
  */
 export function px(raw) {
-    return Math.ceil(raw / designWidth * DEVICE_WIDTH)
+    return Math.ceil(raw / designWidth * width)
 }

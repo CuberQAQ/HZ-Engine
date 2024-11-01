@@ -1,0 +1,17 @@
+{
+  "name": "hzengine-plugin-inside-view",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./dist/index",
+  "type": "module",
+  "types": "./src/index",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "private": true,
+  "devDependencies": {
+    "@zeppos/device-types": "^3.0.0"
+  }
+}

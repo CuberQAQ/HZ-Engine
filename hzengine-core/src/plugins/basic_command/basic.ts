@@ -40,128 +40,28 @@ export function basic_commands(core: HZEngineCore) {
     console.log(`[ECHO] ${core.script.parseString(str.slice(4).trim())}`);
   });
 
-  // show command
-  core.script.use((ctx, next) => {
-    if (ctx.rawtext.trim().split(" ")[0].toLowerCase() !== "show")
-      return next();
-    if (ctx.slicedArgs.length === 1)
-      throw `Show Command: incorrect amount of args`;
-    if (ctx.slicedArgs.length === 2)
-      throw `Show Command: incorrect amount of args`;
-    let tag = ctx.slicedArgs[1].str;
-    let name_key = "";
-    for (let i = 1; i < ctx.slicedArgs.length; ++i) {
-      name_key += ctx.slicedArgs[i].str + " ";
-    }
-    name_key = name_key.trim().toLowerCase();
-    let path = core.storage.preloadedData.image.nameMap[name_key]?.[0];
-    if (!path)
-      throw `Show Command: image with name_key [${name_key}] not found `;
-    let size = (hmUI as any).getImageInfo(path);
-    if (!size) throw `Show Command: read size of [${path}] failed`;
-
-    showAction(tag, path, size);
-  });
-
-  function showAction(tag: string, path: string, size: UI.Size) {
-    const show_view_tag_prefix = "hzengine.fg_img";
-    const show_view_name = "fg_img";
-    let prop: UI.FgImgViewProp = {
-      imgPath: path,
-      offset: {
-        x: 0,
-        y: 0,
-      },
-      size: {
-        width: size.width,
-        height: size.height,
-      },
-    };
-
-    let tag_prefixed = `${show_view_tag_prefix}.${tag}`;
-    let router = core.ui.getRouter(tag_prefixed);
-    if (!router) {
-      core.ui.addRouter(tag_prefixed, "fg");
-      router = core.ui.getRouter(tag_prefixed)!;
-    }
-    router.replace<UI.FgImgViewProp>(show_view_name, prop);
-  }
-
-  // hide command
-  core.script.use((ctx, next) => {
-    if (ctx.rawtext.trim().split(" ")[0].toLowerCase() !== "hide")
-      return next();
-    if (ctx.slicedArgs.length !== 2)
-      throw `Show Command: incorrect amount of args`;
-    let tag = ctx.slicedArgs[1].str;
-    hideAction(tag);
-  });
-
-  function hideAction(tag: string) {
-    const show_view_tag_prefix = "hzengine.fg_img";
-
-    let tag_prefixed = `${show_view_tag_prefix}.${tag}`;
-    let router = core.ui.getRouter(tag_prefixed);
-    if (!router) {
-      throw `Hide Command: router with tag [${tag}] not found `;
-    }
-    router.clear();
-  }
-
-  // scene command
-  core.script.use((ctx, next) => {
-    if (ctx.rawtext.trim().split(" ")[0].toLowerCase() !== "scene")
-      return next();
-    if (ctx.slicedArgs.length === 1)
-      throw `Scene Command: incorrect amount of args`;
-    if (ctx.slicedArgs.length === 2)
-      throw `Scene Command: incorrect amount of args`;
-    let tag = ctx.slicedArgs[1].str;
-    let name_key = "";
-    for (let i = 1; i < ctx.slicedArgs.length; ++i) {
-      name_key += ctx.slicedArgs[i].str + " ";
-    }
-    name_key = name_key.trim().toLowerCase();
-    let path = core.storage.preloadedData.image.nameMap[name_key]?.[0];
-    if (!path)
-      throw `Scene Command: image with name_key [${name_key}] not found `;
-    let size = (hmUI as any).getImageInfo(path);
-    if (!size) throw `Scene Command: read size of [${path}] failed`;
-
-    sceneAction(tag, path, size);
-  });
-
-  function sceneAction(tag: string, path: string, size: UI.Size) {
-    const scene_view_tag_prefix = "hzengine.bg_img";
-    const scene_view_name = "bg_img";
-    let prop: UI.BgImgViewProp = {
-      imgPath: path,
-      offset: {
-        x: 0,
-        y: 0,
-      },
-      size: {
-        width: size.width,
-        height: size.height,
-      },
-    };
-
-    let tag_prefixed = `${scene_view_tag_prefix}.${tag}`;
-    let router = core.ui.getRouter(tag_prefixed);
-    if (!router) {
-      core.ui.addRouter(tag_prefixed, "bg");
-      router = core.ui.getRouter(tag_prefixed)!;
-    }
-    if (!router.length) {
-      router.push<UI.BgImgViewProp>(scene_view_name, prop);
-    } else {
-      router.update<UI.BgImgViewProp>(prop);
-    }
-  }
-
   // say command
   core.script.use((ctx, next) => {
     if (!ctx.rawtext.trim().startsWith('"')) return next();
+
+    function parseSayCommandArgs() {
+      if (
+        ctx.slicedArgs.length > 0 &&
+        ctx.slicedArgs[ctx.slicedArgs.length - 1].str === "nowait"
+      ) {
+        ctx.slicedArgs = ctx.slicedArgs.slice(0, ctx.slicedArgs.length - 1);
+        return {
+          wait: false,
+        };
+      } else {
+        return {
+          wait: true,
+        };
+      }
+    }
+
+    let parsed = parseSayCommandArgs();
+
     if (ctx.slicedArgs.length > 2 || ctx.slicedArgs.length < 1) {
       throw `Say Command: incorrect amount of args`;
     }
@@ -175,7 +75,8 @@ export function basic_commands(core: HZEngineCore) {
       console.log(`[SAY] ${ctx.slicedArgs[0].str}: ${ctx.slicedArgs[1].str}`);
       sayAction(core, ctx.slicedArgs[0].str, ctx.slicedArgs[1].str);
     }
-    core.system.pause();
+
+    if (parsed?.wait) core.system.pause();
   });
 
   // pause command
@@ -190,7 +91,7 @@ export function basic_commands(core: HZEngineCore) {
         !isFinite(Number(ctx.slicedArgs[1].str))
       )
         throw `Pause Command: the second arg must be a number`;
-      core.system.pause(Number(ctx.slicedArgs[1].str));
+      core.system.pause(Number(ctx.slicedArgs[1].str) * 1000);
     } else core.system.pause();
   });
 }

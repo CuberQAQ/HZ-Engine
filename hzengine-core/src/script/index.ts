@@ -1,9 +1,15 @@
 import { HZEngineCore } from "..";
 
 import { HzsInfo, Storage } from "../storage";
-import { parseInterpolatedStr, removeComment, splitStr2Objs } from "./strtools";
+import {
+  mergeObjs2Str as joinObjs2Str,
+  parseInterpolatedStr,
+  removeComment,
+  splitStr2Objs,
+} from "./strtools";
 import { readline } from "./readscript";
 import { ArchiveStateAccessor } from "../storage/decorator";
+import { join } from "@cuberqaq/path-polyfill";
 export class Script {
   constructor(public _core: HZEngineCore) {}
   /**
@@ -48,7 +54,7 @@ export class Script {
     this.incrementNextPosition();
 
     let rawCommand = readline(nowRunPosition[0], nowRunPosition[1])!;
-    
+
     // remove comment
 
     rawCommand = removeComment(rawCommand);
@@ -400,6 +406,12 @@ export namespace Script {
       this._rawtextChanged = false;
       return this._slicedArgs;
     }
+    // 注意只有在修改在触发slicedArgs的时候才会更新rawtext
+    set slicedArgs(slicedArgs: Context.SlicedArg[]) {
+      this._slicedArgs = JSON.parse(JSON.stringify(slicedArgs)); // TODO 深拷贝 性能
+      this._rawtext = joinObjs2Str(slicedArgs);
+      // TODO this._rawtextChanged = true ???
+    }
     /**
      * 開始一個新的Statement，返回該Statement的數據
      * Start a new statement and return the data of the new statement
@@ -482,6 +494,68 @@ export namespace Script {
       statement_data_in_file["" + start_position[1]] = statement_data;
       this._core.storage.saveGlobalData();
     }
+  }
+  export namespace Utils {
+    export const joinSlicedArgs: typeof joinObjs2Str = joinObjs2Str;
+    export const splitRawtext: typeof splitStr2Objs = splitStr2Objs;
+    export function splitCommas(rawtext: string): string[] {
+      let slicedArgs = splitStr2Objs(rawtext);
+      console.log(`splitCommas rawtext: ${rawtext}, slicedArgs: ${JSON.stringify(slicedArgs)}`);
+      
+      let res: string[] = [];
+      for (let i = 0; i < slicedArgs.length; i++) {
+        if (slicedArgs[i].isQuoted) res.push(`"${slicedArgs[i].str}"`);
+        else if (slicedArgs[i].isSquared) res.push(`[${slicedArgs[i].str}]`);
+        else if (slicedArgs[i].isRounded) res.push(`(${slicedArgs[i].str})`);
+        else {
+          slicedArgs[i].str.split(",").forEach((str) => {
+            str = str.trim();
+            if (str) res.push(str)
+          });
+        }
+      }
+      console.log(`splitCommas res: ${JSON.stringify(res)}`);
+      
+      return res;
+    }
+    export function parseTuple(rawtext: string) {
+      if (
+        rawtext.length < 2 ||
+        rawtext[0] !== "(" ||
+        rawtext[rawtext.length - 1] !== ")"
+      ) {
+        throw `invalid tuple: ${rawtext}`;
+      }
+      rawtext = rawtext.slice(1, rawtext.length - 1);
+      console.log(`parseTuple rawtext: ${rawtext}`);
+      
+      return parseHzsArgs(rawtext);
+    }
+    export function parseArray(rawtext: string) {
+      if (
+        rawtext.length < 2 ||
+        rawtext[0] !== "[" ||
+        rawtext[rawtext.length - 1] !== "]"
+      ) {
+        throw `invalid array: ${rawtext}`;
+      }
+      rawtext = rawtext.slice(1, rawtext.length - 1);
+      return parseHzsArgs(rawtext);
+    }
+    export function parseHzsArgs(rawtext: string): TupleOrArr {
+      rawtext = rawtext.trim();
+      let arr = splitCommas(rawtext);
+      let res = arr.map((str) => {
+        if (str.startsWith("(")) return parseTuple(str);
+        else if (str.startsWith("[")) return parseArray(str);
+        else return str;
+      });
+      console.log(`parseHzsArgs from: "${rawtext}" ; res: ${JSON.stringify(res)}`);
+      
+      return res;
+    }
+
+    type TupleOrArr = (string | TupleOrArr)[]
   }
   export type MiddlewareForAnalyseStatement = (
     ctx: ContextForAnalyseStatement,

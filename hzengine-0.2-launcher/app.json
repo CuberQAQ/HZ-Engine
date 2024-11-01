@@ -10,7 +10,7 @@
     },
     "icon": "icon.png",
     "vender": "CuberQAQ",
-    "description": "HZEngine 0.1.0 Launcher (for temporal use)"
+    "description": "HZEngine 0.2.0 Launcher"
   },
   "permissions": ["data:os.device.info"],
   "runtime": {

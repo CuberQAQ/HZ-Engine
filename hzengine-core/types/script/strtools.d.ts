@@ -7,7 +7,14 @@ export declare function splitStr2Objs(str: string): {
     str: string;
     isQuoted?: boolean;
     isSquared?: boolean;
+    isRounded?: boolean;
 }[];
+export declare function mergeObjs2Str(objs: {
+    str: string;
+    isQuoted?: boolean;
+    isSquared?: boolean;
+    isRounded?: boolean;
+}[]): string;
 export declare function splitStr2Strs(str: string): string[];
 /**
  * 转义一遍字符串，使其中\n等变成对应字符（可能报错）

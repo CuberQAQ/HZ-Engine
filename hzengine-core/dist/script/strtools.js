@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.splitStr2Objs = splitStr2Objs;
+exports.mergeObjs2Str = mergeObjs2Str;
 exports.splitStr2Strs = splitStr2Strs;
 exports.transformStr = transformStr;
 exports.parseInterpolatedStr = parseInterpolatedStr;
@@ -11,6 +12,7 @@ exports.removeComment = removeComment;
  * @returns
  */
 function splitStr2Objs(str) {
+    console.log(`splitStr2Objs: ${str}`);
     let res = [];
     let len = str.length;
     let p = 0;
@@ -56,9 +58,23 @@ function splitStr2Objs(str) {
             res.push({ str: resstr, isSquared: true });
             p = q + 1;
         }
+        else if (str[p] === "(") {
+            // find next `)`
+            let q = p + 1;
+            while (q < len && str[q] !== ")") {
+                // if (str[q] === "\\") q += 2;
+                // else ++q;
+                ++q;
+            }
+            if (q >= len)
+                throw "round brackets not completed";
+            let resstr = str.slice(p + 1, q);
+            res.push({ str: resstr, isRounded: true });
+            p = q + 1;
+        }
         else {
             let q = p + 1;
-            while (q < len && str[q] !== " " && str[q] !== '"')
+            while (q < len && str[q] !== " " && str[q] !== '"' && str[q] !== "(" && str[q] !== "[")
                 ++q; // find first space/quote after this
             let resstr = str.slice(p, q);
             //   console.log(transformStr(resstr));
@@ -67,6 +83,11 @@ function splitStr2Objs(str) {
         }
     }
     return res;
+}
+function mergeObjs2Str(objs) {
+    return objs
+        .map((obj) => obj.isQuoted ? `"${obj.str}"` : obj.isSquared ? `[${obj.str}]` : obj.isRounded ? `(${obj.str})` : obj.str)
+        .join(" ");
 }
 function splitStr2Strs(str) {
     return splitStr2Objs(str).map((obj) => obj.isQuoted ? `"${obj.str}"` : obj.str);
@@ -136,7 +157,7 @@ function removeComment(str) {
         else if (str[i] === `"`) {
             quoteNotClosed = !quoteNotClosed;
         }
-        else if (str[i] === '#' && !quoteNotClosed) {
+        else if (str[i] === "#" && !quoteNotClosed) {
             return str.slice(0, i);
         }
     }

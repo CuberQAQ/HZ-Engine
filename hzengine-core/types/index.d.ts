@@ -24,10 +24,12 @@ declare class HZEngineCore {
     }): void;
     start(callback?: () => unknown): void;
     end(): void;
+    plugins: Map<string, unknown>;
     loadPlugin(name: string, plugin: Plugin): void;
     on(event: string, cb: Function): void;
     off(event: string, cb: Function): boolean;
     emit(event: string, ...args: any[]): void;
 }
-type Plugin = (core: HZEngineCore) => void;
-export { HZEngineCore, UI, Storage, Script, System };
+type Plugin = (core: HZEngineCore) => any;
+export { HZEngineCore, UI, Storage, Script, System, Async };
+export * as TransformPlugin from "./plugins/transform";

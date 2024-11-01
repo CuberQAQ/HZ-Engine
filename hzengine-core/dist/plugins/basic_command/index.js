@@ -7,6 +7,7 @@ const character_1 = require("./character");
 const conditional_1 = require("./conditional");
 const decorator_1 = require("./decorator");
 const eval_1 = require("./eval");
+const img_1 = require("./img");
 const menu_1 = require("./menu");
 function basic_command(core) {
     (0, basic_1.basic_commands)(core);
@@ -16,4 +17,5 @@ function basic_command(core) {
     (0, _1.$_command)(core);
     (0, eval_1.eval_module)(core);
     (0, conditional_1.conditional)(core);
+    (0, img_1.img)(core);
 }

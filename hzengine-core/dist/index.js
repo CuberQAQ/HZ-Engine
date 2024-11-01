@@ -3,12 +3,37 @@
  * HZEngineCore
  * @copyright Copyright (c) 2024 CuberQAQ. All rights reserved.
  */
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.System = exports.Script = exports.Storage = exports.UI = exports.HZEngineCore = void 0;
+exports.TransformPlugin = exports.Async = exports.System = exports.Script = exports.Storage = exports.UI = exports.HZEngineCore = void 0;
 const async_1 = require("./async");
+Object.defineProperty(exports, "Async", { enumerable: true, get: function () { return async_1.Async; } });
 const debug_1 = require("./debug");
 const basic_command_1 = require("./plugins/basic_command");
 const global_gesture_1 = require("./plugins/global_gesture");
+const transform_1 = require("./plugins/transform");
 const script_1 = require("./script");
 Object.defineProperty(exports, "Script", { enumerable: true, get: function () { return script_1.Script; } });
 const storage_1 = require("./storage");
@@ -27,8 +52,10 @@ class HZEngineCore {
         this.script = new script_1.Script(this);
         this.system = new system_1.System(this);
         this.debug = new debug_1.Debug(this);
+        this.plugins = new Map();
         // internal plugin
         this.loadPlugin("global_gesture", global_gesture_1.global_gesture);
+        this.loadPlugin("transform", transform_1.registerPlugin);
         this.loadPlugin("basic_command", basic_command_1.basic_command);
     }
     loadProject(options) {
@@ -38,6 +65,7 @@ class HZEngineCore {
         // this.system.start()
         async_1.Async.nextTick(() => {
             var _a;
+            console.log("[HZEngine] Game Start");
             let title = (_a = this.storage.packageData) === null || _a === void 0 ? void 0 : _a.name;
             if (title == null) {
                 throw `[HZEngine] project name is null, please loadProject first or check your project.json format`;
@@ -73,7 +101,9 @@ class HZEngineCore {
     // Load Plugin
     loadPlugin(name, plugin) {
         console.log(`[HZEngine] load plugin [${name}]`);
-        plugin(this);
+        let slot = plugin(this);
+        if (slot != undefined)
+            this.plugins.set(name, slot);
     }
     // Event Bus
     on(event, cb) {
@@ -96,3 +126,4 @@ class HZEngineCore {
     }
 }
 exports.HZEngineCore = HZEngineCore;
+exports.TransformPlugin = __importStar(require("./plugins/transform"));

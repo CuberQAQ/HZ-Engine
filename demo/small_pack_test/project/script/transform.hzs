@@ -1,32 +1,69 @@
 *transform_test
 
-    transform move_to_right_easeout
-        frame time 1.0 type linear 
-        xanchor 0.0
-        xalign 1.0
-    end transform
+    # transform move_to_right_easeout
+    #     @linear 1.0
+    #         xanchor 0.0
+    #         xalign 1.0
+    # end transform
 
 
+    # transform fadein
+    #     alpha 0.0
+    #     @easein 1.0
+    #         alpha 1.0
+    # end transform
+
+    # transform fadeout
+    #     alpha 0.0
+    #     @easein 1.0
+    #         alpha 1.0
+    # end transform
     transform fadein
-        alpha 0.0
-        frame time 1.0 type easein
-        alpha 1.0
+    {
+        "time": 1.5,
+        "wrapper": "easein",
+        "frame": {
+            "alpha": 1
+        }
+        
+    }
     end transform
 
-    transform fadeout
-        alpha 0.0
-        frame time 1.0 type easein
-        alpha 1.0
-    end transform
+    # transform multi_track
+    #     tracklist
+    #         insert fadein
+    #         ---
+    #         insert move_to_right_easeout
+    #         ---
+    #         async track
+    #             pause 2.0
+    #             color (100, 100, 100)
+    #             @easein 2.0
+    #                 color (255, 255, 255)
+    #         end track
+    #     end tracklist
 
-    transition fade = fadein fadeout 
+    # end transform
+    transition fade = (fadein, fadeout) 
 
-    show girl normal
+    hide girl
+    "即将开始测试"
+    show girl normal with fadeout fadein 
     girl "你今天下午去哪了"
 
     "无可奉告"
 
-    show girl angry with fade
+    show girl angry with fadeout fadein
     girl "无耻之人！！"
 
-    hide girl normal at move_to_right_easeout, fadeout
+    # girl "我将变成萤火虫"
+    # show girl normal with fadeout fade_repeat
+    # girl "怎么样？"
+    girl "我要走了！"
+    hide girl with move_to_right_out fadein
+
+    # hide girl with fadeout fadein
+    "测试完成"
+    # return
+
+    # hide girl normal at move_to_right_easeout, fadeout

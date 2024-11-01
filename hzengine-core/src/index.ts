@@ -7,11 +7,11 @@ import { Async } from "./async";
 import { Debug } from "./debug";
 import { basic_command } from "./plugins/basic_command";
 import { global_gesture } from "./plugins/global_gesture";
+import { registerPlugin } from "./plugins/transform";
 import { Script } from "./script";
 import { Storage } from "./storage";
 import { System } from "./system";
 import { UI } from "./ui";
-
 
 class HZEngineCore {
   // 請不要調整這裡的初始化順序，不然會有問題（裝飾器裡有時候要用到前面初始化的東西）
@@ -25,14 +25,20 @@ class HZEngineCore {
   constructor() {
     // internal plugin
     this.loadPlugin("global_gesture", global_gesture);
+    this.loadPlugin("transform", registerPlugin);
     this.loadPlugin("basic_command", basic_command);
   }
-  loadProject(options: { projectPath: string, cachePath: string, savePath: string }) {
+  loadProject(options: {
+    projectPath: string;
+    cachePath: string;
+    savePath: string;
+  }) {
     this.storage.loadProject(options);
   }
   start(callback?: () => unknown) {
     // this.system.start()
     Async.nextTick(() => {
+      console.log("[HZEngine] Game Start");
       let title = this.storage.packageData?.name;
       if (title == null) {
         throw `[HZEngine] project name is null, please loadProject first or check your project.json format`;
@@ -70,11 +76,12 @@ class HZEngineCore {
     });
   }
 
+  public plugins: Map<string, unknown> = new Map();
   // Load Plugin
   loadPlugin(name: string, plugin: Plugin) {
     console.log(`[HZEngine] load plugin [${name}]`);
-
-    plugin(this);
+    let slot = plugin(this);
+    if (slot != undefined) this.plugins.set(name, slot);
   }
 
   // Event Bus
@@ -95,6 +102,7 @@ class HZEngineCore {
   }
 }
 
-type Plugin = (core: HZEngineCore) => void;
+type Plugin = (core: HZEngineCore) => any;
 
-export { HZEngineCore, UI, Storage, Script, System };
+export { HZEngineCore, UI, Storage, Script, System, Async };
+export * as TransformPlugin from "./plugins/transform";

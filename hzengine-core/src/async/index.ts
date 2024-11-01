@@ -11,7 +11,7 @@ export class Async {
     if (this._nextTickTimerId == null) {
       this._nextTickTimerId = setTimeout(() => {
         this._nextTickTimerCallback();
-      }, 0) as unknown as number;
+      }, 30) as unknown as number;
     }
   }
 
@@ -24,16 +24,19 @@ export class Async {
     });
   }
 
-  private _fps = 30;
+  private _fps = 45;
   private _hmTime = new Time();
   private _lastTime: number = this._hmTime.getTime();
   constructor(public _core: HZEngineCore) {
     // console.log("async init");
-    let timer = new ZeppTimer(() => {
-    //   console.log(`async timer cb`);
+    // let timer = new ZeppTimer(() => {
+    // //   console.log(`async timer cb`);
+    //   this._scheduleTask();
+    // }, ~~(1000 / this._fps));
+    // timer.start();
+    setInterval(() => {
       this._scheduleTask();
     }, ~~(1000 / this._fps));
-    timer.start();
   }
 
   _scheduleTask() {

@@ -1,17 +1,34 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Transition1 = void 0;
-exports.Transition1 = [
+exports.ExampleProfile1 = void 0;
+exports.ExampleProfile1 = [
     [
         {
-            "frame": {
-                "alpha": 0,
+            frame: {
+                alpha: 0,
             }
         },
         {
-            "duration": 0.5,
-            "frame": {
-                "alpha": 1,
+            time: 0.5,
+            wrapper: "easein",
+            frame: {
+                alpha: 1,
+            }
+        }
+    ],
+    [
+        {
+            frame: {
+                xalign: -1,
+                xanchor: -1,
+            }
+        },
+        {
+            time: 1.0,
+            wrapper: "easein",
+            frame: {
+                xalign: 1,
+                xanchor: 1,
             }
         }
     ]

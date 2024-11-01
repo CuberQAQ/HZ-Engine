@@ -22,6 +22,7 @@
     "@cuberqaq/asuka-solid": "^1.0.1",
     "@cuberqaq/asuka-ui": "^1.0.1",
     "@zeppos/zml": "^0.0.29",
-    "hzengine-core": "file:../hzengine-core"
+    "hzengine-core": "file:../hzengine-core",
+    "hzengine-plugin-black-trans": "file:plugins/black_trans"
   }
 }
