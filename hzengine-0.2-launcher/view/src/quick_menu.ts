@@ -76,7 +76,10 @@ export class QuickMenu extends UI.View<QuickMenuViewProp> {
               this.core.storage.saveArchiveData("archive_quick.json");
             } catch (e) {
               hmUI.showToast({ text: "快速存档失败" });
-              console.log(`quick save failed, error: \n${e}`);
+              this.core.debug.log(
+                "[QuickMenu]",
+                `quick save failed, error: \n${e}`
+              );
               throw e;
             }
             hmUI.showToast({ text: "快速存档成功" });
@@ -111,7 +114,10 @@ export class QuickMenu extends UI.View<QuickMenuViewProp> {
               this.core.storage.loadArchiveData("archive_quick.json");
             } catch (e) {
               hmUI.showToast({ text: "快速读档失败" });
-              console.log(`quick load failed, error: \n${e}`);
+              this.core.debug.log(
+                "[QuickMenu]",
+                `quick load failed, error: \n${e}`
+              );
               throw e;
             }
             hmUI.showToast({ text: "快速读档成功" });

@@ -37,7 +37,7 @@ function img(core) {
         showAction(tag, path, size, parsedRes.strategy);
     });
     function showAction(tag, path, size, routerStrategy) {
-        const show_view_tag_prefix = "hzengine.fg_img";
+        const show_view_tag_prefix = "hzengine.img";
         const show_view_name = "fg_img";
         let prop = {
             imgPath: path,
@@ -73,7 +73,7 @@ function img(core) {
         hideAction(tag, parsedRes.strategy);
     });
     function hideAction(tag, routerStrategy) {
-        const show_view_tag_prefix = "hzengine.fg_img";
+        const show_view_tag_prefix = "hzengine.img";
         let tag_prefixed = `${show_view_tag_prefix}.${tag}`;
         let router = core.ui.getRouter(tag_prefixed);
         if (!router) {
@@ -110,7 +110,7 @@ function img(core) {
         sceneAction(tag, path, size, parsedRes.strategy);
     });
     function sceneAction(tag, path, size, routerStrategy) {
-        const scene_view_tag_prefix = "hzengine.bg_img";
+        const scene_view_tag_prefix = "hzengine.img";
         const scene_view_name = "bg_img";
         let prop = {
             imgPath: path,
@@ -166,7 +166,7 @@ function img(core) {
         let inTransforms = [];
         let outTransforms = [];
         while (true) {
-            console.log(`slicedArgs: ${JSON.stringify(slicedArgs)}`);
+            // console.log(`slicedArgs: ${JSON.stringify(slicedArgs)}`);
             let keyword_index = findLastIndex(slicedArgs, (slicedArg) => !slicedArg.isQuoted &&
                 !slicedArg.isSquared &&
                 keywords.includes(slicedArg.str));
@@ -180,7 +180,7 @@ function img(core) {
             }
             else if (keyword === "with") {
                 let args = __1.Script.Utils.parseHzsArgs(__1.Script.Utils.joinSlicedArgs(currentFieldArgs));
-                console.log(`with args: ${JSON.stringify(args)}`);
+                // console.log(`with args: ${JSON.stringify(args)}`);
                 for (let i = 0; i < args.length; i++) {
                     if (Array.isArray(args[i])) {
                         // Annoymous Transition Tuple

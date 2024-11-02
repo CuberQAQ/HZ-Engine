@@ -198,7 +198,7 @@ let UI = (() => {
         _UI__routerMap_accessor_storage = new WeakMap(),
         (() => {
             const _metadata = typeof Symbol === "function" && Symbol.metadata ? Object.create(null) : void 0;
-            __layerList_decorators = [(0, decorator_1.ArchiveStateAccessorWithSerializer)("ui.layerList", function serializer(layerList) {
+            __layerList_decorators = [(0, decorator_1.CustomSave)("ui.layerList", function serializer(layerList) {
                     let obj = {};
                     for (let [key, value] of this.layerList) {
                         obj[key] = [value.name, value.z_index];
@@ -219,8 +219,8 @@ let UI = (() => {
                     }
                     return newLayerList;
                 })];
-            __nextViewId_decorators = [(0, decorator_1.ArchiveStateAccessor)("ui.nextViewId")];
-            __viewMap_decorators = [(0, decorator_1.ArchiveStateAccessorWithSerializer)("ui.viewMap", function serializer(viewMap) {
+            __nextViewId_decorators = [(0, decorator_1.Save)("ui.nextViewId")];
+            __viewMap_decorators = [(0, decorator_1.CustomSave)("ui.viewMap", function serializer(viewMap) {
                     let obj = {};
                     for (let [id, view] of viewMap) {
                         // 注意viewMap中的id是number，而obj中的id會自動轉成string
@@ -238,7 +238,7 @@ let UI = (() => {
                     }
                     return newViewMap;
                 })];
-            __routerMap_decorators = [(0, decorator_1.ArchiveStateAccessorWithSerializer)("ui.routerMap", function serializer(routerMap) {
+            __routerMap_decorators = [(0, decorator_1.CustomSave)("ui.routerMap", function serializer(routerMap) {
                     let obj = {};
                     for (let [key, value] of routerMap) {
                         if (!value.isSave)

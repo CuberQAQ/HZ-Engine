@@ -114,7 +114,7 @@ let Script = (() => {
                         }
                     }
                     else {
-                        console.log("Run cmd: " + rawCommand);
+                        this._core.debug.log("Run cmd: " + rawCommand);
                         // Process Command
                         this._processCmd(rawCommand, [...nowRunPosition]);
                     }
@@ -262,7 +262,7 @@ let Script = (() => {
              * and continue executing.
              */
             analyseStatement(ctx) {
-                console.log("[HZEngine] Start statement analyse mode");
+                // this._core.debug.log("[HZEngine] Start statement analyse mode");
                 // Backup _nextRunPosition
                 let _nextRunPositionBackup = this
                     ._nextRunPosition
@@ -316,7 +316,7 @@ let Script = (() => {
                     throw `statement not closed, at file [${this._statementAnalyseStack[this._statementAnalyseStack.length - 1][1][0]}] line [${this._statementAnalyseStack[this._statementAnalyseStack.length - 1][1][1] + 1}]`;
                 }
                 // Reset _nextRunPosition to the backup value, and switch back to normal mode, and continue executing
-                console.log("[HZEngine] Finished analyse statement mode ");
+                // this._core.debug.logconsole.log("[HZEngine] Finished analyse statement mode ");
             }
             // eval
             evalScope(code) {
@@ -324,16 +324,16 @@ let Script = (() => {
                     return new Function("sd", "gd", "hz", `${code}`)(this._core.storage.sd, this._core.storage.gd, this._core);
                 }
                 catch (e) {
-                    console.log(`Error in evalScope: ${e}`);
+                    this._core.debug.log(`Error in evalScope: ${e}`);
                 }
             }
             evalExpression(code) {
-                console.log(`[HZEngine] evalExpression: ${code}`);
+                this._core.debug.log(`evalExpression: ${code}`);
                 try {
                     return new Function("sd", "gd", "hz", `return (${code})`)(this._core.storage.sd, this._core.storage.gd, this._core);
                 }
                 catch (e) {
-                    console.log(`Error in evalExpression: ${e}`);
+                    this._core.debug.log(`Error in evalExpression: ${e}`);
                 }
             }
             // parse string
@@ -356,9 +356,9 @@ let Script = (() => {
         _Script__nextRunPosition_accessor_storage = new WeakMap(),
         (() => {
             const _metadata = typeof Symbol === "function" && Symbol.metadata ? Object.create(null) : void 0;
-            __callStack_decorators = [(0, decorator_1.ArchiveStateAccessor)("script.callStack")];
-            __statementStack_decorators = [(0, decorator_1.ArchiveStateAccessor)("script.statementStack")];
-            __nextRunPosition_decorators = [(0, decorator_1.ArchiveStateAccessor)("script.nextRunPosition")];
+            __callStack_decorators = [(0, decorator_1.Save)("script.callStack")];
+            __statementStack_decorators = [(0, decorator_1.Save)("script.statementStack")];
+            __nextRunPosition_decorators = [(0, decorator_1.Save)("script.nextRunPosition")];
             __esDecorate(_a, null, __callStack_decorators, { kind: "accessor", name: "_callStack", static: false, private: false, access: { has: obj => "_callStack" in obj, get: obj => obj._callStack, set: (obj, value) => { obj._callStack = value; } }, metadata: _metadata }, __callStack_initializers, __callStack_extraInitializers);
             __esDecorate(_a, null, __statementStack_decorators, { kind: "accessor", name: "_statementStack", static: false, private: false, access: { has: obj => "_statementStack" in obj, get: obj => obj._statementStack, set: (obj, value) => { obj._statementStack = value; } }, metadata: _metadata }, __statementStack_initializers, __statementStack_extraInitializers);
             __esDecorate(_a, null, __nextRunPosition_decorators, { kind: "accessor", name: "_nextRunPosition", static: false, private: false, access: { has: obj => "_nextRunPosition" in obj, get: obj => obj._nextRunPosition, set: (obj, value) => { obj._nextRunPosition = value; } }, metadata: _metadata }, __nextRunPosition_initializers, __nextRunPosition_extraInitializers);
@@ -450,7 +450,7 @@ exports.Script = Script;
         Utils.splitRawtext = strtools_1.splitStr2Objs;
         function splitCommas(rawtext) {
             let slicedArgs = (0, strtools_1.splitStr2Objs)(rawtext);
-            console.log(`splitCommas rawtext: ${rawtext}, slicedArgs: ${JSON.stringify(slicedArgs)}`);
+            // console.log(`splitCommas rawtext: ${rawtext}, slicedArgs: ${JSON.stringify(slicedArgs)}`);
             let res = [];
             for (let i = 0; i < slicedArgs.length; i++) {
                 if (slicedArgs[i].isQuoted)
@@ -467,7 +467,7 @@ exports.Script = Script;
                     });
                 }
             }
-            console.log(`splitCommas res: ${JSON.stringify(res)}`);
+            // console.log(`splitCommas res: ${JSON.stringify(res)}`);
             return res;
         }
         Utils.splitCommas = splitCommas;
@@ -478,7 +478,7 @@ exports.Script = Script;
                 throw `invalid tuple: ${rawtext}`;
             }
             rawtext = rawtext.slice(1, rawtext.length - 1);
-            console.log(`parseTuple rawtext: ${rawtext}`);
+            // console.log(`parseTuple rawtext: ${rawtext}`);
             return parseHzsArgs(rawtext);
         }
         Utils.parseTuple = parseTuple;
@@ -503,7 +503,7 @@ exports.Script = Script;
                 else
                     return str;
             });
-            console.log(`parseHzsArgs from: "${rawtext}" ; res: ${JSON.stringify(res)}`);
+            // console.log(`parseHzsArgs from: "${rawtext}" ; res: ${JSON.stringify(res)}`);
             return res;
         }
         Utils.parseHzsArgs = parseHzsArgs;

@@ -17,7 +17,7 @@ function decorator_module(core) {
                 }
                 break;
             default:
-                console.log(`Decorator: Unknown decorator [${decorator}]`);
+                core.debug.log(`Decorator: Unknown decorator [${decorator}]`);
         }
         ctx.rawtext = ctx.rawtext.trim().slice(ctx.slicedArgs[0].str.length + 2).trim();
         if (!ctx.rawtext.length)

@@ -1,6 +1,7 @@
 import { HZEngineCore } from "..";
 export declare class Audio {
     _core: HZEngineCore;
+    static _hmPlayer: import("@zos/media").Player;
     constructor(_core: HZEngineCore);
     private accessor _channels;
     get channels(): Record<string, Audio.Channel>;
@@ -8,10 +9,13 @@ export declare class Audio {
 }
 export declare namespace Audio {
     class Channel {
-        constructor();
+        _audio: Audio;
+        constructor(_audio: Audio);
         mode: Channel.Mode;
         status: Channel.Status;
-        playbackList: PlaybackItem[];
+        _playbackList: PlaybackItem[];
+        _nowIndex: number | null;
+        currentInfo: AudioInfo | null;
         push(item: PlaybackItem): void;
         play(): void;
         pause(): void;
@@ -19,22 +23,40 @@ export declare namespace Audio {
          * 停止并清空队列
          */
         stop(): void;
+        serialize(): Channel.Serialized;
+        static deserialize(audio: Audio, data: Channel.Serialized): Channel;
+        _onPrepared(result: boolean): void;
+        _onCompleted(): void;
+        /**
+         * Play the next item in the playback list. If there are no items in the
+         * playback list, set the channel status to Stopped and return.
+         * @private
+         */
+        _playNext(): void;
     }
     namespace Channel {
         enum Mode {
             PlayInOrder = 0,
-            PlayInOrderRepeat = 1,
-            Random = 2,
-            RandomRepeat = 3
+            PlayInOrderRepeat = 1
         }
         enum Status {
-            Pending = 0,
-            Stopped = 1,
-            Playing = 2,
-            Error = 3
+            Stopped = 0,
+            Playing = 1,
+            Error = 2
         }
+        type Serialized = {
+            mode: Channel.Mode;
+            status: Channel.Status;
+            playbackList: PlaybackItem[];
+            nowIndex: number | null;
+        };
     }
     interface PlaybackItem {
         path: string;
+    }
+    interface AudioInfo {
+        duration: number;
+        title: string;
+        artist: string;
     }
 }

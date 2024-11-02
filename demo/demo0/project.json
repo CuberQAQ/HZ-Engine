@@ -1,0 +1,10 @@
+{
+    "name": "HZ-Demo 0",
+    "version": "1.0.0",
+    "author": "CuberQAQ",
+    "description": "HZ Engine Demo No.0",
+
+    "hz": {
+        "version": "1.0.0"
+    }
+}

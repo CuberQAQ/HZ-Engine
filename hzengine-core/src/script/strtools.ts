@@ -4,7 +4,7 @@
  * @returns
  */
 export function splitStr2Objs(str: string) {
-  console.log(`splitStr2Objs: ${str}`);
+  // console.log(`splitStr2Objs: ${str}`);
   
   let res: { str: string; isQuoted?: boolean; isSquared?: boolean, isRounded?: boolean }[] = [];
   let len = str.length;

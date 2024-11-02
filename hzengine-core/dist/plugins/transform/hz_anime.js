@@ -170,8 +170,8 @@ let AnimationPlugin = (() => {
         _AnimationPlugin__animationMap_accessor_storage = new WeakMap(),
         (() => {
             const _metadata = typeof Symbol === "function" && Symbol.metadata ? Object.create(null) : void 0;
-            __nextAnimationId_decorators = [(0, decorator_1.ArchiveStateAccessor)("anime.nid")];
-            __animationMap_decorators = [(0, decorator_1.ArchiveStateAccessorWithSerializer)("anime.map", function (obj) {
+            __nextAnimationId_decorators = [(0, decorator_1.Save)("anime.nid")];
+            __animationMap_decorators = [(0, decorator_1.CustomSave)("anime.map", function (obj) {
                     let res = {};
                     for (let id in obj) {
                         if (!obj[id].isSave)

@@ -6,7 +6,7 @@ class Debug {
         this._core = _core;
     }
     log(...args) {
-        console.log(...args);
+        console.log("[HZEngine]", ...args);
     }
 }
 exports.Debug = Debug;

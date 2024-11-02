@@ -6,7 +6,7 @@ import { Async } from "../async";
  * @param store_key 保存数据到存档数据对象的key
  * @returns
  */
-export function ArchiveStateAccessor<
+export function Save<
   This extends { _core: HZEngineCore },
   Value extends Storage.Saveable<Value>
 >(store_key: string) {
@@ -40,7 +40,7 @@ export function ArchiveStateAccessor<
             false,
             ...store_key.split(".")
           ) as Value;
-          console.log(`Load Data from Archive, store_key: ${store_key}, dataInArchive: ${JSON.stringify(dataInArchive)}`);
+          this._core.debug.log(`Load Data from Archive, store_key: ${store_key}, dataInArchive: ${JSON.stringify(dataInArchive)}`);
           target.set.call(this, dataInArchive);
         });
       });
@@ -66,7 +66,7 @@ export function ArchiveStateAccessor<
  * @param store_key 保存数据到存档数据对象的key
  * @returns
  */
-export function ArchiveStateAccessorWithSerializer<
+export function CustomSave<
   This extends { _core: HZEngineCore },
   Value,
   SerializedValue extends Storage.Saveable<SerializedValue>
@@ -108,7 +108,7 @@ export function ArchiveStateAccessorWithSerializer<
             false,
             ...store_key.split(".")
           ) as SerializedValue;
-          console.log(`Load Data from Archive, store_key: ${store_key}, dataInArchive: ${JSON.stringify(dataInArchive)}`);
+          this._core.debug.log(`Load Data from Archive, store_key: ${store_key}, dataInArchive: ${JSON.stringify(dataInArchive)}`);
           target.set.call(this, deserializer.call(this, dataInArchive));
         });
       });
@@ -137,7 +137,7 @@ export function ArchiveStateAccessorWithSerializer<
   };
 }
 
-export function ArchiveStateGetter<
+export function SaveGetter<
   This extends { _core: HZEngineCore },
   Value extends Storage.Saveable<Value>
 >(store_key: string) {
@@ -180,7 +180,7 @@ export function ArchiveStateGetter<
   };
 }
 
-export function ArchiveStateGetterWithSerializer<
+export function CustomSaveGetter<
   This extends { _core: HZEngineCore },
   Value,
   SerializedValue extends Storage.Saveable<SerializedValue>
@@ -233,7 +233,7 @@ export function ArchiveStateGetterWithSerializer<
  * @param store_key 保存数据到存档数据对象的key
  * @returns
  */
-export function ArchiveStateSetter<
+export function SaveSetter<
   This extends { _core: HZEngineCore },
   Value extends Storage.Saveable<Value>
 >(store_key: string) {
@@ -253,7 +253,7 @@ export function ArchiveStateSetter<
             false,
             ...store_key.split(".")
           ) as Value;
-          console.log(`Load Data from Archive, store_key: ${store_key}, dataInArchive: ${JSON.stringify(dataInArchive)}`);
+          this._core.debug.log(`Load Data from Archive, store_key: ${store_key}, dataInArchive: ${JSON.stringify(dataInArchive)}`);
           target.call(this, dataInArchive);
         });
       });
@@ -269,7 +269,7 @@ export function ArchiveStateSetter<
   };
 }
 
-export function ArchiveStateSetterWithDeserializer<
+export function CustomSaveSetter<
   This extends { _core: HZEngineCore },
   Value,
   SerializedValue extends Storage.Saveable<SerializedValue>
@@ -293,7 +293,7 @@ export function ArchiveStateSetterWithDeserializer<
             false,
             ...store_key.split(".")
           ) as SerializedValue;
-          console.log(`Load Data from Archive, store_key: ${store_key}, dataInArchive: ${JSON.stringify(dataInArchive)}`);
+          this._core.debug.log(`Load Data from Archive, store_key: ${store_key}, dataInArchive: ${JSON.stringify(dataInArchive)}`);
           target.call(this, deserializer.call(this, dataInArchive));
         });
       });

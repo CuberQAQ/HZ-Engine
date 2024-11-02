@@ -6,6 +6,6 @@ export class Debug {
     }
 
     log(...args: any[]) {
-        console.log(...args);
+        console.log("[HZEngine]", ...args);
     }
 }

@@ -4,6 +4,8 @@
  */
 
 import { Async } from "./async";
+import { Audio } from "./audio";
+import { Config } from "./config";
 import { Debug } from "./debug";
 import { basic_command } from "./plugins/basic_command";
 import { global_gesture } from "./plugins/global_gesture";
@@ -21,6 +23,8 @@ class HZEngineCore {
   ui = new UI(this);
   script = new Script(this);
   system = new System(this);
+  config = new Config(this);
+  audio = new Audio(this);
   debug = new Debug(this);
   constructor() {
     // internal plugin
@@ -38,7 +42,7 @@ class HZEngineCore {
   start(callback?: () => unknown) {
     // this.system.start()
     Async.nextTick(() => {
-      console.log("[HZEngine] Game Start");
+      this.debug.log("[HZEngine] Game Start");
       let title = this.storage.packageData?.name;
       if (title == null) {
         throw `[HZEngine] project name is null, please loadProject first or check your project.json format`;
@@ -59,7 +63,7 @@ class HZEngineCore {
   }
 
   end() {
-    console.log("[HZEngine] Game End, return to title");
+    this.debug.log("[HZEngine] Game End, return to title");
 
     let title = this.storage.packageData?.name;
     if (title == null) {
@@ -79,7 +83,7 @@ class HZEngineCore {
   public plugins: Map<string, unknown> = new Map();
   // Load Plugin
   loadPlugin(name: string, plugin: Plugin) {
-    console.log(`[HZEngine] load plugin [${name}]`);
+    this.debug.log(`[HZEngine] load plugin [${name}]`);
     let slot = plugin(this);
     if (slot != undefined) this.plugins.set(name, slot);
   }

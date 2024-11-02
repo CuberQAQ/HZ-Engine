@@ -18,7 +18,7 @@ function conditional(core) {
             return next();
         }
         let data = ctx.startStatement("if");
-        console.log(`if data=${JSON.stringify(data)}`);
+        // console.log(`if data=${JSON.stringify(data)}`);
         let if_expression_res = core.script.evalExpression(data.if_expression);
         if (typeof if_expression_res !== "boolean") {
             throw `If statement: if expression must return boolean, at file [${data.start_position[0]}] line [${data.start_position[1]}]`;
@@ -242,7 +242,7 @@ function conditional(core) {
         // find the closest breakable statement
         // (currently only while statement is breakable)
         //(debug) output stack
-        console.log("Stack=" + JSON.stringify(ctx.statementStack));
+        // console.log("Stack="+JSON.stringify(ctx.statementStack));
         let resIndex = -1;
         for (let i = ctx.statementStack.length - 1; i >= 0; i--) {
             if (ctx.statementStack[i][0] === "while") {
@@ -254,7 +254,7 @@ function conditional(core) {
             throw `Break command: break statement must come after while statement, at file [${ctx.currentPath}] line [${ctx.currentLineIndex}]`;
         }
         let data = ctx.statementStack[resIndex][2];
-        console.log(`Break command: break from ${ctx.statementStack[resIndex][0]} statement at file [${data.start_position[0]}] line [${data.start_position[1] + 1}]`);
+        core.debug.log(`Break command: break from ${ctx.statementStack[resIndex][0]} statement at file [${data.start_position[0]}] line [${data.start_position[1] + 1}]`);
         core.script.jump(...data.end_position, false);
         core.script.incrementNextPosition();
         // clear statement stack from breakable statement

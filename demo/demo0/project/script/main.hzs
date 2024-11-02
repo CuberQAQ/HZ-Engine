@@ -1,0 +1,16 @@
+*start
+    scene bg cafe
+    pause 2.5
+    show girl normal with (fadeout, fadein)
+    character girl "綾地寧寧"
+    girl "好無聊..."
+    girl "我給你講個故事吧！"
+    hide girl with (fadeout)
+    pause 2.0
+    "這是一部名為《水仙》的小說..."
+    hide bg with (fadeout)
+
+    pause 2.0
+
+    "序章"
+    jump intro

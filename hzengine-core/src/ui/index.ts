@@ -1,7 +1,7 @@
 import { HZEngineCore } from "..";
 import {
-  ArchiveStateAccessor,
-  ArchiveStateAccessorWithSerializer,
+  Save,
+  CustomSave,
 } from "../storage/decorator";
 import { Storage } from "../storage/index";
 /// <reference path="node_modules/@zeppos/device-types/dist/index.d.ts" />
@@ -37,7 +37,7 @@ export class UI {
   }
 
   // Layer
-  @ArchiveStateAccessorWithSerializer(
+  @CustomSave(
     "ui.layerList",
     function serializer(layerList) {
       let obj: Record<string, [name: string, z_index: number]> = {};
@@ -94,10 +94,10 @@ export class UI {
   }
 
   // View
-  @ArchiveStateAccessor("ui.nextViewId")
+  @Save("ui.nextViewId")
   private accessor _nextViewId: number = 50;
 
-  @ArchiveStateAccessorWithSerializer(
+  @CustomSave(
     "ui.viewMap",
     function serializer(viewMap) {
       let obj: Record<string, UI.View.Serialized> = {};
@@ -172,7 +172,7 @@ export class UI {
     return viewInstance;
   }
 
-  @ArchiveStateAccessorWithSerializer(
+  @CustomSave(
     "ui.routerMap",
     function serializer(routerMap) {
       let obj: Record<string, UI.Router.Serialized> = {};

@@ -1,7 +1,7 @@
 import { HZEngineCore, Storage, UI } from "../..";
 import {
-  ArchiveStateAccessor,
-  ArchiveStateAccessorWithSerializer,
+  Save,
+  CustomSave,
 } from "../../storage/decorator";
 import { Animation, Profile, Wrapper } from "./animation";
 import { Time } from "@zos/sensor";
@@ -13,10 +13,10 @@ export class AnimationPlugin {
     _core.async.addRepeatTask("anime.cb", [], 0); // 此處周期應考慮加個sync update
   }
 
-  @ArchiveStateAccessor("anime.nid")
+  @Save("anime.nid")
   private accessor _nextAnimationId: number = 1; // self-increment
 
-  @ArchiveStateAccessorWithSerializer(
+  @CustomSave(
     "anime.map",
     function (obj): Record<string, AnimationPlugin.AnimationItem.Serialized> {
       let res: Record<string, AnimationPlugin.AnimationItem.Serialized> = {};

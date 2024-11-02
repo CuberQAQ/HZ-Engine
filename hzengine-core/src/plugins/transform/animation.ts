@@ -1,6 +1,6 @@
 /**
  * animation.js
- * @description A library for providing multi-track animations in ZeppOS. 一个用于在ZeppOS中提供简单动画的库
+ * @description A library for providing multi-track animations for HZEngine. 一个用于在HZEngine中提供简单动画的库
  * @date 2024/10/2
  * @author CuberQAQ
  */
@@ -16,7 +16,7 @@ export class Animation<P extends Profile.PropsType = unknown> {
 
   constructor(profile: Profile<P>, options?: Animation.Options<P>) {
     this.normalizedProfile = Profile.normalize(profile);
-    console.log(`[HZEngine] Animation: ${JSON.stringify(profile)}`);
+    console.log(`Animation: ${JSON.stringify(profile)}`);
 
     if (options) {
       options.initProps && (this.initProps = options.initProps);
@@ -436,7 +436,7 @@ export class ActiveTrackNode<P extends Profile.PropsType> {
   activeSyncs: ActiveTrackNode<P>[] = [];
 
   initSyncs() {
-    console.log("init syncs");
+    // console.log("init syncs");
 
     let activeSyncs: ActiveTrackNode<P>[] = [];
     // if (this.currentSection.syncs == null) return;

@@ -70,7 +70,7 @@ let System = (() => {
              * @param delayMs
              */
             pause(delayMs) {
-                console.log(`[HZEngine] Pause`);
+                this._core.debug.log(`Pause`);
                 if (this.condition === _a.Condition.Gaming) {
                     this.condition = _a.Condition.Pause;
                 }
@@ -120,7 +120,7 @@ let System = (() => {
             start(initLabel = "start") {
                 // 初始化存档
                 this._core.storage.archiveData;
-                console.log("ciallo");
+                this._core.debug.log("Game Start");
                 this._core.script.clear();
                 this._core.script.jumpLabel(initLabel);
                 this.run();
@@ -129,7 +129,7 @@ let System = (() => {
         _System_condition_accessor_storage = new WeakMap(),
         (() => {
             const _metadata = typeof Symbol === "function" && Symbol.metadata ? Object.create(null) : void 0;
-            _condition_decorators = [(0, decorator_1.ArchiveStateAccessor)("system.condition")];
+            _condition_decorators = [(0, decorator_1.Save)("system.condition")];
             __esDecorate(_a, null, _condition_decorators, { kind: "accessor", name: "condition", static: false, private: false, access: { has: obj => "condition" in obj, get: obj => obj.condition, set: (obj, value) => { obj.condition = value; } }, metadata: _metadata }, _condition_initializers, _condition_extraInitializers);
             if (_metadata) Object.defineProperty(_a, Symbol.metadata, { enumerable: true, configurable: true, writable: true, value: _metadata });
         })(),

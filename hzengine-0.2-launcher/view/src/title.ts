@@ -21,7 +21,7 @@ export class TitleView extends UI.View<TitleViewProp> {
   enable_opening_anim = true;
   opening_view_id: number | null = null;
   onCreate(prop: TitleViewProp): void {
-    this.core.debug.log(`onCreate title view`);
+    // this.core.debug.log(`onCreate title view`);
     // title text widget
     {
       let w = width;
@@ -37,9 +37,9 @@ export class TitleView extends UI.View<TitleViewProp> {
         align_h: hmUI.align.CENTER_H,
         align_v: hmUI.align.CENTER_V,
       };
-      this.core.debug.log(
-        `onCreate title text widget: ${JSON.stringify(props)}`
-      );
+      // this.core.debug.log(
+      //   `onCreate title text widget: ${JSON.stringify(props)}`
+      // );
       this._widgets = {
         title_text: this._widgetFactory.createWidget(hmUI.widget.TEXT, props),
       };
@@ -71,7 +71,7 @@ export class TitleView extends UI.View<TitleViewProp> {
               cb && Async.nextTick(cb);
             };
             if (!black_trans_plugin) {
-              this.core.debug.log("black_trans plugin not found");
+              this.core.debug.log("[TitleView]","black_trans plugin not found");
               start();
             } else {
               black_trans_plugin.show({
@@ -108,7 +108,7 @@ export class TitleView extends UI.View<TitleViewProp> {
             try {
               this.core.storage.loadArchiveData("archive000.json");
             } catch (e) {
-              console.log("請先開始遊戲");
+              this.core.debug.log("[TitleView]","請先開始遊戲");
               throw e;
             }
             this.core.ui.getRouter("page")!.pop();
@@ -232,7 +232,7 @@ export class TitleView extends UI.View<TitleViewProp> {
 
   _buildAnim() {
     if (!this._animationPlugin) {
-      this.core.debug.log("[Title View] Animation Plugin not found");
+      this.core.debug.log("[Title View]","Animation Plugin not found");
       return;
     }
     if (this._animation != null) return;
@@ -256,7 +256,7 @@ export class TitleView extends UI.View<TitleViewProp> {
     let delayList = Array<number>(5)
       .fill(0)
       .map((_, i) => i * 0.16 + 1.5);
-    console.log(`delayList = ${JSON.stringify(delayList)}`);
+      // this.core.debug.log(`delayList = ${JSON.stringify(delayList)}`);
 
     this._animation =
       this._animationPlugin.createTempAnimation<TitleViewAnimProp>({

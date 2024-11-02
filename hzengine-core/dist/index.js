@@ -30,6 +30,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.TransformPlugin = exports.Async = exports.System = exports.Script = exports.Storage = exports.UI = exports.HZEngineCore = void 0;
 const async_1 = require("./async");
 Object.defineProperty(exports, "Async", { enumerable: true, get: function () { return async_1.Async; } });
+const audio_1 = require("./audio");
+const config_1 = require("./config");
 const debug_1 = require("./debug");
 const basic_command_1 = require("./plugins/basic_command");
 const global_gesture_1 = require("./plugins/global_gesture");
@@ -51,6 +53,8 @@ class HZEngineCore {
         this.ui = new ui_1.UI(this);
         this.script = new script_1.Script(this);
         this.system = new system_1.System(this);
+        this.config = new config_1.Config(this);
+        this.audio = new audio_1.Audio(this);
         this.debug = new debug_1.Debug(this);
         this.plugins = new Map();
         // internal plugin
@@ -65,7 +69,7 @@ class HZEngineCore {
         // this.system.start()
         async_1.Async.nextTick(() => {
             var _a;
-            console.log("[HZEngine] Game Start");
+            this.debug.log("[HZEngine] Game Start");
             let title = (_a = this.storage.packageData) === null || _a === void 0 ? void 0 : _a.name;
             if (title == null) {
                 throw `[HZEngine] project name is null, please loadProject first or check your project.json format`;
@@ -85,7 +89,7 @@ class HZEngineCore {
     }
     end() {
         var _a;
-        console.log("[HZEngine] Game End, return to title");
+        this.debug.log("[HZEngine] Game End, return to title");
         let title = (_a = this.storage.packageData) === null || _a === void 0 ? void 0 : _a.name;
         if (title == null) {
             throw `[HZEngine] project name is null, please loadProject first or check your project.json format`;
@@ -100,7 +104,7 @@ class HZEngineCore {
     }
     // Load Plugin
     loadPlugin(name, plugin) {
-        console.log(`[HZEngine] load plugin [${name}]`);
+        this.debug.log(`[HZEngine] load plugin [${name}]`);
         let slot = plugin(this);
         if (slot != undefined)
             this.plugins.set(name, slot);

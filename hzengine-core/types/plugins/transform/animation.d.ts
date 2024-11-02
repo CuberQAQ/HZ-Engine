@@ -1,6 +1,6 @@
 /**
  * animation.js
- * @description A library for providing multi-track animations in ZeppOS. 一个用于在ZeppOS中提供简单动画的库
+ * @description A library for providing multi-track animations for HZEngine. 一个用于在HZEngine中提供简单动画的库
  * @date 2024/10/2
  * @author CuberQAQ
  */
@@ -122,7 +122,7 @@ export declare namespace ActiveTrackNode {
 }
 export type Wrapper = (x: number) => number;
 declare const buildInWrappers: {
-    none: (x: number) => 0 | 1;
+    none: (x: number) => 1 | 0;
     linear: (x: number) => number;
     easeout: (x: number) => number;
     easein: (x: number) => number;

@@ -12,7 +12,7 @@ exports.removeComment = removeComment;
  * @returns
  */
 function splitStr2Objs(str) {
-    console.log(`splitStr2Objs: ${str}`);
+    // console.log(`splitStr2Objs: ${str}`);
     let res = [];
     let len = str.length;
     let p = 0;

@@ -1,5 +1,5 @@
 import { HZEngineCore } from "..";
-import { ArchiveStateAccessor } from "../storage/decorator";
+import { Save } from "../storage/decorator";
 
 export class System {
   constructor(public _core: HZEngineCore) {
@@ -9,7 +9,7 @@ export class System {
     });
   }
 
-  @ArchiveStateAccessor("system.condition")
+  @Save("system.condition")
   accessor condition: System.Condition = System.Condition.Free;
 
   _pauseTimer: number | null = null;
@@ -20,7 +20,7 @@ export class System {
    * @param delayMs
    */
   pause(delayMs?: number) {
-    console.log(`[HZEngine] Pause`);
+    this._core.debug.log(`Pause`);
 
     if (this.condition === System.Condition.Gaming) {
       this.condition = System.Condition.Pause;
@@ -77,7 +77,7 @@ export class System {
   start(initLabel: string = "start") {
     // 初始化存档
     this._core.storage.archiveData;
-    console.log("ciallo");
+    this._core.debug.log("Game Start");
 
     this._core.script.clear();
     this._core.script.jumpLabel(initLabel);

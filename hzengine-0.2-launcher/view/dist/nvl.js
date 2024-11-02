@@ -22,7 +22,7 @@ class CustomSayView extends UI.MessageView {
     onCreate(prop) {
         let w = screenShape === SCREEN_SHAPE_SQUARE ? width : width;
         let h = screenShape === SCREEN_SHAPE_SQUARE ? height / 2 : height / 2;
-        console.log(`SayView OnCreate who=${prop.who} what=${prop.what}`);
+        // this.core.debug.log(`SayView OnCreate who=${prop.who} what=${prop.what}`);
         this._what = prop.what;
         this._widgets = {
             bg: this._widgetFactory.createWidget(hmUI.widget.IMG, {
@@ -95,7 +95,7 @@ class CustomSayView extends UI.MessageView {
         //   //   enable: false,
         // } as any);
         if (!this._animationPlugin) {
-            this.core.debug.log("Animation Plugin not found");
+            this.core.debug.log("[SayView]", "Animation Plugin not found");
         }
         Async.nextTick(() => {
             this._animationId =
@@ -114,7 +114,7 @@ class CustomSayView extends UI.MessageView {
                         this._widgets?.what_text.setProperty(hmUI.prop.TEXT, this._what?.slice(0, ~~props.len));
                     },
                     onEnd: () => {
-                        this.core.debug.log("打字机结束");
+                        this.core.debug.log("[SayView]", "打字机结束");
                     },
                 }) ?? null;
         });

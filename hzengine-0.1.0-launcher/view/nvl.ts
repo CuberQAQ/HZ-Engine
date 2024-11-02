@@ -20,7 +20,7 @@ class CustomSayView extends UI.MessageView {
   onCreate(prop: UI.Message): void {
     let w = screenShape === SCREEN_SHAPE_SQUARE ? width : width;
     let h = screenShape === SCREEN_SHAPE_SQUARE ? height / 2 : height / 2;
-    console.log(`SayView OnCreate who=${prop.who} what=${prop.what}`);
+    this.core.debug.log(`SayView OnCreate who=${prop.who} what=${prop.what}`);
     this._what = prop.what;
     this._widgets = {
       bg: this._widgetFactory.createWidget(hmUI.widget.IMG, {

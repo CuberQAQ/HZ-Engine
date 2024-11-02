@@ -134,8 +134,8 @@ export function character_command(core: HZEngineCore) {
           ctx.slicedArgs[1].str
         );
 
-        sayAction(core, characterMap[key].display_name, ctx.slicedArgs[1].str);
-        if(parsed.wait) core.system.pause();
+        sayAction(core, characterMap[key].display_name, ctx.slicedArgs[1].str, parsed.wait);
+        // if(parsed.wait) core.system.pause();
         return;
       }
     }

@@ -1,18 +1,18 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ArchiveStateAccessor = ArchiveStateAccessor;
-exports.ArchiveStateAccessorWithSerializer = ArchiveStateAccessorWithSerializer;
-exports.ArchiveStateGetter = ArchiveStateGetter;
-exports.ArchiveStateGetterWithSerializer = ArchiveStateGetterWithSerializer;
-exports.ArchiveStateSetter = ArchiveStateSetter;
-exports.ArchiveStateSetterWithDeserializer = ArchiveStateSetterWithDeserializer;
+exports.Save = Save;
+exports.CustomSave = CustomSave;
+exports.SaveGetter = SaveGetter;
+exports.CustomSaveGetter = CustomSaveGetter;
+exports.SaveSetter = SaveSetter;
+exports.CustomSaveSetter = CustomSaveSetter;
 const async_1 = require("../async");
 /**
  * 存档属性装饰器
  * @param store_key 保存数据到存档数据对象的key
  * @returns
  */
-function ArchiveStateAccessor(store_key) {
+function Save(store_key) {
     return function (target, context) {
         context.addInitializer(function () {
             async_1.Async.nextTick(() => {
@@ -25,7 +25,7 @@ function ArchiveStateAccessor(store_key) {
                 });
                 core.on("afterLoadArchive", () => {
                     let dataInArchive = core.storage.getSaveableData(core.storage.archiveData, false, ...store_key.split("."));
-                    console.log(`Load Data from Archive, store_key: ${store_key}, dataInArchive: ${JSON.stringify(dataInArchive)}`);
+                    this._core.debug.log(`Load Data from Archive, store_key: ${store_key}, dataInArchive: ${JSON.stringify(dataInArchive)}`);
                     target.set.call(this, dataInArchive);
                 });
             });
@@ -50,7 +50,7 @@ function ArchiveStateAccessor(store_key) {
  * @param store_key 保存数据到存档数据对象的key
  * @returns
  */
-function ArchiveStateAccessorWithSerializer(store_key, serializer, deserializer) {
+function CustomSave(store_key, serializer, deserializer) {
     return (target, context) => {
         if (context.kind !== "accessor") {
             throw new Error("ArchiveStateAccessor只能用于accessor属性");
@@ -66,7 +66,7 @@ function ArchiveStateAccessorWithSerializer(store_key, serializer, deserializer)
                 });
                 core.on("afterLoadArchive", () => {
                     let dataInArchive = core.storage.getSaveableData(core.storage.archiveData, false, ...store_key.split("."));
-                    console.log(`Load Data from Archive, store_key: ${store_key}, dataInArchive: ${JSON.stringify(dataInArchive)}`);
+                    this._core.debug.log(`Load Data from Archive, store_key: ${store_key}, dataInArchive: ${JSON.stringify(dataInArchive)}`);
                     target.set.call(this, deserializer.call(this, dataInArchive));
                 });
             });
@@ -83,7 +83,7 @@ function ArchiveStateAccessorWithSerializer(store_key, serializer, deserializer)
         };
     };
 }
-function ArchiveStateGetter(store_key) {
+function SaveGetter(store_key) {
     return (target, context) => {
         context.addInitializer(function () {
             async_1.Async.nextTick(() => {
@@ -105,7 +105,7 @@ function ArchiveStateGetter(store_key) {
         };
     };
 }
-function ArchiveStateGetterWithSerializer(store_key, serializer) {
+function CustomSaveGetter(store_key, serializer) {
     return (target, context) => {
         if (context.kind !== "getter") {
             throw new Error("ArchiveStateGetter只能用于getter属性");
@@ -132,7 +132,7 @@ function ArchiveStateGetterWithSerializer(store_key, serializer) {
  * @param store_key 保存数据到存档数据对象的key
  * @returns
  */
-function ArchiveStateSetter(store_key) {
+function SaveSetter(store_key) {
     return (target, context) => {
         if (context.kind !== "setter") {
             throw new Error("ArchiveStateSetter只能用于setter属性");
@@ -142,7 +142,7 @@ function ArchiveStateSetter(store_key) {
                 let core = this._core;
                 core.on("afterLoadArchive", () => {
                     let dataInArchive = core.storage.getSaveableData(core.storage.archiveData, false, ...store_key.split("."));
-                    console.log(`Load Data from Archive, store_key: ${store_key}, dataInArchive: ${JSON.stringify(dataInArchive)}`);
+                    this._core.debug.log(`Load Data from Archive, store_key: ${store_key}, dataInArchive: ${JSON.stringify(dataInArchive)}`);
                     target.call(this, dataInArchive);
                 });
             });
@@ -152,7 +152,7 @@ function ArchiveStateSetter(store_key) {
         };
     };
 }
-function ArchiveStateSetterWithDeserializer(store_key, deserializer) {
+function CustomSaveSetter(store_key, deserializer) {
     return (target, context) => {
         if (context.kind !== "setter") {
             throw new Error("ArchiveStateSetter只能用于setter属性");
@@ -162,7 +162,7 @@ function ArchiveStateSetterWithDeserializer(store_key, deserializer) {
                 let core = this._core;
                 core.on("afterLoadArchive", () => {
                     let dataInArchive = core.storage.getSaveableData(core.storage.archiveData, false, ...store_key.split("."));
-                    console.log(`Load Data from Archive, store_key: ${store_key}, dataInArchive: ${JSON.stringify(dataInArchive)}`);
+                    this._core.debug.log(`Load Data from Archive, store_key: ${store_key}, dataInArchive: ${JSON.stringify(dataInArchive)}`);
                     target.call(this, deserializer.call(this, dataInArchive));
                 });
             });

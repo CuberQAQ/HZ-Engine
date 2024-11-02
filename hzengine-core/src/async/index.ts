@@ -1,5 +1,5 @@
 import { HZEngineCore, Storage } from "..";
-import { ArchiveStateAccessor } from "../storage/decorator";
+import { Save } from "../storage/decorator";
 import { ZeppTimer } from "./zeppos_timer";
 import { Time } from "@zos/sensor";
 
@@ -63,11 +63,11 @@ export class Async {
     }
   }
 
-  @ArchiveStateAccessor("async.nextTimerId")
+  @Save("async.nextTimerId")
   private accessor _nextTimerId: number = 50;
 
   // tasks
-  @ArchiveStateAccessor("async.delayTasks")
+  @Save("async.delayTasks")
   private accessor _delayTasks: Record<number, Async.Task> = {};
 
   // 注意在task執行中立即創建一個新的task，會在同一個js task中執行

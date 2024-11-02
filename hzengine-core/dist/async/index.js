@@ -151,8 +151,8 @@ let Async = (() => {
         _Async__delayTasks_accessor_storage = new WeakMap(),
         (() => {
             const _metadata = typeof Symbol === "function" && Symbol.metadata ? Object.create(null) : void 0;
-            __nextTimerId_decorators = [(0, decorator_1.ArchiveStateAccessor)("async.nextTimerId")];
-            __delayTasks_decorators = [(0, decorator_1.ArchiveStateAccessor)("async.delayTasks")];
+            __nextTimerId_decorators = [(0, decorator_1.Save)("async.nextTimerId")];
+            __delayTasks_decorators = [(0, decorator_1.Save)("async.delayTasks")];
             __esDecorate(_a, null, __nextTimerId_decorators, { kind: "accessor", name: "_nextTimerId", static: false, private: false, access: { has: obj => "_nextTimerId" in obj, get: obj => obj._nextTimerId, set: (obj, value) => { obj._nextTimerId = value; } }, metadata: _metadata }, __nextTimerId_initializers, __nextTimerId_extraInitializers);
             __esDecorate(_a, null, __delayTasks_decorators, { kind: "accessor", name: "_delayTasks", static: false, private: false, access: { has: obj => "_delayTasks" in obj, get: obj => obj._delayTasks, set: (obj, value) => { obj._delayTasks = value; } }, metadata: _metadata }, __delayTasks_initializers, __delayTasks_extraInitializers);
             if (_metadata) Object.defineProperty(_a, Symbol.metadata, { enumerable: true, configurable: true, writable: true, value: _metadata });

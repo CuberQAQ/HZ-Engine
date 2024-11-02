@@ -44,6 +44,10 @@
         {
           "name": "Monaco",
           "deviceSource": 8519936
+        },
+        {
+          "name": "GTR4",
+          "deviceSource": 7930112
         }
       ],
       "designWidth": 480

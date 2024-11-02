@@ -3,6 +3,8 @@
  * @copyright Copyright (c) 2024 CuberQAQ. All rights reserved.
  */
 import { Async } from "./async";
+import { Audio } from "./audio";
+import { Config } from "./config";
 import { Debug } from "./debug";
 import { Script } from "./script";
 import { Storage } from "./storage";
@@ -15,6 +17,8 @@ declare class HZEngineCore {
     ui: UI;
     script: Script;
     system: System;
+    config: Config;
+    audio: Audio;
     debug: Debug;
     constructor();
     loadProject(options: {

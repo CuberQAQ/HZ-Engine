@@ -1,0 +1,14 @@
+[
+    {
+        "frame": {
+            "alpha": 0
+        }
+    },
+    {
+        "frame": {
+            "alpha": 1
+        },
+        "time": 1.6,
+        "wrapper": "linear"
+    }
+]

@@ -77,7 +77,7 @@ export class TitleView extends UI.View<TitleViewProp> {
             try {
               this.core.storage.loadArchiveData("archive000.json");
             } catch(e) {
-              console.log("請先開始遊戲");
+              this.core.debug.log("請先開始遊戲");
               throw e
             }
             this.core.ui.getRouter("page")!.pop();

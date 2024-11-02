@@ -39,7 +39,7 @@ export function img(core: HZEngineCore) {
     size: UI.Size,
     routerStrategy: UI.Router.RouteStrategy | null
   ) {
-    const show_view_tag_prefix = "hzengine.fg_img";
+    const show_view_tag_prefix = "hzengine.img";
     const show_view_name = "fg_img";
     let prop: UI.FgImgViewProp = {
       imgPath: path,
@@ -86,7 +86,7 @@ export function img(core: HZEngineCore) {
     tag: string,
     routerStrategy: UI.Router.RouteStrategy | null
   ) {
-    const show_view_tag_prefix = "hzengine.fg_img";
+    const show_view_tag_prefix = "hzengine.img";
 
     let tag_prefixed = `${show_view_tag_prefix}.${tag}`;
     let router = core.ui.getRouter(tag_prefixed);
@@ -132,7 +132,7 @@ export function img(core: HZEngineCore) {
     size: UI.Size,
     routerStrategy: UI.Router.RouteStrategy | null
   ) {
-    const scene_view_tag_prefix = "hzengine.bg_img";
+    const scene_view_tag_prefix = "hzengine.img";
     const scene_view_name = "bg_img";
     let prop: UI.BgImgViewProp = {
       imgPath: path,
@@ -198,7 +198,7 @@ export function img(core: HZEngineCore) {
     let inTransforms: string[] = [];
     let outTransforms: string[] = [];
     while (true) {
-      console.log(`slicedArgs: ${JSON.stringify(slicedArgs)}`);
+      // console.log(`slicedArgs: ${JSON.stringify(slicedArgs)}`);
 
       let keyword_index = findLastIndex(
         slicedArgs,
@@ -225,7 +225,7 @@ export function img(core: HZEngineCore) {
         let args = Script.Utils.parseHzsArgs(
           Script.Utils.joinSlicedArgs(currentFieldArgs)
         );
-        console.log(`with args: ${JSON.stringify(args)}`);
+        // console.log(`with args: ${JSON.stringify(args)}`);
 
         for (let i = 0; i < args.length; i++) {
           if (Array.isArray(args[i])) {

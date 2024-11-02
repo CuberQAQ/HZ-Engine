@@ -8,7 +8,7 @@ import {
   splitStr2Objs,
 } from "./strtools";
 import { readline } from "./readscript";
-import { ArchiveStateAccessor } from "../storage/decorator";
+import { Save } from "../storage/decorator";
 import { join } from "@cuberqaq/path-polyfill";
 export class Script {
   constructor(public _core: HZEngineCore) {}
@@ -16,7 +16,7 @@ export class Script {
    * 调用栈
    * 在call时保存当前执行位置和语句栈，在return时恢复执行位置和语句栈
    */
-  @ArchiveStateAccessor("script.callStack")
+  @Save("script.callStack")
   private accessor _callStack: {
     position: [path: string, index: number] | null;
     statementStack: Script.StatementStack;
@@ -26,14 +26,14 @@ export class Script {
    * 语句栈
    * 比如while, if，会在语句开始时入栈，语句结束时出栈
    */
-  @ArchiveStateAccessor("script.statementStack")
+  @Save("script.statementStack")
   private accessor _statementStack: Script.StatementStack = [];
 
   /**
    * 下一次执行的脚本位置
    * 注意：存储该值的时候应总是拷贝赋值而非直接引用赋值
    */
-  @ArchiveStateAccessor("script.nextRunPosition")
+  @Save("script.nextRunPosition")
   private accessor _nextRunPosition: [path: string, index: number] | null =
     null;
 
@@ -65,7 +65,7 @@ export class Script {
           throw `label between statement is not allowed, at file [${nowRunPosition[0]}] line [${nowRunPosition[1]}]`;
         }
       } else {
-        console.log("Run cmd: " + rawCommand);
+        this._core.debug.log("Run cmd: " + rawCommand);
 
         // Process Command
         this._processCmd(rawCommand, [...nowRunPosition]);
@@ -260,7 +260,7 @@ export class Script {
    * and continue executing.
    */
   analyseStatement(ctx: Script.Context) {
-    console.log("[HZEngine] Start statement analyse mode");
+    // this._core.debug.log("[HZEngine] Start statement analyse mode");
 
     // Backup _nextRunPosition
     let _nextRunPositionBackup: [path: string, index: number] | null = this
@@ -336,7 +336,7 @@ export class Script {
     }
 
     // Reset _nextRunPosition to the backup value, and switch back to normal mode, and continue executing
-    console.log("[HZEngine] Finished analyse statement mode ");
+    // this._core.debug.logconsole.log("[HZEngine] Finished analyse statement mode ");
   }
 
   // eval
@@ -348,11 +348,11 @@ export class Script {
         this._core
       );
     } catch (e) {
-      console.log(`Error in evalScope: ${e}`);
+      this._core.debug.log(`Error in evalScope: ${e}`);
     }
   }
   evalExpression(code: string) {
-    console.log(`[HZEngine] evalExpression: ${code}`);
+    this._core.debug.log(`evalExpression: ${code}`);
 
     try {
       return new Function("sd", "gd", "hz", `return (${code})`)(
@@ -361,7 +361,7 @@ export class Script {
         this._core
       );
     } catch (e) {
-      console.log(`Error in evalExpression: ${e}`);
+      this._core.debug.log(`Error in evalExpression: ${e}`);
     }
   }
 
@@ -500,7 +500,7 @@ export namespace Script {
     export const splitRawtext: typeof splitStr2Objs = splitStr2Objs;
     export function splitCommas(rawtext: string): string[] {
       let slicedArgs = splitStr2Objs(rawtext);
-      console.log(`splitCommas rawtext: ${rawtext}, slicedArgs: ${JSON.stringify(slicedArgs)}`);
+      // console.log(`splitCommas rawtext: ${rawtext}, slicedArgs: ${JSON.stringify(slicedArgs)}`);
       
       let res: string[] = [];
       for (let i = 0; i < slicedArgs.length; i++) {
@@ -514,7 +514,7 @@ export namespace Script {
           });
         }
       }
-      console.log(`splitCommas res: ${JSON.stringify(res)}`);
+      // console.log(`splitCommas res: ${JSON.stringify(res)}`);
       
       return res;
     }
@@ -527,7 +527,7 @@ export namespace Script {
         throw `invalid tuple: ${rawtext}`;
       }
       rawtext = rawtext.slice(1, rawtext.length - 1);
-      console.log(`parseTuple rawtext: ${rawtext}`);
+      // console.log(`parseTuple rawtext: ${rawtext}`);
       
       return parseHzsArgs(rawtext);
     }
@@ -550,7 +550,7 @@ export namespace Script {
         else if (str.startsWith("[")) return parseArray(str);
         else return str;
       });
-      console.log(`parseHzsArgs from: "${rawtext}" ; res: ${JSON.stringify(res)}`);
+      // console.log(`parseHzsArgs from: "${rawtext}" ; res: ${JSON.stringify(res)}`);
       
       return res;
     }

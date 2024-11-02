@@ -20,7 +20,7 @@ export function conditional(core: HZEngineCore) {
       return next();
     }
     let data = ctx.startStatement("if") as unknown as IfStatementData;
-    console.log(`if data=${JSON.stringify(data)}`);
+    // console.log(`if data=${JSON.stringify(data)}`);
 
     let if_expression_res: unknown = core.script.evalExpression(
       data.if_expression
@@ -305,7 +305,7 @@ export function conditional(core: HZEngineCore) {
     // (currently only while statement is breakable)
 
     //(debug) output stack
-    console.log("Stack="+JSON.stringify(ctx.statementStack));
+    // console.log("Stack="+JSON.stringify(ctx.statementStack));
 
     let resIndex = -1
     for (let i = ctx.statementStack.length - 1; i >= 0; i--) {
@@ -319,7 +319,7 @@ export function conditional(core: HZEngineCore) {
     }
 
     let data = ctx.statementStack[resIndex][2] as unknown as WhileStatementData;
-    console.log(`Break command: break from ${ctx.statementStack[resIndex][0]} statement at file [${data.start_position[0]}] line [${data.start_position[1] + 1}]`);
+    core.debug.log(`Break command: break from ${ctx.statementStack[resIndex][0]} statement at file [${data.start_position[0]}] line [${data.start_position[1] + 1}]`);
     core.script.jump(
       ...data.end_position,
       false

@@ -1,0 +1,59 @@
+*start
+    #启用实机模式
+    [REAL = true]
+
+    character girl "綾地寧寧"
+    $ a = 3
+    show girl normal
+
+    # 使用 [{decorator_name}] command 可以使用装饰器
+    # 例如内置装饰器[REAL]的作用是在实机模式下执行后面的语句
+    # [REAL] "只有在实机才能看到这句话"
+    # "神秘人物" "欢迎来到HZEngine的世界!"
+    "这里是第一个游戏的新版\n(dev 2.0.1)"
+
+    menu
+    @"前往咖啡馆"
+        call ciallo
+    @"流程分支测试"
+        menu
+        @"嵌套menu测试"
+            menu 
+            @"choice1"
+                "你选择了choice1"
+            @"choice2"
+                "你选择了choice2"
+            @"choice3"
+                menu 
+                @"choice3.1"
+                    "你选择了choice3.1"
+                @"choice3.2"
+                    "你选择了choice3.2"
+                @"choice3.3"
+                    "今天是0721节，你0721了吗"
+                end menu
+                "菜单结束"
+            end menu
+            "菜单结束"
+            "嵌套测试完成"
+        @"if语句测试"
+            call if_test
+        @"轮回测试"
+            call loop_test
+        end menu
+    @"动画系统测试"
+        call transform_test
+    @"音频系统测试"
+        call audio_test
+    @"配置系统测试"
+        call config_test
+    end menu
+
+
+*end
+
+    # hide girl
+    "游戲結束，恭喜達成真結局\n即将触发轮回！！\nQAQ"
+
+
+    jump start

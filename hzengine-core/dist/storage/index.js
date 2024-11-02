@@ -73,18 +73,16 @@ class Storage {
     loadPackageData() {
         if (!this.projectRoot)
             throw "projectDir is null";
-        console.log(`loadPackageData ${this.projectRoot} ${path_1.default.join(this.projectRoot, "hz_package.json")}`);
+        this._core.debug.log(`loadPackageData ${this.projectRoot} ${path_1.default.join(this.projectRoot, "hz_package.json")}`);
         if (!hmFS.statSync({
             path: path_1.default.join(this.projectRoot, "hz_package.json"),
         })) {
             throw "HZEngine Package File (hz_package.json) not exist";
         }
-        console.log("start 1");
         this.packageData = JSON.parse(hmFS.readFileSync({
             path: path_1.default.join(this.projectRoot, "hz_package.json"),
             options: { encoding: "utf8" },
         }));
-        console.log("end 1");
     }
     get globalData() {
         if (!this._globalData) {
@@ -134,14 +132,15 @@ class Storage {
             }
         }
         else {
-            console.log(`[HZEngine] globalData.json not exist, create it.`);
+            this._core.debug.log(`globalData.json not exist, create it.`);
             this._globalData = {}; // Initial GlobalData value
+            this._core.emit("initGlobalData");
             hmFS.writeFileSync({
                 path: path_1.default.join(this.saveRoot, "globalData.json"),
                 data: JSON.stringify(this._globalData),
             });
-            this._core.emit("afterLoadGlobalData");
         }
+        this._core.emit("afterLoadGlobalData");
     }
     saveGlobalData() {
         if (!this.projectRoot) {
@@ -161,7 +160,7 @@ class Storage {
             }); // TODO
             if (res < 0)
                 throw `[HZEngine] save globalData to globalData.json failed, code = ${res}`;
-            console.log(`[HZEngine] save globalData to globalData.json`);
+            this._core.debug.log(`save globalData to globalData.json`);
             this._core.emit("afterSaveGlobalData");
         }, 0);
     }
@@ -184,11 +183,11 @@ class Storage {
             if (archiveData == null)
                 throw `[HZEngine] ArchiveData is null`;
             this._archiveData = archiveData;
-            console.log(`[HZEngine] load archiveData from ${archiveFile}`);
+            this._core.debug.log(`load archiveData from ${archiveFile}`);
             this._core.emit("afterLoadArchive");
         }
         else {
-            console.log(`[HZEngine] load archiveData from empty template`);
+            this._core.debug.log(`load archiveData from empty template`);
             this._archiveData = {};
             this._core.emit("initArchiveData");
         }
@@ -202,9 +201,9 @@ class Storage {
         if (!this.saveRoot)
             throw `saveRoot is null, please loadProject first`;
         this._core.emit("beforeSaveArchive");
-        console.log("[HZEngine] will save archiveData to " + archiveFile);
+        this._core.debug.log("Will save archiveData to " + archiveFile);
         let saveFunc = () => {
-            console.log("[HZEngine] saving archiveData to " + archiveFile);
+            this._core.debug.log("Saving archiveData to " + archiveFile);
             if (!this.saveRoot)
                 throw `projectDir is null, please loadProject first`;
             let res = hmFS.writeFileSync({
@@ -213,7 +212,7 @@ class Storage {
             }); //TODO
             if (res < 0)
                 throw `[HZEngine] save archiveData to ${archiveFile} failed, code = ${res}`;
-            console.log(`[HZEngine] save archiveData to ${archiveFile}`);
+            this._core.debug.log(`Save archiveData to ${archiveFile}`);
             this._core.emit("afterSaveArchive");
         };
         if (immediate) {
@@ -256,7 +255,7 @@ class Storage {
         return obj;
     }
     setSaveableData(data, auto_correct, value, ...key_chain) {
-        console.log(`[HZEngine] setSaveableData ${key_chain} = ${JSON.stringify(value)}`);
+        this._core.debug.log(`setSaveableData ${key_chain} => ${JSON.stringify(value)}`);
         if (key_chain.length == 0)
             throw `key_chain is empty`;
         let parentObj = this.getSaveableData(data, auto_correct, ...key_chain.slice(0, -1));
@@ -298,8 +297,8 @@ class Storage {
                 nameMap: {},
             },
             animation: {
-                profileMap: {}
-            }
+                profileMap: {},
+            },
         };
         this.preloadScript();
         this.preloadImage();
@@ -462,9 +461,7 @@ at [${labelMap[label][0]}(line ${labelMap[label][1]})] \
         }
         function preloadAnimation(path) {
             let raw_name = path_1.default.parse(path).name;
-            let name_key = raw_name
-                .trim()
-                .replace(/ +/, "_");
+            let name_key = raw_name.trim().replace(/ +/, "_");
             if (profileMap[name_key])
                 throw `Animation profile name key conflict [${name_key}], at file [${path}] and [${profileMap[name_key]}]`;
             profileMap[name_key] = [path];

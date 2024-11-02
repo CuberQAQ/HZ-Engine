@@ -105,9 +105,8 @@ function character_command(core) {
                 if (ctx.slicedArgs.length != 2)
                     throw `Character Say Command: incorrect amount of args`;
                 console.log("Character Say Command:", short_name, ctx.slicedArgs[1].str);
-                (0, basic_1.sayAction)(core, characterMap[key].display_name, ctx.slicedArgs[1].str);
-                if (parsed.wait)
-                    core.system.pause();
+                (0, basic_1.sayAction)(core, characterMap[key].display_name, ctx.slicedArgs[1].str, parsed.wait);
+                // if(parsed.wait) core.system.pause();
                 return;
             }
         }

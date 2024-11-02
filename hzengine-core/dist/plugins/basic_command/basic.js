@@ -10,7 +10,7 @@ function basic_commands(core) {
             return next();
         if (strArr.length !== 2)
             throw "Jump Command: incorrect amount of args";
-        console.log(`Jump Command: jump to label [${strArr[1]}]`);
+        core.debug.log(`Jump Command: jump to label [${strArr[1]}]`);
         core.script.jumpLabel(strArr[1]);
     });
     // call command
@@ -20,7 +20,7 @@ function basic_commands(core) {
             return next();
         if (strArr.length !== 2)
             throw "Call Command: incorrect amount of args";
-        console.log(`Call Command: call label [${strArr[1]}]`);
+        core.debug.log(`Call Command: call label [${strArr[1]}]`);
         core.script.callLabel(strArr[1]);
     });
     // return command
@@ -30,7 +30,7 @@ function basic_commands(core) {
             return next();
         if (strArr.length !== 1)
             throw "Return Command: this command can not have args";
-        console.log(`Return Command: return`);
+        core.debug.log(`Return Command: return`);
         core.script.return();
     });
     // (debug) echo command
@@ -38,7 +38,7 @@ function basic_commands(core) {
         let str = ctx.rawtext.trim();
         if (!str.startsWith("echo"))
             return next();
-        console.log(`[ECHO] ${core.script.parseString(str.slice(4).trim())}`);
+        core.debug.log(`[ECHO] ${core.script.parseString(str.slice(4).trim())}`);
     });
     // say command
     core.script.use((ctx, next) => {
@@ -63,17 +63,16 @@ function basic_commands(core) {
             throw `Say Command: incorrect amount of args`;
         }
         if (ctx.slicedArgs.length === 1) {
-            console.log(`[SAY] ${ctx.slicedArgs[0].str}`);
-            sayAction(core, "", ctx.slicedArgs[0].str);
+            core.debug.log(`[SAY] ${ctx.slicedArgs[0].str}`);
+            sayAction(core, "", ctx.slicedArgs[0].str, parsed.wait);
         }
         else {
             if (!ctx.slicedArgs[1].isQuoted)
                 throw `Say Command: second arg should be quoted`;
-            console.log(`[SAY] ${ctx.slicedArgs[0].str}: ${ctx.slicedArgs[1].str}`);
-            sayAction(core, ctx.slicedArgs[0].str, ctx.slicedArgs[1].str);
+            core.debug.log(`[SAY] ${ctx.slicedArgs[0].str}: ${ctx.slicedArgs[1].str}`);
+            sayAction(core, ctx.slicedArgs[0].str, ctx.slicedArgs[1].str, parsed.wait);
         }
-        if (parsed === null || parsed === void 0 ? void 0 : parsed.wait)
-            core.system.pause();
+        // if (parsed?.wait) core.system.pause();
     });
     // pause command
     core.script.use((ctx, next) => {
@@ -91,7 +90,7 @@ function basic_commands(core) {
             core.system.pause();
     });
 }
-function sayAction(core, who, what) {
+function sayAction(core, who, what, wait) {
     const say_view_tag = "hzengine.say";
     const say_view_name = "say";
     what = core.script.parseString(what);
@@ -109,5 +108,19 @@ function sayAction(core, who, what) {
     }
     else {
         router.update(message);
+    }
+    if (wait) {
+        if (core.config.getConfig("game.autoplay.enable")) {
+            let delay = core.config.getConfig("game.autoplay.extra_delay") +
+                core.config.getConfig("game.autoplay.ms_per_char") *
+                    what.length;
+            if (isNaN(delay) || !isFinite(delay) || delay < 0) {
+                throw `Say Action: AutoPlay Delay Error: ${delay} ms`;
+            }
+            core.system.pause(delay);
+        }
+        else {
+            core.system.pause();
+        }
     }
 }
