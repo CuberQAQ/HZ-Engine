@@ -132,6 +132,7 @@ export class AnimationPlugin {
       this._tempAnimationMap[id].stop();
       delete this._tempAnimationMap[id];
     }
+    
   }
 
   private _timerCb() {

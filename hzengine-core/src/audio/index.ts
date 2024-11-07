@@ -38,9 +38,11 @@ export class Audio {
     return this._channels;
   }
 
+
   createChannel(name: string): Audio.Channel {
     // TODO support more audio channels
-    if(Object.getOwnPropertyNames(this._channels).length > 0) throw "Can't create more than one audio channel on ZeppOS";
+    if (Object.getOwnPropertyNames(this._channels).length > 0)
+      throw "Can't create more than one audio channel on ZeppOS";
 
     if (this._channels[name]) throw "Channel Already Exist";
     return (this._channels[name] = new Audio.Channel(this));
