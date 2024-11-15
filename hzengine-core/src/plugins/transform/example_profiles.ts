@@ -1,4 +1,4 @@
-import { Profile } from "./animation";
+import { Profile } from "./animation.js";
 
 export const ExampleProfile1: Profile = [
     [ // alpha

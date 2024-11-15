@@ -1,5 +1,5 @@
-import { HZEngineCore } from "..";
-import { Save } from "../storage/decorator";
+import { HZEngineCore } from "../index.js";
+import { Save } from "../storage/decorator.js";
 
 export class System {
   constructor(public _core: HZEngineCore) {

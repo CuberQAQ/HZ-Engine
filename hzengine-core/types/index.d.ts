@@ -2,14 +2,14 @@
  * HZEngineCore
  * @copyright Copyright (c) 2024 CuberQAQ. All rights reserved.
  */
-import { Async } from "./async";
-import { Audio } from "./audio";
-import { Config } from "./config";
-import { Debug } from "./debug";
-import { Script } from "./script";
-import { Storage } from "./storage";
-import { System } from "./system";
-import { UI } from "./ui";
+import { Async } from "./async/index.js";
+import { Audio } from "./audio/index.js";
+import { Config } from "./config/index.js";
+import { Debug } from "./debug/index.js";
+import { Script } from "./script/index.js";
+import { Storage } from "./storage/index.js";
+import { System } from "./system/index.js";
+import { UI } from "./ui/index.js";
 declare class HZEngineCore {
     private _eventCallbacks;
     storage: Storage;
@@ -36,4 +36,4 @@ declare class HZEngineCore {
 }
 type Plugin = (core: HZEngineCore) => any;
 export { HZEngineCore, UI, Storage, Script, System, Async };
-export * as TransformPlugin from "./plugins/transform";
+export * as TransformPlugin from "./plugins/transform/index.js";

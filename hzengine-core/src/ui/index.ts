@@ -1,9 +1,9 @@
-import { HZEngineCore } from "..";
+import { HZEngineCore } from "../index.js";
 import {
   Save,
   CustomSave,
-} from "../storage/decorator";
-import { Storage } from "../storage/index";
+} from "../storage/decorator.js";
+import { Storage } from "../storage/index.js";
 /// <reference path="node_modules/@zeppos/device-types/dist/index.d.ts" />
 import * as hmUI from "@zos/ui";
 import {} from "@zos/ui";

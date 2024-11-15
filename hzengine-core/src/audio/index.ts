@@ -1,6 +1,6 @@
 /// <reference path="./zos_media.d.ts" />
-import { CustomSave, Save } from "../storage/decorator";
-import { HZEngineCore } from "..";
+import { CustomSave, Save } from "../storage/decorator.js";
+import { HZEngineCore } from "../index.js";
 
 import { create, id } from "@zos/media";
 

@@ -1,4 +1,4 @@
-import { HZEngineCore, Storage } from "..";
+import { HZEngineCore, Storage } from "../index.js";
 export declare class Async {
     _core: HZEngineCore;
     static _nextTickCallbacks: (() => void)[];

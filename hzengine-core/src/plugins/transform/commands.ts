@@ -1,4 +1,4 @@
-import { HZEngineCore, Script } from "../..";
+import { HZEngineCore, Script } from "../../index.js";
 
 export function registerHzscriptCommands(core: HZEngineCore) {
   core.script.use((ctx, next) => {

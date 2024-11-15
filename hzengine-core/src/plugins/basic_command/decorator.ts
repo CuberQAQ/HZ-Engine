@@ -1,5 +1,5 @@
-import { HZEngineCore } from "../..";
-import { splitStr2Objs, splitStr2Strs } from "../../script/strtools";
+import { HZEngineCore } from "../../index.js";
+import { splitStr2Objs, splitStr2Strs } from "../../script/strtools.js";
 
 export function decorator_module(core: HZEngineCore) {
   core.script.use((ctx, next) => {

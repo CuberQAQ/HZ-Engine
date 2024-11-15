@@ -1,4 +1,4 @@
-import { HZEngineCore } from "..";
+import { HZEngineCore } from "../index.js";
 export declare class Audio {
     _core: HZEngineCore;
     static _hmPlayer: import("@zos/media").Player;

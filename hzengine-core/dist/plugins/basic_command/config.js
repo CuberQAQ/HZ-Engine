@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.config_command = config_command;
-function config_command(core) {
+export function config_command(core) {
     // set command: set <key> <value>
     core.script.use((ctx, next) => {
         if (ctx.rawtext.trim().split(" ")[0].toLowerCase() !== "set")

@@ -1,5 +1,5 @@
-import { HZEngineCore, Storage } from "..";
-import { Async } from "../async";
+import { HZEngineCore, Storage } from "../index.js";
+import { Async } from "../async/index.js";
 
 /**
  * 存档属性装饰器

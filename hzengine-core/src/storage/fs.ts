@@ -1,6 +1,6 @@
 import * as hmApp from "@zos/app";
 import * as hmFS from "@zos/fs";
-// import Path from "../utils/path";
+// import Path ;
 // function getAppDir(appId = (hmApp.getPackageInfo() as any).appId) {
 //   let str = appId.toString(16);
 //   switch (str.length) {

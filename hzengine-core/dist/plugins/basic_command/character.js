@@ -1,8 +1,5 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.character_command = character_command;
-const basic_1 = require("./basic");
-function character_command(core) {
+import { sayAction } from "./basic.js";
+export function character_command(core) {
     // character command
     // Used to create a character, and save it to script field in archive storage,
     // so that it can be used when the archive is loaded next time the game starts
@@ -105,7 +102,7 @@ function character_command(core) {
                 if (ctx.slicedArgs.length != 2)
                     throw `Character Say Command: incorrect amount of args`;
                 console.log("Character Say Command:", short_name, ctx.slicedArgs[1].str);
-                (0, basic_1.sayAction)(core, characterMap[key].display_name, ctx.slicedArgs[1].str, parsed.wait);
+                sayAction(core, characterMap[key].display_name, ctx.slicedArgs[1].str, parsed.wait);
                 // if(parsed.wait) core.system.pause();
                 return;
             }

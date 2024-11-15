@@ -1,2 +1,2 @@
-import { Profile } from "./animation";
+import { Profile } from "./animation.js";
 export declare const ExampleProfile1: Profile;

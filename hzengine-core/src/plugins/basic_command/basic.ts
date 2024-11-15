@@ -1,5 +1,5 @@
 import hmUI from "@zos/ui";
-import { HZEngineCore, UI } from "../..";
+import { HZEngineCore, UI } from "../../index.js";
 
 export function basic_commands(core: HZEngineCore) {
   // jump command

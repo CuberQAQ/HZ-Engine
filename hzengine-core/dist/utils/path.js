@@ -286,4 +286,4 @@ posix.parse = function (pathString) {
 };
 posix.sep = "/"; // POSIX 路径分隔符
 posix.delimiter = ":"; // POSIX 路径分隔符（用于环境变量）
-module.exports = posix; // 导出 posix 模块
+export default posix; // 导出 posix 模块

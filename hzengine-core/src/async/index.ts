@@ -1,6 +1,6 @@
-import { HZEngineCore, Storage } from "..";
-import { Save } from "../storage/decorator";
-import { ZeppTimer } from "./zeppos_timer";
+import { HZEngineCore, Storage } from "../index.js";
+import { Save } from "../storage/decorator.js";
+import { ZeppTimer } from "./zeppos_timer.js";
 import { Time } from "@zos/sensor";
 
 export class Async {

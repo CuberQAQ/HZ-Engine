@@ -1,5 +1,5 @@
-import { HZEngineCore } from "../..";
-import Path from "../../utils/path";
+import { HZEngineCore } from "../../index.js";
+import Path from "../../utils/path.js";
 
 export function audio_command(core: HZEngineCore) {
   // play command: play <channel> "<path>"

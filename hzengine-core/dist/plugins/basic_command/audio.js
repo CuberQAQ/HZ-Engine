@@ -1,11 +1,5 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.audio_command = audio_command;
-const path_1 = __importDefault(require("../../utils/path"));
-function audio_command(core) {
+import Path from "../../utils/path.js";
+export function audio_command(core) {
     // play command: play <channel> "<path>"
     core.script.use((ctx, next) => {
         if (ctx.rawtext.trim().split(" ")[0].toLowerCase() !== "play" &&
@@ -25,7 +19,7 @@ function audio_command(core) {
         if (ctx.slicedArgs[0].str !== "queue") {
             channel.stop();
         }
-        channel.push({ path: path_1.default.join(core.storage.projectRoot, "audio", path) });
+        channel.push({ path: Path.join(core.storage.projectRoot, "audio", path) });
         channel.play();
     });
     // stop command: stop <channel>

@@ -1,9 +1,9 @@
-import { HZEngineCore, Storage, UI } from "../..";
+import { HZEngineCore, Storage, UI } from "../../index.js";
 import {
   Save,
   CustomSave,
-} from "../../storage/decorator";
-import { Animation, Profile, Wrapper } from "./animation";
+} from "../../storage/decorator.js";
+import { Animation, Profile, Wrapper } from "./animation.js";
 import { Time } from "@zos/sensor";
 
 export class AnimationPlugin {

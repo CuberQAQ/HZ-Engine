@@ -1,13 +1,10 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.decorator_module = decorator_module;
-const strtools_1 = require("../../script/strtools");
-function decorator_module(core) {
+import { splitStr2Strs } from "../../script/strtools.js";
+export function decorator_module(core) {
     core.script.use((ctx, next) => {
         if (!ctx.slicedArgs[0].isSquared)
             return next();
         let decorator = ctx.slicedArgs[0].str.toLowerCase();
-        switch ((0, strtools_1.splitStr2Strs)(decorator).join("").toLowerCase()) {
+        switch (splitStr2Strs(decorator).join("").toLowerCase()) {
             case "real=true":
                 core.storage.globalData.realEnv = true;
                 break;

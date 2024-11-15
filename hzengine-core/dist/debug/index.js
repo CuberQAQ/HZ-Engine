@@ -1,7 +1,5 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Debug = void 0;
-class Debug {
+export class Debug {
+    _core;
     constructor(_core) {
         this._core = _core;
     }
@@ -9,4 +7,3 @@ class Debug {
         console.log("[HZEngine]", ...args);
     }
 }
-exports.Debug = Debug;

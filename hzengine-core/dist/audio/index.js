@@ -1,4 +1,3 @@
-"use strict";
 var __esDecorate = (this && this.__esDecorate) || function (ctor, descriptorIn, decorators, contextIn, initializers, extraInitializers) {
     function accept(f) { if (f !== void 0 && typeof f !== "function") throw new TypeError("Function expected"); return f; }
     var kind = contextIn.kind, key = kind === "getter" ? "get" : kind === "setter" ? "set" : "value";
@@ -33,53 +32,17 @@ var __runInitializers = (this && this.__runInitializers) || function (thisArg, i
     }
     return useValue ? value : void 0;
 };
-var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {
-    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
-    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
-    return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
-};
-var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {
-    if (kind === "m") throw new TypeError("Private method is not writable");
-    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a setter");
-    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
-    return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Audio = void 0;
 /// <reference path="./zos_media.d.ts" />
-const decorator_1 = require("../storage/decorator");
-const media_1 = require("@zos/media");
+import { CustomSave } from "../storage/decorator.js";
+import { create, id } from "@zos/media";
 let Audio = (() => {
-    var _a, _Audio__channels_accessor_storage;
     let __channels_decorators;
     let __channels_initializers = [];
     let __channels_extraInitializers = [];
-    return _a = class Audio {
-            constructor(_core) {
-                this._core = _core;
-                _Audio__channels_accessor_storage.set(this, __runInitializers(this, __channels_initializers, {}));
-                __runInitializers(this, __channels_extraInitializers);
-                this._core = _core;
-                this._channels["audio"] = new _a.Channel(this);
-            }
-            get _channels() { return __classPrivateFieldGet(this, _Audio__channels_accessor_storage, "f"); }
-            set _channels(value) { __classPrivateFieldSet(this, _Audio__channels_accessor_storage, value, "f"); }
-            get channels() {
-                return this._channels;
-            }
-            createChannel(name) {
-                // TODO support more audio channels
-                if (Object.getOwnPropertyNames(this._channels).length > 0)
-                    throw "Can't create more than one audio channel on ZeppOS";
-                if (this._channels[name])
-                    throw "Channel Already Exist";
-                return (this._channels[name] = new _a.Channel(this));
-            }
-        },
-        _Audio__channels_accessor_storage = new WeakMap(),
-        (() => {
+    return class Audio {
+        static {
             const _metadata = typeof Symbol === "function" && Symbol.metadata ? Object.create(null) : void 0;
-            __channels_decorators = [(0, decorator_1.CustomSave)("audio.channels", function (channels) {
+            __channels_decorators = [CustomSave("audio.channels", function (channels) {
                     let res = {};
                     for (let key in channels) {
                         res[key] = channels[key].serialize();
@@ -96,29 +59,50 @@ let Audio = (() => {
                     }
                     return res;
                 })];
-            __esDecorate(_a, null, __channels_decorators, { kind: "accessor", name: "_channels", static: false, private: false, access: { has: obj => "_channels" in obj, get: obj => obj._channels, set: (obj, value) => { obj._channels = value; } }, metadata: _metadata }, __channels_initializers, __channels_extraInitializers);
-            if (_metadata) Object.defineProperty(_a, Symbol.metadata, { enumerable: true, configurable: true, writable: true, value: _metadata });
-        })(),
-        _a._hmPlayer = (0, media_1.create)(media_1.id.PLAYER),
-        _a;
+            __esDecorate(this, null, __channels_decorators, { kind: "accessor", name: "_channels", static: false, private: false, access: { has: obj => "_channels" in obj, get: obj => obj._channels, set: (obj, value) => { obj._channels = value; } }, metadata: _metadata }, __channels_initializers, __channels_extraInitializers);
+            if (_metadata) Object.defineProperty(this, Symbol.metadata, { enumerable: true, configurable: true, writable: true, value: _metadata });
+        }
+        _core;
+        static _hmPlayer = create(id.PLAYER);
+        constructor(_core) {
+            __runInitializers(this, __channels_extraInitializers);
+            this._core = _core;
+            this._channels["audio"] = new Audio.Channel(this);
+        }
+        #_channels_accessor_storage = __runInitializers(this, __channels_initializers, {});
+        get _channels() { return this.#_channels_accessor_storage; }
+        set _channels(value) { this.#_channels_accessor_storage = value; }
+        get channels() {
+            return this._channels;
+        }
+        createChannel(name) {
+            // TODO support more audio channels
+            if (Object.getOwnPropertyNames(this._channels).length > 0)
+                throw "Can't create more than one audio channel on ZeppOS";
+            if (this._channels[name])
+                throw "Channel Already Exist";
+            return (this._channels[name] = new Audio.Channel(this));
+        }
+    };
 })();
-exports.Audio = Audio;
+export { Audio };
 (function (Audio) {
     class Channel {
+        _audio;
         // platform specific
         // universal
         constructor(_audio) {
             this._audio = _audio;
-            this.mode = Channel.Mode.PlayInOrder;
-            this.status = Channel.Status.Stopped;
-            this._playbackList = [];
-            this._nowIndex = null;
-            this.currentInfo = null;
             Audio._hmPlayer.addEventListener(Audio._hmPlayer.event.PREPARE, (res) => this._onPrepared(res));
             Audio._hmPlayer.addEventListener(Audio._hmPlayer.event.COMPLETE, () => {
                 this._onCompleted();
             });
         }
+        mode = Channel.Mode.PlayInOrder;
+        status = Channel.Status.Stopped;
+        _playbackList = [];
+        _nowIndex = null;
+        currentInfo = null;
         push(item) {
             this._playbackList.push(item);
         }
@@ -165,13 +149,12 @@ exports.Audio = Audio;
             return channel;
         }
         _onPrepared(result) {
-            var _a, _b;
             if (result) {
                 let mediaInfo = Audio._hmPlayer.getMediaInfo();
                 this.currentInfo = {
                     // placeholder
-                    artist: (_a = mediaInfo.artist) !== null && _a !== void 0 ? _a : "未知",
-                    title: (_b = mediaInfo.title) !== null && _b !== void 0 ? _b : "未知",
+                    artist: mediaInfo.artist ?? "未知",
+                    title: mediaInfo.title ?? "未知",
                     duration: mediaInfo.duration,
                 };
                 console.log("=== prepare succeed ===");
@@ -245,4 +228,4 @@ exports.Audio = Audio;
             Status[Status["Error"] = 2] = "Error";
         })(Status = Channel.Status || (Channel.Status = {}));
     })(Channel = Audio.Channel || (Audio.Channel = {}));
-})(Audio || (exports.Audio = Audio = {}));
+})(Audio || (Audio = {}));

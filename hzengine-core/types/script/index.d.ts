@@ -1,6 +1,6 @@
-import { HZEngineCore } from "..";
-import { Storage } from "../storage";
-import { mergeObjs2Str as joinObjs2Str, splitStr2Objs } from "./strtools";
+import { HZEngineCore } from "../index.js";
+import { Storage } from "../storage/index.js";
+import { mergeObjs2Str as joinObjs2Str, splitStr2Objs } from "./strtools.js";
 export declare class Script {
     _core: HZEngineCore;
     constructor(_core: HZEngineCore);

@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.eval_module = eval_module;
-function eval_module(core) {
+export function eval_module(core) {
     // single line eval command
     // syntax: eval <code>
     core.script.use((ctx, next) => {

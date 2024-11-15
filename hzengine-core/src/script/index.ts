@@ -1,15 +1,14 @@
-import { HZEngineCore } from "..";
+import { HZEngineCore } from "../index.js";
 
-import { HzsInfo, Storage } from "../storage";
+import { HzsInfo, Storage } from "../storage/index.js";
 import {
   mergeObjs2Str as joinObjs2Str,
   parseInterpolatedStr,
   removeComment,
   splitStr2Objs,
-} from "./strtools";
-import { readline } from "./readscript";
-import { Save } from "../storage/decorator";
-import { join } from "@cuberqaq/path-polyfill";
+} from "./strtools.js";
+import { readline } from "./readscript.js";
+import { Save } from "../storage/decorator.js";
 export class Script {
   constructor(public _core: HZEngineCore) {}
   /**

@@ -1,63 +1,16 @@
-"use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Storage = void 0;
-const hmFS = __importStar(require("@zos/fs"));
-const path_1 = __importDefault(require("../utils/path"));
-const fs_1 = require("./fs");
-class Storage {
+import * as hmFS from "@zos/fs";
+import Path from "../utils/path.js";
+import { isFileSync } from "./fs.js";
+export class Storage {
+    _core;
     constructor(_core) {
         this._core = _core;
-        this.projectRoot = null;
-        this.cacheRoot = null;
-        this.saveRoot = null;
-        this.preloadedData = null;
-        this.packageData = null;
-        // Storage Data
-        /**
-         * 全局数据
-         * 其中的数据不会跟随存档保存，而是直接存储在全局数据文件中
-         * 如：设置、CG解锁情况等
-         */
-        this._globalData = null;
-        /**
-         * 存档数据
-         * 其中的数据会跟随存档保存
-         * 如：脚本执行位置即调用栈，攻略度等
-         */
-        this._archiveData = null;
-        /**
-         * 保存全局数据
-         * 可以多次調用，實際上會異步儲存，也就是在一個宏任務中即使調用多次，也只會在宏任務結束後儲存一次
-         */
-        this._saveGlobalDataTimerId = null;
-        this._saveArchiveDataTimerId = null;
     }
+    projectRoot = null;
+    cacheRoot = null;
+    saveRoot = null;
+    preloadedData = null;
+    packageData = null;
     loadProject(options) {
         this._core.emit("beforeLoadProject");
         if (!hmFS.readdirSync({ path: options.projectPath })) {
@@ -73,17 +26,24 @@ class Storage {
     loadPackageData() {
         if (!this.projectRoot)
             throw "projectDir is null";
-        this._core.debug.log(`loadPackageData ${this.projectRoot} ${path_1.default.join(this.projectRoot, "hz_package.json")}`);
+        this._core.debug.log(`loadPackageData ${this.projectRoot} ${Path.join(this.projectRoot, "hz_package.json")}`);
         if (!hmFS.statSync({
-            path: path_1.default.join(this.projectRoot, "hz_package.json"),
+            path: Path.join(this.projectRoot, "hz_package.json"),
         })) {
             throw "HZEngine Package File (hz_package.json) not exist";
         }
         this.packageData = JSON.parse(hmFS.readFileSync({
-            path: path_1.default.join(this.projectRoot, "hz_package.json"),
+            path: Path.join(this.projectRoot, "hz_package.json"),
             options: { encoding: "utf8" },
         }));
     }
+    // Storage Data
+    /**
+     * 全局数据
+     * 其中的数据不会跟随存档保存，而是直接存储在全局数据文件中
+     * 如：设置、CG解锁情况等
+     */
+    _globalData = null;
     get globalData() {
         if (!this._globalData) {
             this.loadGlobalData();
@@ -98,6 +58,12 @@ class Storage {
     get gd() {
         return this.globalData;
     }
+    /**
+     * 存档数据
+     * 其中的数据会跟随存档保存
+     * 如：脚本执行位置即调用栈，攻略度等
+     */
+    _archiveData = null;
     get archiveData() {
         if (!this._archiveData) {
             this.loadArchiveData();
@@ -118,10 +84,10 @@ class Storage {
         }
         this._core.emit("beforeLoadGlobalData");
         if (hmFS.statSync({
-            path: path_1.default.join(this.saveRoot, "globalData.json"),
+            path: Path.join(this.saveRoot, "globalData.json"),
         })) {
             this._globalData = JSON.parse(hmFS.readFileSync({
-                path: path_1.default.join(this.saveRoot, "globalData.json"),
+                path: Path.join(this.saveRoot, "globalData.json"),
                 options: {
                     encoding: "utf8",
                 },
@@ -136,12 +102,17 @@ class Storage {
             this._globalData = {}; // Initial GlobalData value
             this._core.emit("initGlobalData");
             hmFS.writeFileSync({
-                path: path_1.default.join(this.saveRoot, "globalData.json"),
+                path: Path.join(this.saveRoot, "globalData.json"),
                 data: JSON.stringify(this._globalData),
             });
         }
         this._core.emit("afterLoadGlobalData");
     }
+    /**
+     * 保存全局数据
+     * 可以多次調用，實際上會異步儲存，也就是在一個宏任務中即使調用多次，也只會在宏任務結束後儲存一次
+     */
+    _saveGlobalDataTimerId = null;
     saveGlobalData() {
         if (!this.projectRoot) {
             throw "projectDir is null, please loadProject first";
@@ -155,7 +126,7 @@ class Storage {
             }
             this._core.emit("beforeSaveGlobalData");
             let res = hmFS.writeFileSync({
-                path: path_1.default.join(this.projectRoot, "globalData.json"),
+                path: Path.join(this.projectRoot, "globalData.json"),
                 data: JSON.stringify(this._globalData),
             }); // TODO
             if (res < 0)
@@ -170,12 +141,12 @@ class Storage {
             if (!this.saveRoot)
                 throw `saveRoot is null, please loadProject first`;
             if (!hmFS.statSync({
-                path: path_1.default.join(this.saveRoot, archiveFile),
+                path: Path.join(this.saveRoot, archiveFile),
             })) {
                 throw `Archive [${archiveFile}] not exist`;
             }
             let archiveData = JSON.parse(hmFS.readFileSync({
-                path: path_1.default.join(this.saveRoot, archiveFile),
+                path: Path.join(this.saveRoot, archiveFile),
                 options: {
                     encoding: "utf8",
                 },
@@ -192,6 +163,7 @@ class Storage {
             this._core.emit("initArchiveData");
         }
     }
+    _saveArchiveDataTimerId = null;
     /**
      * 保存存档数据
      * 可以多次調用，實際上會異步儲存，也就是在一個宏任務中即使調用多次，也只會在宏任務結束後儲存一次
@@ -207,7 +179,7 @@ class Storage {
             if (!this.saveRoot)
                 throw `projectDir is null, please loadProject first`;
             let res = hmFS.writeFileSync({
-                path: path_1.default.join(this.saveRoot, archiveFile),
+                path: Path.join(this.saveRoot, archiveFile),
                 data: JSON.stringify(this._archiveData),
             }); //TODO
             if (res < 0)
@@ -277,11 +249,11 @@ class Storage {
         }
         // writeFileSync({path: "data://test.json", data: "awa", options: {encoding: "utf8"}});
         if (hmFS.statSync({
-            path: path_1.default.join(this.cacheRoot, "preloaded.json"),
+            path: Path.join(this.cacheRoot, "preloaded.json"),
         })) {
             // 已经预加载过了，退出
             this.preloadedData = JSON.parse(hmFS.readFileSync({
-                path: path_1.default.join(this.cacheRoot, "preloaded.json"),
+                path: Path.join(this.cacheRoot, "preloaded.json"),
                 options: {
                     encoding: "utf8",
                 },
@@ -305,7 +277,7 @@ class Storage {
         this.preloadAnimation();
         // console.log(JSON.stringify(this.preloadedData));
         hmFS.writeFileSync({
-            path: path_1.default.join(this.cacheRoot, "preloaded.json"),
+            path: Path.join(this.cacheRoot, "preloaded.json"),
             data: JSON.stringify(this.preloadedData),
         });
         // console.log(
@@ -323,7 +295,7 @@ class Storage {
         // 记录脚本label的位置
         // 这里的index是以0开始计数的行数
         let labelMap = this.preloadedData.script.labelMap;
-        let scriptDir = path_1.default.join(this.projectRoot, "script");
+        let scriptDir = Path.join(this.projectRoot, "script");
         let hzsInfoMap = this.preloadedData.script.hzsInfoMap;
         if (!hmFS.readdirSync({ path: scriptDir }))
             throw "项目文件夹中script文件夹不存在";
@@ -333,8 +305,8 @@ class Storage {
             let dirs = hmFS.readdirSync({ path });
             // console.log(dirs);
             for (let dir of dirs) {
-                let subpath = path_1.default.join(path, dir);
-                if ((0, fs_1.isFileSync)({ path: subpath })) {
+                let subpath = Path.join(path, dir);
+                if (isFileSync({ path: subpath })) {
                     // 是文件
                     if (dir.endsWith(".hzs")) {
                         preloadHzs(subpath);
@@ -391,7 +363,7 @@ at [${labelMap[label][0]}(line ${labelMap[label][1]})] \
      */
     preloadImage() {
         let nameMap = this.preloadedData.image.nameMap;
-        let imageDir = path_1.default.join(this.projectRoot, "image");
+        let imageDir = Path.join(this.projectRoot, "image");
         if (!hmFS.readdirSync({ path: imageDir }))
             throw "项目文件夹中image文件夹不存在";
         // 遍历所有hzs文件
@@ -400,8 +372,8 @@ at [${labelMap[label][0]}(line ${labelMap[label][1]})] \
             let dirs = hmFS.readdirSync({ path });
             // console.log(dirs);
             for (let dir of dirs) {
-                let subpath = path_1.default.join(path, dir);
-                if ((0, fs_1.isFileSync)({ path: subpath })) {
+                let subpath = Path.join(path, dir);
+                if (isFileSync({ path: subpath })) {
                     // 是文件
                     if (dir.endsWith(".png")) {
                         preloadImage(subpath);
@@ -418,7 +390,7 @@ at [${labelMap[label][0]}(line ${labelMap[label][1]})] \
          * 2. 记录所有image的name key和路径
          */
         function preloadImage(path) {
-            let raw_name = path_1.default.parse(path).name;
+            let raw_name = Path.parse(path).name;
             let name_key = raw_name
                 .trim()
                 .replace("_", " ")
@@ -438,7 +410,7 @@ at [${labelMap[label][0]}(line ${labelMap[label][1]})] \
      */
     preloadAnimation() {
         let profileMap = this.preloadedData.animation.profileMap;
-        let animationDir = path_1.default.join(this.projectRoot, "animation");
+        let animationDir = Path.join(this.projectRoot, "animation");
         if (!hmFS.readdirSync({ path: animationDir }))
             throw "项目文件夹中animation文件夹不存在";
         traverseAnimation(animationDir);
@@ -446,8 +418,8 @@ at [${labelMap[label][0]}(line ${labelMap[label][1]})] \
             let dirs = hmFS.readdirSync({ path });
             // console.log(dirs);
             for (let dir of dirs) {
-                let subpath = path_1.default.join(path, dir);
-                if ((0, fs_1.isFileSync)({ path: subpath })) {
+                let subpath = Path.join(path, dir);
+                if (isFileSync({ path: subpath })) {
                     // 是文件
                     if (dir.endsWith(".json")) {
                         preloadAnimation(subpath);
@@ -460,7 +432,7 @@ at [${labelMap[label][0]}(line ${labelMap[label][1]})] \
             }
         }
         function preloadAnimation(path) {
-            let raw_name = path_1.default.parse(path).name;
+            let raw_name = Path.parse(path).name;
             let name_key = raw_name.trim().replace(/ +/, "_");
             if (profileMap[name_key])
                 throw `Animation profile name key conflict [${name_key}], at file [${path}] and [${profileMap[name_key]}]`;
@@ -468,4 +440,3 @@ at [${labelMap[label][0]}(line ${labelMap[label][1]})] \
         }
     }
 }
-exports.Storage = Storage;

@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.conditional = conditional;
-function conditional(core) {
+export function conditional(core) {
     // if ... [elif] ... [else] ... end if
     // syntax:
     // if <expression>

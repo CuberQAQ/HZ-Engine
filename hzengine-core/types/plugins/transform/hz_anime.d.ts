@@ -1,5 +1,5 @@
-import { HZEngineCore, Storage, UI } from "../..";
-import { Animation, Profile, Wrapper } from "./animation";
+import { HZEngineCore, Storage, UI } from "../../index.js";
+import { Animation, Profile, Wrapper } from "./animation.js";
 export declare class AnimationPlugin {
     _core: HZEngineCore;
     constructor(_core: HZEngineCore);

@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.menu_statement = menu_statement;
-function menu_statement(core) {
+export function menu_statement(core) {
     // menu statement start
     core.script.use((ctx, next) => {
         if (ctx.rawtext.trim().split(" ")[0] !== "menu")
@@ -136,7 +133,7 @@ function menu_statement(core) {
         // parse menu item string
         let parsed_item_list = [];
         for (let item of menu_data.item_list) {
-            parsed_item_list.push(Object.assign(Object.assign({}, item), { text: core.script.parseString(item.text) }));
+            parsed_item_list.push({ ...item, text: core.script.parseString(item.text) });
         }
         return { itemList: parsed_item_list };
     }

@@ -3,17 +3,17 @@
  * @copyright Copyright (c) 2024 CuberQAQ. All rights reserved.
  */
 
-import { Async } from "./async";
-import { Audio } from "./audio";
-import { Config } from "./config";
-import { Debug } from "./debug";
-import { basic_command } from "./plugins/basic_command";
-import { global_gesture } from "./plugins/global_gesture";
-import { registerPlugin } from "./plugins/transform";
-import { Script } from "./script";
-import { Storage } from "./storage";
-import { System } from "./system";
-import { UI } from "./ui";
+import { Async } from "./async/index.js";
+import { Audio } from "./audio/index.js";
+import { Config } from "./config/index.js";
+import { Debug } from "./debug/index.js";
+import { basic_command } from "./plugins/basic_command/index.js";
+import { global_gesture } from "./plugins/global_gesture/index.js";
+import { registerPlugin } from "./plugins/transform/index.js";
+import { Script } from "./script/index.js";
+import { Storage } from "./storage/index.js";
+import { System } from "./system/index.js";
+import { UI } from "./ui/index.js";
 
 class HZEngineCore {
   // 請不要調整這裡的初始化順序，不然會有問題（裝飾器裡有時候要用到前面初始化的東西）
@@ -109,4 +109,4 @@ class HZEngineCore {
 type Plugin = (core: HZEngineCore) => any;
 
 export { HZEngineCore, UI, Storage, Script, System, Async };
-export * as TransformPlugin from "./plugins/transform";
+export * as TransformPlugin from "./plugins/transform/index.js";

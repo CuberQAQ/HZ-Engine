@@ -1,7 +1,7 @@
-import { HZEngineCore, Storage, UI } from "../..";
-import { AnimationPlugin } from "./hz_anime";
-import { Animation, Profile } from "./animation";
-import { TransitionData } from "./commands";
+import { HZEngineCore, Storage, UI } from "../../index.js";
+import { AnimationPlugin } from "./hz_anime.js";
+import { Animation, Profile } from "./animation.js";
+import { TransitionData } from "./commands.js";
 export declare function registerPlugin(core: HZEngineCore): InstanceType;
 export interface InstanceType {
     applyTransform(names: string[], target: UI.View<Storage.Saveable<unknown>>, isSave?: boolean, destroyOnEnd?: boolean): void;

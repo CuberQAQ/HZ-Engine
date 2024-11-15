@@ -3,8 +3,8 @@
   "version": "0.1.1-dev",
   "private": true,
   "description": "An Visual Novel Engine for Zepp OS",
-  "main": "./dist/index",
-  "types": "./src/index",
+  "main": "./dist/index.js",
+  "types": "./src/index.ts",
   "type": "module",
   "scripts": {
     "build": "tsc",
@@ -20,5 +20,8 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "@zeppos/device-types": "^3.0.0"
+  },
+  "dependencies": {
+    "@cuberqaq/path-polyfill": "^1.0.2"
   }
 }

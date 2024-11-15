@@ -1,21 +1,13 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Save = Save;
-exports.CustomSave = CustomSave;
-exports.SaveGetter = SaveGetter;
-exports.CustomSaveGetter = CustomSaveGetter;
-exports.SaveSetter = SaveSetter;
-exports.CustomSaveSetter = CustomSaveSetter;
-const async_1 = require("../async");
+import { Async } from "../async/index.js";
 /**
  * 存档属性装饰器
  * @param store_key 保存数据到存档数据对象的key
  * @returns
  */
-function Save(store_key) {
+export function Save(store_key) {
     return function (target, context) {
         context.addInitializer(function () {
-            async_1.Async.nextTick(() => {
+            Async.nextTick(() => {
                 const core = this._core;
                 core.on("initArchiveData", () => {
                     core.storage.setSaveableData(core.storage.archiveData, true, target.get.call(this), ...store_key.split("."));
@@ -50,13 +42,13 @@ function Save(store_key) {
  * @param store_key 保存数据到存档数据对象的key
  * @returns
  */
-function CustomSave(store_key, serializer, deserializer) {
+export function CustomSave(store_key, serializer, deserializer) {
     return (target, context) => {
         if (context.kind !== "accessor") {
             throw new Error("ArchiveStateAccessor只能用于accessor属性");
         }
         context.addInitializer(function () {
-            async_1.Async.nextTick(() => {
+            Async.nextTick(() => {
                 const core = this._core;
                 core.on("initArchiveData", () => {
                     core.storage.setSaveableData(core.storage.archiveData, true, serializer.call(this, target.get.call(this)), ...store_key.split("."));
@@ -83,10 +75,10 @@ function CustomSave(store_key, serializer, deserializer) {
         };
     };
 }
-function SaveGetter(store_key) {
+export function SaveGetter(store_key) {
     return (target, context) => {
         context.addInitializer(function () {
-            async_1.Async.nextTick(() => {
+            Async.nextTick(() => {
                 const core = this._core;
                 core.on("initArchiveData", () => {
                     core.storage.setSaveableData(core.storage.archiveData, true, target.call(this), ...store_key.split("."));
@@ -105,13 +97,13 @@ function SaveGetter(store_key) {
         };
     };
 }
-function CustomSaveGetter(store_key, serializer) {
+export function CustomSaveGetter(store_key, serializer) {
     return (target, context) => {
         if (context.kind !== "getter") {
             throw new Error("ArchiveStateGetter只能用于getter属性");
         }
         context.addInitializer(function () {
-            async_1.Async.nextTick(() => {
+            Async.nextTick(() => {
                 const core = this._core;
                 core.on("initArchiveData", () => {
                     core.storage.setSaveableData(core.storage.archiveData, true, serializer.call(this, target.call(this)), ...store_key.split("."));
@@ -132,13 +124,13 @@ function CustomSaveGetter(store_key, serializer) {
  * @param store_key 保存数据到存档数据对象的key
  * @returns
  */
-function SaveSetter(store_key) {
+export function SaveSetter(store_key) {
     return (target, context) => {
         if (context.kind !== "setter") {
             throw new Error("ArchiveStateSetter只能用于setter属性");
         }
         context.addInitializer(function () {
-            async_1.Async.nextTick(() => {
+            Async.nextTick(() => {
                 let core = this._core;
                 core.on("afterLoadArchive", () => {
                     let dataInArchive = core.storage.getSaveableData(core.storage.archiveData, false, ...store_key.split("."));
@@ -152,13 +144,13 @@ function SaveSetter(store_key) {
         };
     };
 }
-function CustomSaveSetter(store_key, deserializer) {
+export function CustomSaveSetter(store_key, deserializer) {
     return (target, context) => {
         if (context.kind !== "setter") {
             throw new Error("ArchiveStateSetter只能用于setter属性");
         }
         context.addInitializer(function () {
-            async_1.Async.nextTick(() => {
+            Async.nextTick(() => {
                 let core = this._core;
                 core.on("afterLoadArchive", () => {
                     let dataInArchive = core.storage.getSaveableData(core.storage.archiveData, false, ...store_key.split("."));

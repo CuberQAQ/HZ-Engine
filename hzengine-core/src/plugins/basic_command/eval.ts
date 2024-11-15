@@ -1,4 +1,4 @@
-import { HZEngineCore } from "../..";
+import { HZEngineCore } from "../../index.js";
 
 export function eval_module(core: HZEngineCore) {
   // single line eval command

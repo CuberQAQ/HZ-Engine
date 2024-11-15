@@ -1,4 +1,4 @@
-import { HZEngineCore } from "..";
+import { HZEngineCore } from "../index.js";
 export declare class System {
     _core: HZEngineCore;
     constructor(_core: HZEngineCore);

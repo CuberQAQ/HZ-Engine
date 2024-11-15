@@ -1,25 +1,22 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.basic_command = basic_command;
-const _1 = require("./$");
-const audio_1 = require("./audio");
-const basic_1 = require("./basic");
-const character_1 = require("./character");
-const conditional_1 = require("./conditional");
-const config_1 = require("./config");
-const decorator_1 = require("./decorator");
-const eval_1 = require("./eval");
-const img_1 = require("./img");
-const menu_1 = require("./menu");
-function basic_command(core) {
-    (0, basic_1.basic_commands)(core);
-    (0, character_1.character_command)(core);
-    (0, menu_1.menu_statement)(core);
-    (0, decorator_1.decorator_module)(core);
-    (0, _1.$_command)(core);
-    (0, eval_1.eval_module)(core);
-    (0, conditional_1.conditional)(core);
-    (0, img_1.img)(core);
-    (0, audio_1.audio_command)(core);
-    (0, config_1.config_command)(core);
+import { $_command } from "./$.js";
+import { audio_command } from "./audio.js";
+import { basic_commands } from "./basic.js";
+import { character_command } from "./character.js";
+import { conditional } from "./conditional.js";
+import { config_command } from "./config.js";
+import { decorator_module } from "./decorator.js";
+import { eval_module } from "./eval.js";
+import { img } from "./img.js";
+import { menu_statement } from "./menu.js";
+export function basic_command(core) {
+    basic_commands(core);
+    character_command(core);
+    menu_statement(core);
+    decorator_module(core);
+    $_command(core);
+    eval_module(core);
+    conditional(core);
+    img(core);
+    audio_command(core);
+    config_command(core);
 }

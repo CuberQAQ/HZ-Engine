@@ -1,6 +1,6 @@
 import hmUI from "@zos/ui";
-import { HZEngineCore, UI } from "../..";
-import { System } from "../../system";
+import { HZEngineCore, UI } from "../../index.js";
+import { System } from "../../system/index.js";
 
 export function global_gesture(core: HZEngineCore) {
   function addTouchPad(layerInstance: UI.Layer) {

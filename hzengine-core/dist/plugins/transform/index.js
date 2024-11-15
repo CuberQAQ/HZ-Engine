@@ -1,21 +1,11 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.AnimationPlugin = exports.Profile = exports.Animation = void 0;
-exports.registerPlugin = registerPlugin;
-const hz_anime_1 = require("./hz_anime");
-Object.defineProperty(exports, "AnimationPlugin", { enumerable: true, get: function () { return hz_anime_1.AnimationPlugin; } });
-const animation_1 = require("./animation");
-Object.defineProperty(exports, "Animation", { enumerable: true, get: function () { return animation_1.Animation; } });
-Object.defineProperty(exports, "Profile", { enumerable: true, get: function () { return animation_1.Profile; } });
-const fs_1 = __importDefault(require("@zos/fs"));
-const commands_1 = require("./commands");
-function registerPlugin(core) {
-    let animationPlugin = new hz_anime_1.AnimationPlugin(core);
+import { AnimationPlugin } from "./hz_anime.js";
+import { Animation, Profile } from "./animation.js";
+import hmFS from "@zos/fs";
+import { getTransitionMap, registerHzscriptCommands } from "./commands.js";
+export function registerPlugin(core) {
+    let animationPlugin = new AnimationPlugin(core);
     let profileMap = {};
-    (0, commands_1.registerHzscriptCommands)(core);
+    registerHzscriptCommands(core);
     core.on("afterLoadProject", () => {
         profileMap = core.storage.getSaveableData(core.storage.preloadedData, false, "animation", "profileMap");
     });
@@ -25,7 +15,7 @@ function registerPlugin(core) {
             core.debug.log(`Animation profile [${name}] not found`);
             return null;
         }
-        let str = fs_1.default.readFileSync({
+        let str = hmFS.readFileSync({
             path: profile_item[0],
             options: {
                 encoding: "utf8",
@@ -69,6 +59,8 @@ function registerPlugin(core) {
         });
     }
     class TransformRouteStrategy {
+        outTransforms;
+        inTransforms;
         constructor(outTransforms, inTransforms) {
             this.outTransforms = outTransforms;
             this.inTransforms = inTransforms;
@@ -95,8 +87,8 @@ function registerPlugin(core) {
         },
         animationPlugin,
         getTransition(name) {
-            var _a;
-            return (_a = (0, commands_1.getTransitionMap)(core)[name]) !== null && _a !== void 0 ? _a : null;
+            return getTransitionMap(core)[name] ?? null;
         }
     };
 }
+export { Animation, Profile, AnimationPlugin };

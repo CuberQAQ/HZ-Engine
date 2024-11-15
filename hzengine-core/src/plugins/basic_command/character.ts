@@ -1,5 +1,5 @@
-import { HZEngineCore } from "../..";
-import { sayAction } from "./basic";
+import { HZEngineCore } from "../../index.js";
+import { sayAction } from "./basic.js";
 
 export function character_command(core: HZEngineCore) {
   // character command

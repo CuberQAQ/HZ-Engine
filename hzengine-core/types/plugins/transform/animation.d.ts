@@ -122,7 +122,7 @@ export declare namespace ActiveTrackNode {
 }
 export type Wrapper = (x: number) => number;
 declare const buildInWrappers: {
-    none: (x: number) => 1 | 0;
+    none: (x: number) => 0 | 1;
     linear: (x: number) => number;
     easeout: (x: number) => number;
     easein: (x: number) => number;

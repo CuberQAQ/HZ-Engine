@@ -1,4 +1,4 @@
-import { HZEngineCore } from "../..";
+import { HZEngineCore } from "../../index.js";
 
 export function conditional(core: HZEngineCore) {
   // if ... [elif] ... [else] ... end if

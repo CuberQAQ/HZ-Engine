@@ -1,5 +1,5 @@
-import { HZEngineCore } from "..";
-import { Storage } from "../storage/index";
+import { HZEngineCore } from "../index.js";
+import { Storage } from "../storage/index.js";
 export declare class UI {
     _core: HZEngineCore;
     constructor(_core: HZEngineCore);

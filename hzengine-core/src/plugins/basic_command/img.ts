@@ -1,5 +1,5 @@
 import hmUI from "@zos/ui";
-import { Async, HZEngineCore, Script, TransformPlugin, UI } from "../..";
+import { Async, HZEngineCore, Script, TransformPlugin, UI } from "../../index.js";
 
 export function img(core: HZEngineCore) {
   let transform_plugin: TransformPlugin.InstanceType = core.plugins.get(

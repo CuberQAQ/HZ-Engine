@@ -1,17 +1,9 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.splitStr2Objs = splitStr2Objs;
-exports.mergeObjs2Str = mergeObjs2Str;
-exports.splitStr2Strs = splitStr2Strs;
-exports.transformStr = transformStr;
-exports.parseInterpolatedStr = parseInterpolatedStr;
-exports.removeComment = removeComment;
 /**
  * 将一行字符串切割为(str,quoted)[]的形式
  * @param str
  * @returns
  */
-function splitStr2Objs(str) {
+export function splitStr2Objs(str) {
     // console.log(`splitStr2Objs: ${str}`);
     let res = [];
     let len = str.length;
@@ -84,12 +76,12 @@ function splitStr2Objs(str) {
     }
     return res;
 }
-function mergeObjs2Str(objs) {
+export function mergeObjs2Str(objs) {
     return objs
         .map((obj) => obj.isQuoted ? `"${obj.str}"` : obj.isSquared ? `[${obj.str}]` : obj.isRounded ? `(${obj.str})` : obj.str)
         .join(" ");
 }
-function splitStr2Strs(str) {
+export function splitStr2Strs(str) {
     return splitStr2Objs(str).map((obj) => obj.isQuoted ? `"${obj.str}"` : obj.str);
 }
 /**
@@ -97,13 +89,13 @@ function splitStr2Strs(str) {
  * @param str
  * @returns
  */
-function transformStr(str) {
+export function transformStr(str) {
     return JSON.parse(`"${str}"`);
 }
 // 翻译hzengine script插值字符串
 // 语法："...[expression]..."
 // 如果希望在字符串中显示`[`，请使用两个`[`，如`"[[正常显示而不被当作表达式的文字]]"`
-function parseInterpolatedStr(str) {
+export function parseInterpolatedStr(str) {
     let len = str.length;
     let p = 0;
     let expr_record = [];
@@ -147,7 +139,7 @@ function parseInterpolatedStr(str) {
         res.push({ str: str.slice(left, right), isExpression: false });
     return res;
 }
-function removeComment(str) {
+export function removeComment(str) {
     let quoteNotClosed = false;
     let len = str.length;
     for (let i = 0; i < len; ++i) {

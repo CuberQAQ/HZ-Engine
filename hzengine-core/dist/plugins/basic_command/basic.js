@@ -1,8 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.basic_commands = basic_commands;
-exports.sayAction = sayAction;
-function basic_commands(core) {
+export function basic_commands(core) {
     // jump command
     core.script.use((ctx, next) => {
         let strArr = ctx.rawtext.trim().split(/ +/);
@@ -90,7 +86,7 @@ function basic_commands(core) {
             core.system.pause();
     });
 }
-function sayAction(core, who, what, wait) {
+export function sayAction(core, who, what, wait) {
     const say_view_tag = "hzengine.say";
     const say_view_name = "say";
     what = core.script.parseString(what);

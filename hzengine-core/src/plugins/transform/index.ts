@@ -1,9 +1,9 @@
 import hmUI from "@zos/ui";
-import { HZEngineCore, Storage, UI } from "../..";
-import { AnimationPlugin } from "./hz_anime";
-import { Animation, Profile } from "./animation";
+import { HZEngineCore, Storage, UI } from "../../index.js";
+import { AnimationPlugin } from "./hz_anime.js";
+import { Animation, Profile } from "./animation.js";
 import hmFS from "@zos/fs";
-import { getTransitionMap, registerHzscriptCommands, TransitionData } from "./commands";
+import { getTransitionMap, registerHzscriptCommands, TransitionData } from "./commands.js";
 
 export function registerPlugin(core: HZEngineCore): InstanceType {
   let animationPlugin = new AnimationPlugin(core);

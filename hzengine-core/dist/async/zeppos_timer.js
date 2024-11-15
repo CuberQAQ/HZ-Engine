@@ -1,6 +1,3 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.ZeppTimer = void 0;
 /**
  * zeppos-timer.js
  * @description An accurate timer for ZeppOS. 一个适用于ZeppOS的准确的计时器
@@ -11,15 +8,15 @@ exports.ZeppTimer = void 0;
  * https://github.com/XiaomaiTX/zeppos-timer
  *
  * */
-const sensor_1 = require("@zos/sensor");
-class ZeppTimer {
+import { Time } from "@zos/sensor";
+export class ZeppTimer {
     constructor(callback, interval) {
         this.callback = callback;
         this.interval = interval;
         this.timerId = null;
         this.startTime = null;
         this.nextTick = null;
-        this.time = new sensor_1.Time();
+        this.time = new Time();
         this.stopped = false;
     }
     start(delay = 0) {
@@ -59,4 +56,3 @@ class ZeppTimer {
         this.scheduleTick();
     }
 }
-exports.ZeppTimer = ZeppTimer;

@@ -1,8 +1,8 @@
-/// <reference path="../../../../node_modules/@zeppos/device-types/dist/index.d.ts" />
-import { HZEngineCore } from "..";
+/// <reference types="@zeppos/device-types" />
+import { HZEngineCore } from "../index.js";
 import * as hmFS from "@zos/fs";
-import Path from "../utils/path";
-import { isFileSync } from "./fs";
+import Path from "../utils/path.js";
+import { isFileSync } from "./fs.js";
 
 export class Storage {
   constructor(private _core: HZEngineCore) {}

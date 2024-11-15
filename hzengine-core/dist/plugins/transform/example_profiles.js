@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.ExampleProfile1 = void 0;
-exports.ExampleProfile1 = [
+export const ExampleProfile1 = [
     [
         {
             frame: {

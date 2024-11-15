@@ -1,4 +1,4 @@
-import { HZEngineCore, Storage } from "..";
+import { HZEngineCore, Storage } from "../index.js";
 /**
  * 存档属性装饰器
  * @param store_key 保存数据到存档数据对象的key

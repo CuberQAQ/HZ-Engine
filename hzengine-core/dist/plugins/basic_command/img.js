@@ -1,18 +1,11 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.img = img;
-const ui_1 = __importDefault(require("@zos/ui"));
-const __1 = require("../..");
-function img(core) {
+import hmUI from "@zos/ui";
+import { Async, Script } from "../../index.js";
+export function img(core) {
     let transform_plugin = core.plugins.get("transform");
     if (!transform_plugin)
         core.debug.log("[IMG Plugin] Info: Transform plugin not set up");
     // show command
     core.script.use((ctx, next) => {
-        var _a;
         if (ctx.rawtext.trim().split(" ")[0].toLowerCase() !== "show")
             return next();
         if (ctx.slicedArgs.length === 1)
@@ -28,10 +21,10 @@ function img(core) {
             name_key += ctx.slicedArgs[i].str + " ";
         }
         name_key = name_key.trim().toLowerCase();
-        let path = (_a = core.storage.preloadedData.image.nameMap[name_key]) === null || _a === void 0 ? void 0 : _a[0];
+        let path = core.storage.preloadedData.image.nameMap[name_key]?.[0];
         if (!path)
             throw `Show Command: image with name_key [${name_key}] not found `;
-        let size = ui_1.default.getImageInfo(path);
+        let size = hmUI.getImageInfo(path);
         if (!size)
             throw `Show Command: read size of [${path}] failed`;
         showAction(tag, path, size, parsedRes.strategy);
@@ -56,8 +49,8 @@ function img(core) {
             core.ui.addRouter(tag_prefixed, "fg");
             router = core.ui.getRouter(tag_prefixed);
         }
-        __1.Async.nextTick(() => {
-            router.replace(show_view_name, prop, routerStrategy !== null && routerStrategy !== void 0 ? routerStrategy : undefined);
+        Async.nextTick(() => {
+            router.replace(show_view_name, prop, routerStrategy ?? undefined);
         });
     }
     // hide command
@@ -79,13 +72,12 @@ function img(core) {
         if (!router) {
             throw `Hide Command: router with tag [${tag}] not found `;
         }
-        __1.Async.nextTick(() => {
-            router.clear(routerStrategy !== null && routerStrategy !== void 0 ? routerStrategy : undefined);
+        Async.nextTick(() => {
+            router.clear(routerStrategy ?? undefined);
         });
     }
     // scene command
     core.script.use((ctx, next) => {
-        var _a;
         if (ctx.rawtext.trim().split(" ")[0].toLowerCase() !== "scene")
             return next();
         if (ctx.slicedArgs.length === 1)
@@ -101,10 +93,10 @@ function img(core) {
             name_key += ctx.slicedArgs[i].str + " ";
         }
         name_key = name_key.trim().toLowerCase();
-        let path = (_a = core.storage.preloadedData.image.nameMap[name_key]) === null || _a === void 0 ? void 0 : _a[0];
+        let path = core.storage.preloadedData.image.nameMap[name_key]?.[0];
         if (!path)
             throw `Scene Command: image with name_key [${name_key}] not found `;
-        let size = ui_1.default.getImageInfo(path);
+        let size = hmUI.getImageInfo(path);
         if (!size)
             throw `Scene Command: read size of [${path}] failed`;
         sceneAction(tag, path, size, parsedRes.strategy);
@@ -130,13 +122,13 @@ function img(core) {
             router = core.ui.getRouter(tag_prefixed);
         }
         if (!router.length) {
-            __1.Async.nextTick(() => {
-                router.push(scene_view_name, prop, routerStrategy !== null && routerStrategy !== void 0 ? routerStrategy : undefined);
+            Async.nextTick(() => {
+                router.push(scene_view_name, prop, routerStrategy ?? undefined);
             });
         }
         else {
-            __1.Async.nextTick(() => {
-                router.update(prop, routerStrategy !== null && routerStrategy !== void 0 ? routerStrategy : undefined);
+            Async.nextTick(() => {
+                router.update(prop, routerStrategy ?? undefined);
             });
         }
     }
@@ -176,10 +168,10 @@ function img(core) {
             let currentFieldArgs = slicedArgs.splice(keyword_index, slicedArgs.length - keyword_index);
             currentFieldArgs.shift();
             if (keyword === "at") {
-                inTransforms.push(...__1.Script.Utils.splitCommas(__1.Script.Utils.joinSlicedArgs(currentFieldArgs)));
+                inTransforms.push(...Script.Utils.splitCommas(Script.Utils.joinSlicedArgs(currentFieldArgs)));
             }
             else if (keyword === "with") {
-                let args = __1.Script.Utils.parseHzsArgs(__1.Script.Utils.joinSlicedArgs(currentFieldArgs));
+                let args = Script.Utils.parseHzsArgs(Script.Utils.joinSlicedArgs(currentFieldArgs));
                 // console.log(`with args: ${JSON.stringify(args)}`);
                 for (let i = 0; i < args.length; i++) {
                     if (Array.isArray(args[i])) {
@@ -235,7 +227,7 @@ function img(core) {
         }
         return -1;
     }
-    const slicedArgsToTransforms = (slicedArgs) => __1.Script.Utils.joinSlicedArgs(slicedArgs)
+    const slicedArgsToTransforms = (slicedArgs) => Script.Utils.joinSlicedArgs(slicedArgs)
         .split(",")
         .map((str) => str.trim())
         .filter((str) => str.length > 0);
