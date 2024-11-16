@@ -1,0 +1,1 @@
+1. hzengine-core 跨平台改造后，audio 功能似乎有点小问题

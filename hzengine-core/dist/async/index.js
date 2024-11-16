@@ -33,7 +33,7 @@ var __runInitializers = (this && this.__runInitializers) || function (thisArg, i
     return useValue ? value : void 0;
 };
 import { Save } from "../storage/decorator.js";
-import { Time } from "@zos/sensor";
+// import { Time } from "@zos/sensor";
 let Async = (() => {
     let __nextTimerId_decorators;
     let __nextTimerId_initializers = [];
@@ -69,9 +69,9 @@ let Async = (() => {
                 cb();
             });
         }
-        _fps = 45;
-        _hmTime = new Time();
-        _lastTime = this._hmTime.getTime();
+        // private _fps = 45;
+        // private _hmTime = new Time();
+        _lastTime;
         constructor(_core) {
             __runInitializers(this, __delayTasks_extraInitializers);
             this._core = _core;
@@ -81,13 +81,17 @@ let Async = (() => {
             //   this._scheduleTask();
             // }, ~~(1000 / this._fps));
             // timer.start();
-            setInterval(() => {
+            this._lastTime = this._core.platform.getTime();
+            // setInterval(() => {
+            //   this._scheduleTask();
+            // }, ~~(1000 / this._fps));
+            _core.platform.setFrameInterval(() => {
                 this._scheduleTask();
-            }, ~~(1000 / this._fps));
+            });
         }
         _scheduleTask() {
             // TODO 沒有充分考慮存檔時產生的問題（this._delayTasks引用變化），及其它問題
-            let now = this._hmTime.getTime();
+            let now = this._core.platform.getTime();
             let deltaTime = now - this._lastTime;
             this._lastTime = now;
             // console.log(`async timer cb d=${deltaTime}`);

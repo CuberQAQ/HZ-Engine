@@ -2,34 +2,23 @@ import path from "../shared/path.js";
 import {
   Alignment,
   AsukaUI,
-  Axis,
-  Color,
-  createSignal,
-  CrossAxisAlignment,
   EdgeInsets,
-  For,
   LayoutManagerFactory,
-  MainAxisAlignment,
-  Match,
   NativeBindingsFactory,
-  onMount,
-  render,
-  RenderNode,
   reportError,
-  Show,
-  StackFit,
-  Switch,
-  // Solid,
-} from "@cuberqaq/asuka-solid";
-import { getText } from "@zos/i18n";
+} from "@cuberqaq/asuka-ui";
+import {
+  createSignal,
+  For,
+  render,
+
+} from '@cuberqaq/asuka-ui/solid'
 const { width, height, screenShape } = getDeviceInfo();
 import { px } from "../shared/dynamic_px.js";
 import hmUI from "@zos/ui";
 import hmFS from "@zos/fs";
 import { getDeviceInfo, SCREEN_SHAPE_ROUND } from "@zos/device";
 import * as hmRouter from "@zos/router";
-import { onGesture, GESTURE_UP } from "@zos/interaction";
-import { setScrollLock } from "@zos/page";
 import {
   addHzpk,
   checkHzpk_v1,

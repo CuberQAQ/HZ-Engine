@@ -1,6 +1,6 @@
-import * as hmFS from "@zos/fs";
+// import * as this._core.platform from "@zos/fs";
 import Path from "../utils/path.js";
-import { isFileSync } from "./fs.js";
+// import { isFileSync } from "./fs.js";
 export class Storage {
     _core;
     constructor(_core) {
@@ -13,7 +13,7 @@ export class Storage {
     packageData = null;
     loadProject(options) {
         this._core.emit("beforeLoadProject");
-        if (!hmFS.readdirSync({ path: options.projectPath })) {
+        if (!this._core.platform.readdirSync({ path: options.projectPath })) {
             throw "Dir not exist";
         }
         this.projectRoot = options.projectPath;
@@ -27,12 +27,12 @@ export class Storage {
         if (!this.projectRoot)
             throw "projectDir is null";
         this._core.debug.log(`loadPackageData ${this.projectRoot} ${Path.join(this.projectRoot, "hz_package.json")}`);
-        if (!hmFS.statSync({
+        if (!this._core.platform.statSync({
             path: Path.join(this.projectRoot, "hz_package.json"),
         })) {
             throw "HZEngine Package File (hz_package.json) not exist";
         }
-        this.packageData = JSON.parse(hmFS.readFileSync({
+        this.packageData = JSON.parse(this._core.platform.readFileSync({
             path: Path.join(this.projectRoot, "hz_package.json"),
             options: { encoding: "utf8" },
         }));
@@ -83,10 +83,10 @@ export class Storage {
             throw "saveDir is null, please loadProject first";
         }
         this._core.emit("beforeLoadGlobalData");
-        if (hmFS.statSync({
+        if (this._core.platform.statSync({
             path: Path.join(this.saveRoot, "globalData.json"),
         })) {
-            this._globalData = JSON.parse(hmFS.readFileSync({
+            this._globalData = JSON.parse(this._core.platform.readFileSync({
                 path: Path.join(this.saveRoot, "globalData.json"),
                 options: {
                     encoding: "utf8",
@@ -101,7 +101,7 @@ export class Storage {
             this._core.debug.log(`globalData.json not exist, create it.`);
             this._globalData = {}; // Initial GlobalData value
             this._core.emit("initGlobalData");
-            hmFS.writeFileSync({
+            this._core.platform.writeFileSync({
                 path: Path.join(this.saveRoot, "globalData.json"),
                 data: JSON.stringify(this._globalData),
             });
@@ -125,7 +125,7 @@ export class Storage {
                 throw "projectDir is null, please loadProject first";
             }
             this._core.emit("beforeSaveGlobalData");
-            let res = hmFS.writeFileSync({
+            let res = this._core.platform.writeFileSync({
                 path: Path.join(this.projectRoot, "globalData.json"),
                 data: JSON.stringify(this._globalData),
             }); // TODO
@@ -140,12 +140,12 @@ export class Storage {
         if (archiveFile) {
             if (!this.saveRoot)
                 throw `saveRoot is null, please loadProject first`;
-            if (!hmFS.statSync({
+            if (!this._core.platform.statSync({
                 path: Path.join(this.saveRoot, archiveFile),
             })) {
                 throw `Archive [${archiveFile}] not exist`;
             }
-            let archiveData = JSON.parse(hmFS.readFileSync({
+            let archiveData = JSON.parse(this._core.platform.readFileSync({
                 path: Path.join(this.saveRoot, archiveFile),
                 options: {
                     encoding: "utf8",
@@ -178,7 +178,7 @@ export class Storage {
             this._core.debug.log("Saving archiveData to " + archiveFile);
             if (!this.saveRoot)
                 throw `projectDir is null, please loadProject first`;
-            let res = hmFS.writeFileSync({
+            let res = this._core.platform.writeFileSync({
                 path: Path.join(this.saveRoot, archiveFile),
                 data: JSON.stringify(this._archiveData),
             }); //TODO
@@ -248,11 +248,11 @@ export class Storage {
             throw "cacheRoot is null, please loadProject first";
         }
         // writeFileSync({path: "data://test.json", data: "awa", options: {encoding: "utf8"}});
-        if (hmFS.statSync({
+        if (this._core.platform.statSync({
             path: Path.join(this.cacheRoot, "preloaded.json"),
         })) {
             // 已经预加载过了，退出
-            this.preloadedData = JSON.parse(hmFS.readFileSync({
+            this.preloadedData = JSON.parse(this._core.platform.readFileSync({
                 path: Path.join(this.cacheRoot, "preloaded.json"),
                 options: {
                     encoding: "utf8",
@@ -276,7 +276,7 @@ export class Storage {
         this.preloadImage();
         this.preloadAnimation();
         // console.log(JSON.stringify(this.preloadedData));
-        hmFS.writeFileSync({
+        this._core.platform.writeFileSync({
             path: Path.join(this.cacheRoot, "preloaded.json"),
             data: JSON.stringify(this.preloadedData),
         });
@@ -292,45 +292,27 @@ export class Storage {
      * 遍历出所有hzs文件和所有label，建立map
      */
     preloadScript() {
+        // TODO
         // 记录脚本label的位置
         // 这里的index是以0开始计数的行数
         let labelMap = this.preloadedData.script.labelMap;
         let scriptDir = Path.join(this.projectRoot, "script");
         let hzsInfoMap = this.preloadedData.script.hzsInfoMap;
-        if (!hmFS.readdirSync({ path: scriptDir }))
+        if (!this._core.platform.readdirSync({ path: scriptDir }))
             throw "项目文件夹中script文件夹不存在";
-        // 遍历所有hzs文件
-        traverseScript(scriptDir);
-        function traverseScript(path) {
-            let dirs = hmFS.readdirSync({ path });
-            // console.log(dirs);
-            for (let dir of dirs) {
-                let subpath = Path.join(path, dir);
-                if (isFileSync({ path: subpath })) {
-                    // 是文件
-                    if (dir.endsWith(".hzs")) {
-                        preloadHzs(subpath);
-                    }
-                }
-                else {
-                    // 是目录
-                    traverseScript(subpath);
-                }
-            }
-        }
         /**
-         * 1. 预加载所有的label并检查冲突
-         * 2. 记录所有脚本文件的行数
-         */
-        function preloadHzs(path) {
-            let fd = hmFS.openSync({ path });
-            if (fd < 0)
-                throw "Fd<0";
-            let size = hmFS.statSync({ path }).size;
-            let arrbuf = new ArrayBuffer(size);
-            hmFS.readSync({ fd, buffer: arrbuf });
-            let buffer = Buffer.from(arrbuf);
-            let contentStr = buffer.toString();
+     * 1. 预加载所有的label并检查冲突
+     * 2. 记录所有脚本文件的行数
+     */
+        const preloadHzs = (path) => {
+            // let fd = this._core.platform.openSync({ path });
+            // if (fd < 0) throw "Fd<0";
+            // let size = this._core.platform.statSync({ path })!.size;
+            // let arrbuf = new ArrayBuffer(size);
+            // this._core.platform.readSync({ fd, buffer: arrbuf });
+            // let buffer = Buffer.from(arrbuf);
+            // let contentStr = buffer.toString();
+            let contentStr = this._core.platform.readFileSync({ path, options: { encoding: "utf8" } });
             let contentLines = contentStr.split("\n");
             let totalLines = contentLines.length;
             hzsInfoMap[path] = { totalLines };
@@ -349,13 +331,32 @@ export class Storage {
                     let label = line.slice(p, q);
                     if (labelMap[label]) {
                         throw `Label name "${label}" conflict : \
-at [${labelMap[label][0]}(line ${labelMap[label][1]})] \
-[${path}(line ${i + 1})]`;
+    at [${labelMap[label][0]}(line ${labelMap[label][1]})] \
+    [${path}(line ${i + 1})]`;
                     }
                     labelMap[label] = [path, i];
                 }
             }
-        }
+        };
+        // 遍历所有hzs文件
+        const traverseScript = (path) => {
+            let dirs = this._core.platform.readdirSync({ path });
+            // console.log(dirs);
+            for (let dir of dirs) {
+                let subpath = Path.join(path, dir);
+                if (this._core.platform.isFileSync({ path: subpath })) {
+                    // 是文件
+                    if (dir.endsWith(".hzs")) {
+                        preloadHzs(subpath);
+                    }
+                }
+                else {
+                    // 是目录
+                    traverseScript(subpath);
+                }
+            }
+        };
+        traverseScript(scriptDir);
     }
     /**
      * 预加载资源
@@ -364,27 +365,8 @@ at [${labelMap[label][0]}(line ${labelMap[label][1]})] \
     preloadImage() {
         let nameMap = this.preloadedData.image.nameMap;
         let imageDir = Path.join(this.projectRoot, "image");
-        if (!hmFS.readdirSync({ path: imageDir }))
+        if (!this._core.platform.readdirSync({ path: imageDir }))
             throw "项目文件夹中image文件夹不存在";
-        // 遍历所有hzs文件
-        traverseImage(imageDir);
-        function traverseImage(path) {
-            let dirs = hmFS.readdirSync({ path });
-            // console.log(dirs);
-            for (let dir of dirs) {
-                let subpath = Path.join(path, dir);
-                if (isFileSync({ path: subpath })) {
-                    // 是文件
-                    if (dir.endsWith(".png")) {
-                        preloadImage(subpath);
-                    }
-                }
-                else {
-                    // 是目录
-                    traverseImage(subpath);
-                }
-            }
-        }
         /**
          * 1. 预加载所有的image并检查冲突
          * 2. 记录所有image的name key和路径
@@ -400,6 +382,25 @@ at [${labelMap[label][0]}(line ${labelMap[label][1]})] \
                 throw `Image name key conflict [${name_key}], at file [${path}] and [${nameMap[name_key]}]`;
             nameMap[name_key] = [path];
         }
+        // 遍历所有hzs文件
+        const traverseImage = (path) => {
+            let dirs = this._core.platform.readdirSync({ path });
+            // console.log(dirs);
+            for (let dir of dirs) {
+                let subpath = Path.join(path, dir);
+                if (this._core.platform.isFileSync({ path: subpath })) {
+                    // 是文件
+                    if (dir.endsWith(".png")) {
+                        preloadImage(subpath);
+                    }
+                }
+                else {
+                    // 是目录
+                    traverseImage(subpath);
+                }
+            }
+        };
+        traverseImage(imageDir);
         // console.log(
         //   `Preloaded image: ${JSON.stringify(this.preloadedData.image.nameMap)}`
         // );
@@ -411,15 +412,21 @@ at [${labelMap[label][0]}(line ${labelMap[label][1]})] \
     preloadAnimation() {
         let profileMap = this.preloadedData.animation.profileMap;
         let animationDir = Path.join(this.projectRoot, "animation");
-        if (!hmFS.readdirSync({ path: animationDir }))
+        if (!this._core.platform.readdirSync({ path: animationDir }))
             throw "项目文件夹中animation文件夹不存在";
-        traverseAnimation(animationDir);
-        function traverseAnimation(path) {
-            let dirs = hmFS.readdirSync({ path });
+        function preloadAnimation(path) {
+            let raw_name = Path.parse(path).name;
+            let name_key = raw_name.trim().replace(/ +/, "_");
+            if (profileMap[name_key])
+                throw `Animation profile name key conflict [${name_key}], at file [${path}] and [${profileMap[name_key]}]`;
+            profileMap[name_key] = [path];
+        }
+        const traverseAnimation = (path) => {
+            let dirs = this._core.platform.readdirSync({ path });
             // console.log(dirs);
             for (let dir of dirs) {
                 let subpath = Path.join(path, dir);
-                if (isFileSync({ path: subpath })) {
+                if (this._core.platform.isFileSync({ path: subpath })) {
                     // 是文件
                     if (dir.endsWith(".json")) {
                         preloadAnimation(subpath);
@@ -430,13 +437,7 @@ at [${labelMap[label][0]}(line ${labelMap[label][1]})] \
                     traverseAnimation(subpath);
                 }
             }
-        }
-        function preloadAnimation(path) {
-            let raw_name = Path.parse(path).name;
-            let name_key = raw_name.trim().replace(/ +/, "_");
-            if (profileMap[name_key])
-                throw `Animation profile name key conflict [${name_key}], at file [${path}] and [${profileMap[name_key]}]`;
-            profileMap[name_key] = [path];
-        }
+        };
+        traverseAnimation(animationDir);
     }
 }

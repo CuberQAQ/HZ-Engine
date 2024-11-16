@@ -1,4 +1,4 @@
-import { AsukaUI, NativeBindingsFactory, LayoutManagerFactory, EdgeInsets, MainAxisAlignment, reportError } from '@cuberqaq/asuka-solid';
+import { AsukaUI, NativeBindingsFactory, LayoutManagerFactory, EdgeInsets, MainAxisAlignment, reportError } from '@cuberqaq/asuka-ui';
 import { getText } from '@zos/i18n';
 import { getDeviceInfo, SCREEN_SHAPE_ROUND } from '@zos/device';
 import hmUI from '@zos/ui';

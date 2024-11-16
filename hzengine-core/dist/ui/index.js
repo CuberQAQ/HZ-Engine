@@ -32,11 +32,12 @@ var __runInitializers = (this && this.__runInitializers) || function (thisArg, i
     }
     return useValue ? value : void 0;
 };
-import { Save, CustomSave, } from "../storage/decorator.js";
-/// <reference path="node_modules/@zeppos/device-types/dist/index.d.ts" />
-import * as hmUI from "@zos/ui";
-import { getDeviceInfo } from "@zos/device";
-const { width, height, screenShape } = getDeviceInfo();
+import { Save, CustomSave } from "../storage/decorator.js";
+// / <reference path="node_modules/@zeppos/device-types/dist/index.d.ts" />
+// import * as hmUI from "@zos/ui";
+// import {} from "@zos/ui";
+// import { getDeviceInfo, SCREEN_SHAPE_SQUARE } from "@zos/device";
+// const { width, height, screenShape } = getDeviceInfo();
 let UI = (() => {
     let __layerList_decorators;
     let __layerList_initializers = [];
@@ -68,7 +69,7 @@ let UI = (() => {
                     let newLayerList = new Map();
                     // create new layer
                     for (let key in obj) {
-                        let newLayer = new UI.Layer(obj[key][0], obj[key][1]);
+                        let newLayer = new UI.Layer(this._core, obj[key][0], obj[key][1]);
                         newLayerList.set(key, newLayer);
                         this._core.emit("afterAddLayer", newLayer);
                     }
@@ -160,7 +161,7 @@ let UI = (() => {
             this._core.emit("beforeAddLayer", name, z_index);
             if (this._layerList.has(name))
                 throw `Layer ${name} already exist`;
-            let newLayer = new UI.Layer(name, z_index);
+            let newLayer = new UI.Layer(this._core, name, z_index);
             this._layerList.set(name, newLayer);
             this._core.emit("afterAddLayer", newLayer);
         }
@@ -226,6 +227,37 @@ let UI = (() => {
             this._routerMap.set(tag, router);
             return router;
         }
+        getScreenSize() {
+            let [width, height] = this._core.platform.getScreenSize();
+            return { width, height };
+        }
+        /**
+         * 根据 BasicUniversalProp 计算屏幕上的位置
+         * @param prop 包含 BasicUniversalProp 的 prop
+         * @param size (可选)图像的尺寸，若不指定，返回的anchor坐标和origin坐标一样
+         * @returns
+         */
+        calcPosition(prop, size) {
+            let { width, height } = this.getScreenSize();
+            // 1. 确定 anchor
+            // 2. 通过 align 确定初始位置
+            // 3. offset
+            // 返回左上角的位置
+            let anchor_coord = {
+                x: (width * ((prop.xalign ?? 0) + 1)) / 2 + // 根据 align 求出 anchor 位置
+                    (prop.xoffset ?? 0), // offset
+                y: (height * ((prop.yalign ?? 0) + 1)) / 2 + // 根据 align 求出 anchor 位置
+                    (prop.yoffset ?? 0), // offset
+            };
+            let origin_coord = {
+                x: anchor_coord.x - (((prop.xanchor ?? 0) + 1) / 2) * (size?.width ?? 0),
+                y: anchor_coord.y - (((prop.yanchor ?? 0) + 1) / 2) * (size?.height ?? 0),
+            };
+            return {
+                anchor: anchor_coord,
+                origin: origin_coord,
+            };
+        }
     };
 })();
 export { UI };
@@ -271,40 +303,6 @@ export { UI };
         }
     }
     UI.View = View;
-    function getScreenSize() {
-        return {
-            width,
-            height,
-        };
-    }
-    UI.getScreenSize = getScreenSize;
-    /**
-     * 根据 BasicUniversalProp 计算屏幕上的位置
-     * @param prop 包含 BasicUniversalProp 的 prop
-     * @param size (可选)图像的尺寸，若不指定，返回的anchor坐标和origin坐标一样
-     * @returns
-     */
-    function calcPosition(prop, size) {
-        // 1. 确定 anchor
-        // 2. 通过 align 确定初始位置
-        // 3. offset
-        // 返回左上角的位置
-        let anchor_coord = {
-            x: (width * ((prop.xalign ?? 0) + 1)) / 2 + // 根据 align 求出 anchor 位置
-                (prop.xoffset ?? 0), // offset
-            y: (height * ((prop.yalign ?? 0) + 1)) / 2 + // 根据 align 求出 anchor 位置
-                (prop.yoffset ?? 0), // offset
-        };
-        let origin_coord = {
-            x: anchor_coord.x - (((prop.xanchor ?? 0) + 1) / 2) * (size?.width ?? 0),
-            y: anchor_coord.y - (((prop.yanchor ?? 0) + 1) / 2) * (size?.height ?? 0),
-        };
-        return {
-            anchor: anchor_coord,
-            origin: origin_coord,
-        };
-    }
-    UI.calcPosition = calcPosition;
     class MessageView extends View {
     }
     UI.MessageView = MessageView;
@@ -318,19 +316,28 @@ export { UI };
     }
     UI.BgImgView = BgImgView;
     class Layer {
+        _core;
         name;
         z_index;
         widgetFactory;
-        constructor(name, z_index) {
+        constructor(_core, name, z_index) {
+            this._core = _core;
             this.name = name;
             this.z_index = z_index;
-            this.widgetFactory = hmUI.createWidget(hmUI.widget.VIEW_CONTAINER, {
-                scroll_enable: 0,
+            // this.widgetFactory = hmUI.createWidget(
+            //   (hmUI.widget as any).VIEW_CONTAINER,
+            //   {
+            //     scroll_enable: 0,
+            //     z_index,
+            //   }
+            // ) as unknown as Layer.WidgetFactory;
+            this.widgetFactory = _core.platform.createUILayer({
                 z_index,
             });
         }
         destroy() {
-            hmUI.deleteWidget(this.widgetFactory);
+            // hmUI.deleteWidget(this.widgetFactory as any);
+            this._core.platform.deleteUILayer(this.widgetFactory);
         }
     }
     UI.Layer = Layer;

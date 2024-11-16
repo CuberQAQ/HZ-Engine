@@ -1,4 +1,5 @@
-import * as hmFS from "@zos/fs";
+// import * as hmApp from "@zos/app";
+// import * as hmFS from "@zos/fs";
 // import Path ;
 // function getAppDir(appId = (hmApp.getPackageInfo() as any).appId) {
 //   let str = appId.toString(16);
@@ -21,21 +22,21 @@ import * as hmFS from "@zos/fs";
 //       return `${str}`.toUpperCase();
 //   }
 // }
+export {};
 // function readdirAssetsSync(option: { path: string }): string[] | undefined {
 //   return hmFS.readdirSync({
 //     path: fromDataToAssetsPath(option.path),
 //   });
 // }
-export function isFileSync(option) {
-    let code = hmFS.openSync({ path: option.path });
-    if (code >= 0) {
-        hmFS.closeSync({ fd: code });
-        return true;
-    }
-    else {
-        return false;
-    }
-}
+// export function isFileSync(option: { path: string }) {
+//   let code = hmFS.openSync({ path: option.path });
+//   if (code >= 0) {
+//     hmFS.closeSync({ fd: code });
+//     return true;
+//   } else {
+//     return false;
+//   }
+// }
 // function isFileAssetsSync(option: { path: string }) {
 //   // console.log("path=" + option.path);
 //   let code = hmFS.openAssetsSync({ path: option.path });

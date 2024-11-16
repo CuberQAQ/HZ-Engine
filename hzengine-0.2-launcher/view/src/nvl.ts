@@ -152,7 +152,7 @@ class FgImgView extends UI.FgImgView {
   };
   onCreate(prop: UI.FgImgViewProp & UI.BasicUniversalProp): void {
     // TODO
-    let position = UI.calcPosition(
+    let position = this.core.ui.calcPosition(
       { ...this.defaultProp, ...prop },
       prop.size
     ).origin;
@@ -167,7 +167,7 @@ class FgImgView extends UI.FgImgView {
     });
   }
   onCommit(prop: UI.FgImgViewProp & UI.BasicUniversalProp): void {
-    let position = UI.calcPosition(
+    let position = this.core.ui.calcPosition(
       { ...this.defaultProp, ...prop },
       prop.size
     ).origin;
@@ -211,7 +211,7 @@ class BgImgView extends UI.BgImgView {
   onCreate(prop: UI.FgImgViewProp & UI.BasicUniversalProp): void {
     // TODO
     let size = this._calSize(prop.size);
-    let position = UI.calcPosition(prop, size).origin;
+    let position = this.core.ui.calcPosition(prop, size).origin;
     this._widget = this._widgetFactory.createWidget(hmUI.widget.IMG, {
       // x: (width - size.width) / 2 + prop.offset.x,
       // y: (height - size.height) / 2 + prop.offset.y,
@@ -227,7 +227,7 @@ class BgImgView extends UI.BgImgView {
   }
   onCommit(prop: UI.FgImgViewProp & UI.BasicUniversalProp): void {
     let size = this._calSize(prop.size);
-    let position = UI.calcPosition(prop, size).origin;
+    let position = this.core.ui.calcPosition(prop, size).origin;
     this._widget.setProperty(hmUI.prop.MORE, {
       // x: (width - size.width) / 2 + prop.offset.x,
       // y: (height - size.height) / 2 + prop.offset.y,

@@ -1,4 +1,5 @@
-import hmUI from "@zos/ui";
+// / <reference types="@zeppos/device-types" />
+// import hmUI from "@zos/ui";
 import { Async, Script } from "../../index.js";
 export function img(core) {
     let transform_plugin = core.plugins.get("transform");
@@ -24,7 +25,8 @@ export function img(core) {
         let path = core.storage.preloadedData.image.nameMap[name_key]?.[0];
         if (!path)
             throw `Show Command: image with name_key [${name_key}] not found `;
-        let size = hmUI.getImageInfo(path);
+        // let size = (hmUI as any).getImageInfo(path);
+        let size = core.platform.getImageInfo(path);
         if (!size)
             throw `Show Command: read size of [${path}] failed`;
         showAction(tag, path, size, parsedRes.strategy);
@@ -96,7 +98,8 @@ export function img(core) {
         let path = core.storage.preloadedData.image.nameMap[name_key]?.[0];
         if (!path)
             throw `Scene Command: image with name_key [${name_key}] not found `;
-        let size = hmUI.getImageInfo(path);
+        // let size = (hmUI as any).getImageInfo(path);
+        let size = core.platform.getImageInfo(path);
         if (!size)
             throw `Scene Command: read size of [${path}] failed`;
         sceneAction(tag, path, size, parsedRes.strategy);

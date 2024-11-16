@@ -7,6 +7,7 @@ import { Async } from "./async/index.js";
 import { Audio } from "./audio/index.js";
 import { Config } from "./config/index.js";
 import { Debug } from "./debug/index.js";
+import Platform from "./platform/index.js";
 import { basic_command } from "./plugins/basic_command/index.js";
 import { global_gesture } from "./plugins/global_gesture/index.js";
 import { registerPlugin } from "./plugins/transform/index.js";
@@ -16,17 +17,26 @@ import { System } from "./system/index.js";
 import { UI } from "./ui/index.js";
 
 class HZEngineCore {
-  // 請不要調整這裡的初始化順序，不然會有問題（裝飾器裡有時候要用到前面初始化的東西）
   private _eventCallbacks: Map<string, Set<Function>> = new Map();
-  storage = new Storage(this);
-  async = new Async(this);
-  ui = new UI(this);
-  script = new Script(this);
-  system = new System(this);
-  config = new Config(this);
-  audio = new Audio(this);
-  debug = new Debug(this);
-  constructor() {
+  public storage;
+  public async;
+  public ui;
+  public script;
+  public system;
+  public config;
+  public audio;
+  public debug;
+  constructor(public platform: Platform) {
+    // 請不要調整這裡的初始化順序，不然會有問題（裝飾器裡有時候要用到前面初始化的東西）
+    this.storage = new Storage(this);
+    this.async = new Async(this);
+    this.ui = new UI(this);
+    this.script = new Script(this);
+    this.system = new System(this);
+    this.config = new Config(this);
+    this.audio = new Audio(this);
+    this.debug = new Debug(this);
+
     // internal plugin
     this.loadPlugin("global_gesture", global_gesture);
     this.loadPlugin("transform", registerPlugin);

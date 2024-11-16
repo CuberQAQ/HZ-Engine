@@ -1,6 +1,6 @@
 import { AnimationPlugin } from "./hz_anime.js";
 import { Animation, Profile } from "./animation.js";
-import hmFS from "@zos/fs";
+// import hmFS from "@zos/fs";
 import { getTransitionMap, registerHzscriptCommands } from "./commands.js";
 export function registerPlugin(core) {
     let animationPlugin = new AnimationPlugin(core);
@@ -15,7 +15,7 @@ export function registerPlugin(core) {
             core.debug.log(`Animation profile [${name}] not found`);
             return null;
         }
-        let str = hmFS.readFileSync({
+        let str = core.platform.readFileSync({
             path: profile_item[0],
             options: {
                 encoding: "utf8",

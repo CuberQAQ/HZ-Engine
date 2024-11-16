@@ -14,17 +14,27 @@ import { Storage } from "./storage/index.js";
 import { System } from "./system/index.js";
 import { UI } from "./ui/index.js";
 class HZEngineCore {
-    // 請不要調整這裡的初始化順序，不然會有問題（裝飾器裡有時候要用到前面初始化的東西）
+    platform;
     _eventCallbacks = new Map();
-    storage = new Storage(this);
-    async = new Async(this);
-    ui = new UI(this);
-    script = new Script(this);
-    system = new System(this);
-    config = new Config(this);
-    audio = new Audio(this);
-    debug = new Debug(this);
-    constructor() {
+    storage;
+    async;
+    ui;
+    script;
+    system;
+    config;
+    audio;
+    debug;
+    constructor(platform) {
+        this.platform = platform;
+        // 請不要調整這裡的初始化順序，不然會有問題（裝飾器裡有時候要用到前面初始化的東西）
+        this.storage = new Storage(this);
+        this.async = new Async(this);
+        this.ui = new UI(this);
+        this.script = new Script(this);
+        this.system = new System(this);
+        this.config = new Config(this);
+        this.audio = new Audio(this);
+        this.debug = new Debug(this);
         // internal plugin
         this.loadPlugin("global_gesture", global_gesture);
         this.loadPlugin("transform", registerPlugin);

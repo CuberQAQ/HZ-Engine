@@ -1,7 +1,7 @@
 import { HZEngineCore } from "../index.js";
+import { AudioPlayer } from "../platform/index.js";
 export declare class Audio {
     _core: HZEngineCore;
-    static _hmPlayer: import("@zos/media").Player;
     constructor(_core: HZEngineCore);
     private accessor _channels;
     get channels(): Record<string, Audio.Channel>;
@@ -10,7 +10,9 @@ export declare class Audio {
 export declare namespace Audio {
     class Channel {
         _audio: Audio;
+        _audioPlayer: AudioPlayer;
         constructor(_audio: Audio);
+        onRelease(): void;
         mode: Channel.Mode;
         status: Channel.Status;
         _playbackList: PlaybackItem[];

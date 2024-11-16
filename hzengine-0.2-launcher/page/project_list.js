@@ -1,11 +1,8 @@
-import { A as AsukaUI, N as NativeBindingsFactory, L as LayoutManagerFactory, r as render, c as createSignal, o as getHzpkList, a as createElement, i as insertNode, b as insert, d as createComponent, F as For, s as setProp, q as posix, e as effect, p as px, g as Alignment, E as EdgeInsets, j as reportError } from './hzpk-BUs1JVlU.js';
-import '@zos/i18n';
+import { A as AsukaUI, N as NativeBindingsFactory, L as LayoutManagerFactory, r as render, c as createSignal, o as getHzpkList, a as createElement, i as insertNode, b as insert, d as createComponent, F as For, s as setProp, q as posix, e as effect, p as px, g as Alignment, E as EdgeInsets, j as reportError } from './hzpk-i_2nB0nN.js';
 import hmUI__default from '@zos/ui';
 import hmFS from '@zos/fs';
 import { getDeviceInfo, SCREEN_SHAPE_ROUND } from '@zos/device';
 import * as hmRouter from '@zos/router';
-import '@zos/interaction';
-import '@zos/page';
 import '@zos/utils';
 
 const {

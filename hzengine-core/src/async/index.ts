@@ -1,7 +1,7 @@
 import { HZEngineCore, Storage } from "../index.js";
 import { Save } from "../storage/decorator.js";
 import { ZeppTimer } from "./zeppos_timer.js";
-import { Time } from "@zos/sensor";
+// import { Time } from "@zos/sensor";
 
 export class Async {
   static _nextTickCallbacks: (() => void)[] = [];
@@ -24,9 +24,9 @@ export class Async {
     });
   }
 
-  private _fps = 45;
-  private _hmTime = new Time();
-  private _lastTime: number = this._hmTime.getTime();
+  // private _fps = 45;
+  // private _hmTime = new Time();
+  private _lastTime: number;
   constructor(public _core: HZEngineCore) {
     // console.log("async init");
     // let timer = new ZeppTimer(() => {
@@ -34,19 +34,22 @@ export class Async {
     //   this._scheduleTask();
     // }, ~~(1000 / this._fps));
     // timer.start();
-    setInterval(() => {
+    this._lastTime = this._core.platform.getTime();
+    // setInterval(() => {
+    //   this._scheduleTask();
+    // }, ~~(1000 / this._fps));
+    _core.platform.setFrameInterval(() => {
       this._scheduleTask();
-    }, ~~(1000 / this._fps));
+    });
   }
 
   _scheduleTask() {
     // TODO 沒有充分考慮存檔時產生的問題（this._delayTasks引用變化），及其它問題
-    let now = this._hmTime.getTime();
+    let now = this._core.platform.getTime();
     let deltaTime = now - this._lastTime;
     this._lastTime = now;
 
     // console.log(`async timer cb d=${deltaTime}`);
-
 
     for (let id in this._delayTasks) {
       let task = this._delayTasks[id];

@@ -1,11 +1,12 @@
 /// <reference path="../node_modules/@zeppos/device-types/dist/index.d.ts" />
-
-import { getText } from "@zos/i18n";
+/// <reference path="../shared/zos_media.d.ts" />
+import { create, id } from "@zos/media";
 
 import { getDeviceInfo } from "@zos/device";
 const { width, height, screenShape } = getDeviceInfo();
 import { HZEngineCore, System } from "hzengine-core";
 import hmUI, { setStatusBarVisible } from "@zos/ui";
+import * as hmFS from "@zos/fs";
 import { Time, Battery } from "@zos/sensor";
 import ViewPlugin from "../view";
 import BlackTrans from "../plugins/black_trans";
@@ -19,17 +20,11 @@ import {
 } from "@zos/interaction";
 import { onGesture, GESTURE_UP } from "@zos/interaction";
 
-import * as hmApp from "@zos/app";
-import * as hmFS from "@zos/fs";
-import Path from "@cuberqaq/path-polyfill";
 import { px } from "../shared/dynamic_px";
 
 // 电量传感器，用于获取电池电量
 const battery = new Battery();
 const currentBattery = battery.getCurrent();
-
-// 时间传感器
-const time = new Time();
 
 /**
  * 保存HZEngineCore的引用的变量
@@ -71,8 +66,82 @@ Page({
       return;
     }
 
+    // 时间传感器
+    var timeSensor = new Time();
+
     // 创建HZEngineCore实例
-    hzengine = new HZEngineCore();
+    var _hmPlayer = null, hmPlayerOccupied = false;
+
+    hzengine = new HZEngineCore({
+      name: "zeppos",
+
+      // screen
+      getScreenSize() {
+        return [width, height];
+      },
+
+      // ui
+      createUILayer({ z_index }) {
+        return hmUI.createWidget(hmUI.widget.VIEW_CONTAINER, {
+          scroll_enable: 0,
+          z_index,
+        });
+      },
+      deleteUILayer(widgetFactory) {
+        hmUI.deleteWidget(widgetFactory);
+      },
+
+      // fs
+      isFileSync({ path }) {
+        let code = hmFS.openSync({ path });
+        if (code >= 0) {
+          hmFS.closeSync({ fd: code });
+          return true;
+        } else {
+          return false;
+        }
+      },
+
+      readdirSync(option) {
+        return hmFS.readdirSync(option);
+      },
+      statSync(option) {
+        return hmFS.statSync(option);
+      },
+      readFileSync(option) {
+        return hmFS.readFileSync(option);
+      },
+      writeFileSync(option) {
+        return hmFS.writeFileSync(option);
+      },
+
+      getImageInfo(img_path) {
+        return hmUI.getImageInfo(img_path);
+      },
+
+      // timer & async
+      getTime: () => timeSensor.getTime(),
+      
+
+      // audio
+      createAudioPlayer() {
+        if (!_hmPlayer) {
+          _hmPlayer = create(id.PLAYER);
+        }
+        if(hmPlayerOccupied) throw new Error(`[HZEngine] ZeppOS can only have one AudioPlayer.`);
+        hmPlayerOccupied = true;
+        return _hmPlayer;
+      },
+      releaseAudioPlayer(audio_player) {
+        // audio_player.release();
+        audio_player.stop(); // TODO
+        hmPlayerOccupied = false;
+      },
+
+      setFrameInterval(callback) {
+        setInterval(callback, 1000 / 60);
+      },
+    });
 
     // 加载ViewPlugin插件，定义其HZEngine中的插件名字为views
     // 这个插件注册了say，fg_img，bg_img，menu，title，quick_menu等常用页面组件(view)
@@ -97,7 +166,6 @@ Page({
     // 启动HZEngine
     // 这里是异步操作，意味着页面的渲染将在下一刻才执行
     hzengine.start();
-    
 
     // 注册一些监听事件
     // 按下SELECT按键将进行下一步交互
@@ -116,6 +184,36 @@ Page({
         return true;
       }
     }
+
+    function global_gesture(core) {
+      function addTouchPad(layerInstance) {
+        // TODO touch pad
+        core.debug.log("[TouchPad] Test for ZeppOS");
+        let touchPad = layerInstance.widgetFactory.createWidget(hmUI.widget.TEXT, {
+          x: 0,
+          y: 0,
+          w: 600,
+          h: 600,
+          text: "",
+        });
+    
+        touchPad.addEventListener(hmUI.event.SELECT, (info) => {
+          console.log("按下了屏幕");
+          if (core.system.condition === System.Condition.Pause) {
+            core.system.continue();
+          }
+        });
+      }
+      addTouchPad(core.ui.getLayer("ct"));
+      core.on("afterAddLayer", (layerInstance) => {
+        if (layerInstance.name !== "ct") return;
+        addTouchPad(layerInstance);
+      });
+    }
+    global_gesture(hzengine);
+    
+
+
 
     // /**
     //  * 測試脚本

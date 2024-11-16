@@ -1,4 +1,5 @@
 import { HZEngineCore } from "../index.js";
+import { WidgetFactory } from "../platform/index.js";
 import { Storage } from "../storage/index.js";
 export declare class UI {
     _core: HZEngineCore;
@@ -23,6 +24,22 @@ export declare class UI {
     private accessor _routerMap;
     getRouter(tag: string): UI.Router | undefined;
     addRouter(tag: string, layer: string, isSave?: boolean): UI.Router;
+    getScreenSize(): {
+        width: number;
+        height: number;
+    };
+    /**
+     * 根据 BasicUniversalProp 计算屏幕上的位置
+     * @param prop 包含 BasicUniversalProp 的 prop
+     * @param size (可选)图像的尺寸，若不指定，返回的anchor坐标和origin坐标一样
+     * @returns
+     */
+    calcPosition(prop: UI.BasicUniversalProp, size?: UI.Size): {
+        /** 锚点（算上偏移）的屏幕位置 */
+        anchor: UI.Coordinate;
+        /** 图像左上角的屏幕位置 */
+        origin: UI.Coordinate;
+    };
 }
 export declare namespace UI {
     type ViewClass<T extends Storage.Saveable<T>> = {
@@ -62,19 +79,6 @@ export declare namespace UI {
         xoffset?: number;
         yoffset?: number;
     }
-    function getScreenSize(): Size;
-    /**
-     * 根据 BasicUniversalProp 计算屏幕上的位置
-     * @param prop 包含 BasicUniversalProp 的 prop
-     * @param size (可选)图像的尺寸，若不指定，返回的anchor坐标和origin坐标一样
-     * @returns
-     */
-    function calcPosition(prop: BasicUniversalProp, size?: Size): {
-        /** 锚点（算上偏移）的屏幕位置 */
-        anchor: Coordinate;
-        /** 图像左上角的屏幕位置 */
-        origin: Coordinate;
-    };
     interface Message {
         who: string;
         what: string;
@@ -120,17 +124,14 @@ export declare namespace UI {
     abstract class BgImgView extends View<FgImgViewProp> {
     }
     class Layer {
+        _core: HZEngineCore;
         name: string;
         z_index: number;
-        widgetFactory: Layer.WidgetFactory;
-        constructor(name: string, z_index: number);
+        widgetFactory: WidgetFactory;
+        constructor(_core: HZEngineCore, name: string, z_index: number);
         destroy(): void;
     }
     namespace Layer {
-        interface WidgetFactory {
-            createWidget(widgetType: number, option: Record<string, any>): any;
-            deleteWidget(widget: any): void;
-        }
     }
     class Router {
         private _ui;

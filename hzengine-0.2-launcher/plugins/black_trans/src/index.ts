@@ -1,3 +1,4 @@
+/// <reference types="@zeppos/device-types" />
 import hmUI from "@zos/ui";
 import { HZEngineCore, TransformPlugin, UI } from "hzengine-core";
 
@@ -19,7 +20,7 @@ export default function BlackTrans(core: HZEngineCore): InstanceType {
     __prop: BlackTransViewProp | null = null;
     protected onCreate(prop: BlackTransViewProp): void {
       this.__prop = {...prop};
-      let size = UI.getScreenSize();
+      let size = core.ui.getScreenSize();
       this._widget = this._widgetFactory.createWidget(hmUI.widget.FILL_RECT, {
         x: 0,
         y: 0,

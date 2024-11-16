@@ -3,13 +3,12 @@ export class ZeppTimer {
     callback: any;
     interval: any;
     timerId: any;
-    startTime: number | null;
+    startTime: any;
     nextTick: any;
-    time: Time;
+    time: any;
     stopped: boolean;
     start(delay?: number): void;
     stop(): void;
     scheduleTick(): void;
     tick(): void;
 }
-import { Time } from "@zos/sensor";

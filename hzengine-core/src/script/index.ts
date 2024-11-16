@@ -52,7 +52,7 @@ export class Script {
     ];
     this.incrementNextPosition();
 
-    let rawCommand = readline(nowRunPosition[0], nowRunPosition[1])!;
+    let rawCommand = readline(this._core, nowRunPosition[0], nowRunPosition[1])!;
 
     // remove comment
 
@@ -271,6 +271,7 @@ export class Script {
     this._nextRunPosition = [ctx.currentPath, ctx.currentLineIndex];
     while (this._nextRunPosition) {
       let rawCommand = readline(
+        this._core,
         this._nextRunPosition[0],
         this._nextRunPosition[1]
       );

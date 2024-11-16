@@ -5,7 +5,6 @@ export declare class AnimationPlugin {
     constructor(_core: HZEngineCore);
     private accessor _nextAnimationId;
     private accessor _animationMap;
-    private _timeSensor;
     private _lastCbUtc;
     applyAnimation<P extends Profile.PropsType>({ profile, targetView, options, }: {
         profile: Profile<P>;

@@ -5,8 +5,6 @@ export declare class Async {
     static _nextTickTimerId: number | null;
     static nextTick(callback: () => void): void;
     static _nextTickTimerCallback(): void;
-    private _fps;
-    private _hmTime;
     private _lastTime;
     constructor(_core: HZEngineCore);
     _scheduleTask(): void;

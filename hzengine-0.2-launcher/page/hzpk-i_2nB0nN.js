@@ -6,6 +6,7 @@ import hmFS from '@zos/fs';
 
 const equalFn = (a, b) => a === b;
 const $PROXY = Symbol("solid-proxy");
+const SUPPORTS_PROXY = typeof Proxy === "function";
 const $TRACK = Symbol("solid-track");
 const signalOptions = {
   equals: equalFn
@@ -298,6 +299,10 @@ function cleanNode(node) {
       }
     }
   }
+  if (node.tOwned) {
+    for (i = node.tOwned.length - 1; i >= 0; i--) cleanNode(node.tOwned[i]);
+    delete node.tOwned;
+  }
   if (node.owned) {
     for (i = node.owned.length - 1; i >= 0; i--) cleanNode(node.owned[i]);
     node.owned = null;
@@ -343,20 +348,12 @@ function mapArray(list, mapFn, options = {}) {
   onCleanup(() => dispose(disposers));
   return () => {
     let newItems = list() || [],
+      newLen = newItems.length,
       i,
       j;
     newItems[$TRACK];
     return untrack(() => {
-      let newLen = newItems.length,
-        newIndices,
-        newIndicesNext,
-        temp,
-        tempdisposers,
-        tempIndexes,
-        start,
-        end,
-        newEnd,
-        item;
+      let newIndices, newIndicesNext, temp, tempdisposers, tempIndexes, start, end, newEnd, item;
       if (newLen === 0) {
         if (len !== 0) {
           dispose(disposers);
@@ -484,7 +481,7 @@ function mergeProps$1(...sources) {
     proxy = proxy || !!s && $PROXY in s;
     sources[i] = typeof s === "function" ? (proxy = true, createMemo(s)) : s;
   }
-  if (proxy) {
+  if (SUPPORTS_PROXY && proxy) {
     return new Proxy({
       get(property) {
         for (let i = sources.length - 1; i >= 0; i--) {
@@ -841,7 +838,6 @@ function assert(success) {
   }
 }
 function reportError(extra, err) {
-  var _a, _b, _c;
   console.log("Reporting Error...");
   // logger.error(`ERROR:message=${extra} err=${err}`);
   let bg = hmUI__default.createWidget(hmUI__default.widget.FILL_RECT, {
@@ -866,11 +862,11 @@ function reportError(extra, err) {
   let y = px$1(100);
   y += showSubtitle(extra, y) + px$1(10);
   y += showSubtitle('Error Name', y) + px$1(5);
-  y += showCode((_a = err.name) !== null && _a !== void 0 ? _a : 'No Name Founded', y) + px$1(10);
+  y += showCode(err.name ?? 'No Name Founded', y) + px$1(10);
   y += showSubtitle('Error Message', y) + px$1(5);
-  y += showCode((_b = err.message) !== null && _b !== void 0 ? _b : 'No Message Founded', y) + px$1(10);
+  y += showCode(err.message ?? 'No Message Founded', y) + px$1(10);
   y += showSubtitle('Error Stack', y) + px$1(5);
-  y += showCode((_c = err.stack) !== null && _c !== void 0 ? _c : 'No Stack Founded', y) + px$1(10);
+  y += showCode(err.stack ?? 'No Stack Founded', y) + px$1(10);
   bg.setProperty(hmUI__default.prop.MORE, {
     x: 0,
     y: 0,
@@ -975,16 +971,20 @@ function max(a, b) {
  * @todo 处理`NaN`的情况
  */
 class Constraints {
+  minHeight;
+  maxHeight;
+  minWidth;
+  maxWidth;
   constructor({
     minHeight = 0,
     maxHeight = Number.POSITIVE_INFINITY,
     minWidth = 0,
     maxWidth = Number.POSITIVE_INFINITY
   }) {
-    if (isNaN(minHeight !== null && minHeight !== void 0 ? minHeight : NaN)) minHeight = 0;
-    if (isNaN(minWidth !== null && minWidth !== void 0 ? minWidth : NaN)) minWidth = 0;
-    if (isNaN(maxHeight !== null && maxHeight !== void 0 ? maxHeight : NaN)) maxHeight = 0;
-    if (isNaN(maxWidth !== null && maxWidth !== void 0 ? maxWidth : NaN)) maxWidth = 0;
+    if (isNaN(minHeight ?? NaN)) minHeight = 0;
+    if (isNaN(minWidth ?? NaN)) minWidth = 0;
+    if (isNaN(maxHeight ?? NaN)) maxHeight = 0;
+    if (isNaN(maxWidth ?? NaN)) maxWidth = 0;
     if (minHeight < 0) minHeight = 0;
     if (minWidth < 0) minWidth = 0;
     if (maxHeight < minHeight) maxHeight = minHeight;
@@ -1010,8 +1010,7 @@ class Constraints {
     });
   }
   static isValid(constraints) {
-    var _a, _b, _c, _d;
-    return constraints != null && !(isNaN((_a = constraints.minHeight) !== null && _a !== void 0 ? _a : NaN) || isNaN((_b = constraints.minWidth) !== null && _b !== void 0 ? _b : NaN) || isNaN((_c = constraints.maxHeight) !== null && _c !== void 0 ? _c : NaN) || isNaN((_d = constraints.maxWidth) !== null && _d !== void 0 ? _d : NaN)) && constraints.minHeight >= 0 && constraints.minWidth >= 0 && constraints.minHeight <= constraints.maxHeight && constraints.minWidth <= constraints.maxWidth;
+    return constraints != null && !(isNaN(constraints.minHeight ?? NaN) || isNaN(constraints.minWidth ?? NaN) || isNaN(constraints.maxHeight ?? NaN) || isNaN(constraints.maxWidth ?? NaN)) && constraints.minHeight >= 0 && constraints.minWidth >= 0 && constraints.minHeight <= constraints.maxHeight && constraints.minWidth <= constraints.maxWidth;
   }
   static copy(constraints) {
     return new Constraints({
@@ -1160,7 +1159,9 @@ class Size {
   }
   static copy(size) {
     assert(size != null);
-    return Object.assign({}, size);
+    return {
+      ...size
+    };
   }
   /**
    * **分别相加两个`Size`对象的长和宽，并返回一个新对象.**
@@ -1204,7 +1205,9 @@ class Size {
 class Coordinate {
   static copy(coord) {
     assert(coord != null);
-    return Object.assign({}, coord);
+    return {
+      ...coord
+    };
   }
   static isValid(coord) {
     // isFinite(NaN) -> false
@@ -1238,14 +1241,14 @@ class Coordinate {
   }
 }
 class Alignment {
+  _x = 0;
+  _y = 0;
   /**
    * **创建对齐**
    * @param x [-1.0,1.0] 当-1为最左 0为中 1为最右
    * @param y [-1.0,1.0] 当-1为最上 0为中 1为最下
    */
   constructor(x, y) {
-    this._x = 0;
-    this._y = 0;
     if (x) {
       this._x = min(max(x, -1.0), 1.0);
     }
@@ -1455,6 +1458,10 @@ var FlexFit;
  * **边距**
  */
 class EdgeInsets {
+  _left;
+  _up;
+  _right;
+  _down;
   constructor({
     left,
     up,
@@ -1475,12 +1482,11 @@ class EdgeInsets {
     });
   }
   static only(value) {
-    var _a, _b, _c, _d;
     return new EdgeInsets({
-      left: (_a = value === null || value === void 0 ? void 0 : value.left) !== null && _a !== void 0 ? _a : 0,
-      up: (_b = value === null || value === void 0 ? void 0 : value.up) !== null && _b !== void 0 ? _b : 0,
-      right: (_c = value === null || value === void 0 ? void 0 : value.right) !== null && _c !== void 0 ? _c : 0,
-      down: (_d = value === null || value === void 0 ? void 0 : value.down) !== null && _d !== void 0 ? _d : 0
+      left: value?.left ?? 0,
+      up: value?.up ?? 0,
+      right: value?.right ?? 0,
+      down: value?.down ?? 0
     });
   }
   static symmetric({
@@ -1488,10 +1494,10 @@ class EdgeInsets {
     horizontal
   }) {
     return new EdgeInsets({
-      left: horizontal !== null && horizontal !== void 0 ? horizontal : 0,
-      up: vertical !== null && vertical !== void 0 ? vertical : 0,
-      right: horizontal !== null && horizontal !== void 0 ? horizontal : 0,
-      down: vertical !== null && vertical !== void 0 ? vertical : 0
+      left: horizontal ?? 0,
+      up: vertical ?? 0,
+      right: horizontal ?? 0,
+      down: vertical ?? 0
     });
   }
   static get zero() {
@@ -1597,22 +1603,26 @@ function findWhere(arr, ref, returnIndex, byValueOnly) {
 // import { AsukaLayoutNode } from "./asuka-layout";
 // import { defineStyleReflection } from "./layout-bridge";
 // import { splice, findWhere, createAttributeFilter, isElement } from "./util";
-var __classPrivateFieldSet = undefined && undefined.__classPrivateFieldSet || function (receiver, state, value, kind, f) {
-  if (kind === "m") throw new TypeError("Private method is not writable");
-  if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a setter");
-  if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
-  return kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value), value;
-};
-var __classPrivateFieldGet = undefined && undefined.__classPrivateFieldGet || function (receiver, state, kind, f) {
-  if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
-  if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
-  return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
-};
-var _RenderView_key;
 /**
  * **节点类**
  */
 class AsukaNode {
+  nodeType;
+  nodeName;
+  /** 父节点 */
+  parentNode = null;
+  /**
+   * **父节点数据插槽**
+   * @description
+   * 用于存储父节点希望子节点存储的信息。
+   *
+   * 由于子模型无关、布局算法高度自定义等特点，出现父节点需要子节点存储数据的情况十分常见，故提供本插槽属性。
+   * 将在`mountChild`时调用的`_setupMountingChild`中赋值为`{}`(空对象)进行初始化，并在`unmountChild`时调用的`_setupUnmounting`中赋值为`null`进行清除。
+   * 其他任何时候，框架不会访问或改变它。
+   *
+   * 举例：多个采用双向链表存储子节点时诸如`nextSibling`，`previousSibling`等。
+   */
+  parentData;
   get nextSibling() {
     if (this.parentNode === null) return null;
     return this.parentNode.getChildNextSibling(this);
@@ -1621,13 +1631,11 @@ class AsukaNode {
   // public previousSibling: AsukaNode | null = null;
   // /** 直接后继节点 */
   // public nextSibling: AsukaNode | null = null;
-  constructor( /** 节点类型 */
+  constructor(/** 节点类型 */
   nodeType, /** 节点名称 */
   nodeName) {
     this.nodeType = nodeType;
     this.nodeName = nodeName;
-    /** 父节点 */
-    this.parentNode = null;
   }
   /**------------------属性设置------------------- */
   /**
@@ -1646,6 +1654,7 @@ class AsukaNode {
  * **文字节点类**
  */
 class AsukaTextNode extends AsukaNode {
+  _text;
   constructor(text) {
     super(NodeType.TEXT_NODE, '#text'); // 3: TEXT_NODE
     this._text = text;
@@ -1698,167 +1707,10 @@ class AsukaUnknownNode extends AsukaNode {
  * 涉及布局、绘制、事件都是可渲染节点
  */
 class RenderNode extends AsukaNode {
+  _handlers = {};
   // protected _attributes: {};
   constructor(nodeTyle, nodeName) {
     super(nodeTyle || NodeType.RENDER_NODE, nodeName); // 1: ELEMENT_NODE
-    this._handlers = {};
-    // {
-    //   if (ref) splice(this.childNodes, ref, child);
-    //   else this.childNodes.push(child);
-    //   this._setupChild(child)
-    //   return child;
-    // }
-    /**------------------布局相关------------------- */
-    /**
-     * **需要布局(布局脏标记)**
-     *
-     * 框架应保证执行布局操作时，所有非孤立且拥有布局脏标记的节点的`layout`都被调用，并将脏标记清除，并且应迅速(在下一个JS事件循环时)
-     * 若为孤立且拥有脏标记的节点，在转为非孤立状态后应立即请求布局，并在下一个JS事件循环时调用其`layout`，并清除脏标记。
-     *
-     * 框架保证，拥有脏标记的节点在`layout`过程中，其`performLayout`被调用（如果`sizedByParent`为`true`，还保证其`performResize`被调用）。
-     * 通常，所有可能使布局发生变化的操作，都应当做布局脏标记(调用`markNeedsLayout`)
-     */
-    this._needsLayout = false;
-    /**
-     * **需要确认最终位置(放置脏标记)**
-     *
-     * 框架应保证执行确认最终位置操作(简称放置操作)时，所有非孤立且拥有放置脏标记的节点的`place`都被调用，并将脏标记清除，并且应迅速(在下一个JS事件循环时)
-     * 若为孤立且拥有脏标记的节点，在转为非孤立状态后应立即请求放置，并在下一个JS事件循环时调用其`place`，并清除脏标记。
-     *
-     * 框架保证，拥有脏标记的节点在`place`过程中，其`position`会得到更新，并根据情况执行`performCommit`操作.
-     *
-     * @see markNeedsPlace 更多有关`放置脏标记`的原理，请参见该方法
-     */
-    this._needsPlace = false;
-    /**
-     * **必须执行推送操作(强制更新标记)**
-     *
-     * 框架应保证所有非孤立且拥有强制更新标记的节点的`performCommit`和`onCommit`都被调用，并将该标记清除，并且应迅速(在下一个JS事件循环时，`place`过程中)
-     * 若为孤立且拥有脏标记的节点，在转为非孤立状态后应立即请求放置，并在下一个JS事件循环时的`place`时执行推送操作，并清除脏标记。
-     */
-    this._mustCommit = false;
-    /**
-     * **本节点的深度**
-     *
-     * 定义`AsukaUI`的深度为`0`.
-     *
-     * 仅当`_attached`为`true`，即不为孤立节点时有效
-     *
-     * 主要用于在`AsukaUI`执行`layout`和`place`操作时确定先后顺序（深度小的节点先，深度大的节点后），保证不重复计算并正确.
-     *
-     * 在`attach`时更新
-     */
-    this._depth = 0;
-    /**
-     * **本节点尺寸**
-     *
-     * 请勿直接修改本属性，而是通过`size`(getter/setter)修改或访问
-     */
-    this._size = null;
-    /**
-     * **本节点尺寸是否已改变**
-     *
-     * 用途：
-     * - 在`size`setter中判断并标记为`true`.
-     * - 在`place`方法中用于判断是否需要执行`performCommit`操作，并将其标记为`false`
-     */
-    this._sizeChanged = false;
-    /**
-     * **相对父节点的坐标偏移**
-     *
-     * 请勿直接修改本属性，而是通过`offset`(getter/setter)修改或访问
-     */
-    this._offset = null;
-    /**
-     * **该节点在当前坐标系的位置**
-     *
-     * 请勿直接修改本属性，而是通过`position`(getter/setter)修改或访问
-     */
-    this._position = null;
-    /**
-     * **局部重布局边界**
-     * @description
-     * 当子树添加脏标记时，重布局边界节点不会调用`markParentNeedsLayout`将脏标记传递给父节点；
-     * 而是阻止向上传递，（非孤立时）向框架中心请求布局，并将自身加入待布局列表。
-     *
-     * 无论是否孤立，若`_relayoutBoundary`不为`null`，就应保证该属性指向的节点与本节点连通。
-     *
-     * 局部重布局边界需要保证其子树的布局发生变化时(不考虑挂载等非布局操作)，不会影响其父节点的布局结果，即父节点不需要重新布局。
-     *
-     * 具体而言，满足以下四种条件其一的节点，可作为为局部重布局边界。
-     * 1. `sizedByParent == true` 由于布局过程从子节点传递到父节点的信息仅有子节点尺寸，且该节点的尺寸仅由父节点提供的布局约束有关，
-     * 因此，该节点的子树的布局发生变化时，父节点的布局结果不变，可作为为局部重布局边界。
-     * 2. `parentUsesSize == false` 父节点布局过程不计算和使用子节点尺寸，也就是子节点子树发生的任何布局变化即使令该子节点的尺寸发生变化，
-     * 也不影响父节点的布局结果。
-     * 3. `constraints.isTight` 父节点传递的布局约束为严格约束（最大和最小宽度相等且最大和最小高度相等，符合该约束的尺寸仅有一种），
-     * 4. `!isRenderNode(this.parentNode)` 父节点不是可渲染节点，故布局只能从本节点开始。
-     *
-     */
-    this._relayoutBoundary = null;
-    /**
-     * **为子节点提供新的坐标系**
-     * @description
-     * 若为`false`, 子节点的`position`将等于其`offset`加上本节点的`position`；
-     * 若为`true`，子节点的`position`将直接等于其`offset`（相当于本节点为子节点的坐标系原点）
-     *
-     * 用于如`ViewContainer`这样的为子节点提供了新的坐标参考系的组件中
-     *
-     * **请务必在对象初始化完成前确定，后续不应再修改**，若为`true`，
-     *
-     * 请考虑在`performLayout`中调用子节点的`layout`时传递为子节点提供的控件工厂(可能是`hmUI.widget.GROUP`或`VIEW_CONTAINER`之类的实例).
-     */
-    this.isNewCoordOrigin = false;
-    /**
-     * **上一次`layout`时获得的控件工厂**
-     * @description
-     * 所谓控件工厂，是指`hmUI`、`GROUP`实例或`VIEW_CONTAINER`实例等，拥有符合接口要求的`createWidget`和`deleteWidget`的方法的对象。
-     * 请注意区分`hmUI`中的其他方法，控件工厂不一定都实现了这些方法。
-     *
-     * 在下一次`layout`或取消挂载或转为孤立树等发生前有效。
-     */
-    this._widgetFactory = null;
-    /**
-     * **上一次`layout()`时获得的布局约束**
-     * @description 布局约束，是指该节点的尺寸的允许范围。
-     * 布局约束由`minHeight`，`maxHeight`，`minWidth`和`maxWidth`四个属性构成，详见`Constraints`
-     *
-     * 应仅当从未布局过时为`null`，其它任何时候都不得将该变量设置为空.
-     */
-    this._constraints = null;
-    /**
-     * **渲染就绪状态**
-     *
-     * 即子节点是否被挂载在可渲染的树上（即根节点是否连接了AsukaUI）
-     *
-     * 仅当该属性为`true`时，才注册重新布局请求(即调用 `AsukaUI#addRelayoutNode` 或 `AsukaUI#requestRelayout` 方法)
-     */
-    this._attached = false;
-    /**
-     * **框架中心**
-     * @description
-     * 提供处理布局、放置请求，处理基本默认事件，管理活动视图等核心任务。
-     *
-     * 仅当`this._attach`为`true`时，才允许调用其`AsukaUI#addRelayoutNode` 或 `AsukaUI#requestRelayout` 等方法
-     *
-     * 目前由AsukaUI创建节点时设置，不应自行修改)
-     *
-     */
-    this._core = null;
-    /**
-     * **布局尺寸仅由父节点传递的约束决定**
-     * @description
-     * 该节点的Size是否只与父节点传递的Constrains有关，而不与其它任何因素（如子节点的布局）有关。
-     *
-     * 换句话说，当父节点传递的布局约束不变时，本节点的子树无论发生产生何种布局变化，本节点的布局尺寸都不变，
-     * 父节点就不需要重新布局（布局尺寸是父节点在布局时会参考子节点的唯一因素）
-     *
-     * 设置为`true`时，该节点将被标记为重布局边界(RelayoutBoundary)，其及其子节点产生的任何布局脏标记都不会传递给父节点，从而实现优化。
-     * **如果为`true`，请在`performResize`中计算本节点的布局尺寸，不要在`performLayout`里做出任何计算或改变布局尺寸的操作。**
-     *
-     * 该属性由子类自行按需设置。
-     * 除了对象初始化完成前，**请在改变本属性后调用`markSizedByParentChanged`，**保证布局结果得到正确更新。
-     */
-    this.sizedByParent = false;
   }
   /**------------------事件处理------------------- */
   /**
@@ -2042,6 +1894,67 @@ class RenderNode extends AsukaNode {
     }
     this.markNeedsLayout(); // 或许将该职责转移到`unmountChild`上
   }
+  // {
+  //   if (ref) splice(this.childNodes, ref, child);
+  //   else this.childNodes.push(child);
+  //   this._setupChild(child)
+  //   return child;
+  // }
+  /**------------------布局相关------------------- */
+  /**
+   * **需要布局(布局脏标记)**
+   *
+   * 框架应保证执行布局操作时，所有非孤立且拥有布局脏标记的节点的`layout`都被调用，并将脏标记清除，并且应迅速(在下一个JS事件循环时)
+   * 若为孤立且拥有脏标记的节点，在转为非孤立状态后应立即请求布局，并在下一个JS事件循环时调用其`layout`，并清除脏标记。
+   *
+   * 框架保证，拥有脏标记的节点在`layout`过程中，其`performLayout`被调用（如果`sizedByParent`为`true`，还保证其`performResize`被调用）。
+   * 通常，所有可能使布局发生变化的操作，都应当做布局脏标记(调用`markNeedsLayout`)
+   */
+  _needsLayout = false;
+  /**
+   * **需要确认最终位置(放置脏标记)**
+   *
+   * 框架应保证执行确认最终位置操作(简称放置操作)时，所有非孤立且拥有放置脏标记的节点的`place`都被调用，并将脏标记清除，并且应迅速(在下一个JS事件循环时)
+   * 若为孤立且拥有脏标记的节点，在转为非孤立状态后应立即请求放置，并在下一个JS事件循环时调用其`place`，并清除脏标记。
+   *
+   * 框架保证，拥有脏标记的节点在`place`过程中，其`position`会得到更新，并根据情况执行`performCommit`操作.
+   *
+   * @see markNeedsPlace 更多有关`放置脏标记`的原理，请参见该方法
+   */
+  _needsPlace = false;
+  /**
+   * **必须执行推送操作(强制更新标记)**
+   *
+   * 框架应保证所有非孤立且拥有强制更新标记的节点的`performCommit`和`onCommit`都被调用，并将该标记清除，并且应迅速(在下一个JS事件循环时，`place`过程中)
+   * 若为孤立且拥有脏标记的节点，在转为非孤立状态后应立即请求放置，并在下一个JS事件循环时的`place`时执行推送操作，并清除脏标记。
+   */
+  _mustCommit = false;
+  /**
+   * **本节点的深度**
+   *
+   * 定义`AsukaUI`的深度为`0`.
+   *
+   * 仅当`_attached`为`true`，即不为孤立节点时有效
+   *
+   * 主要用于在`AsukaUI`执行`layout`和`place`操作时确定先后顺序（深度小的节点先，深度大的节点后），保证不重复计算并正确.
+   *
+   * 在`attach`时更新
+   */
+  _depth = 0;
+  /**
+   * **本节点尺寸**
+   *
+   * 请勿直接修改本属性，而是通过`size`(getter/setter)修改或访问
+   */
+  _size = null;
+  /**
+   * **本节点尺寸是否已改变**
+   *
+   * 用途：
+   * - 在`size`setter中判断并标记为`true`.
+   * - 在`place`方法中用于判断是否需要执行`performCommit`操作，并将其标记为`false`
+   */
+  _sizeChanged = false;
   /**
    * **设置本节点尺寸**
    *
@@ -2077,6 +1990,12 @@ class RenderNode extends AsukaNode {
     return this._size;
   }
   /**
+   * **相对父节点的坐标偏移**
+   *
+   * 请勿直接修改本属性，而是通过`offset`(getter/setter)修改或访问
+   */
+  _offset = null;
+  /**
    * **设置本节点相对父坐标的偏移**
    *
    * 会检查是否发生变化，如果变化了将自动调用`markNeedsPlace`，使位置得到更新，并自动按需调用`performCommit`.
@@ -2103,6 +2022,12 @@ class RenderNode extends AsukaNode {
   get offset() {
     return this._offset;
   }
+  /**
+   * **该节点在当前坐标系的位置**
+   *
+   * 请勿直接修改本属性，而是通过`position`(getter/setter)修改或访问
+   */
+  _position = null;
   /**
    * **获取本节点在当前坐标系的位置**
    *
@@ -2135,6 +2060,90 @@ class RenderNode extends AsukaNode {
       this._position = Coordinate.copy(position);
     }
   }
+  /**
+   * **局部重布局边界**
+   * @description
+   * 当子树添加脏标记时，重布局边界节点不会调用`markParentNeedsLayout`将脏标记传递给父节点；
+   * 而是阻止向上传递，（非孤立时）向框架中心请求布局，并将自身加入待布局列表。
+   *
+   * 无论是否孤立，若`_relayoutBoundary`不为`null`，就应保证该属性指向的节点与本节点连通。
+   *
+   * 局部重布局边界需要保证其子树的布局发生变化时(不考虑挂载等非布局操作)，不会影响其父节点的布局结果，即父节点不需要重新布局。
+   *
+   * 具体而言，满足以下四种条件其一的节点，可作为为局部重布局边界。
+   * 1. `sizedByParent == true` 由于布局过程从子节点传递到父节点的信息仅有子节点尺寸，且该节点的尺寸仅由父节点提供的布局约束有关，
+   * 因此，该节点的子树的布局发生变化时，父节点的布局结果不变，可作为为局部重布局边界。
+   * 2. `parentUsesSize == false` 父节点布局过程不计算和使用子节点尺寸，也就是子节点子树发生的任何布局变化即使令该子节点的尺寸发生变化，
+   * 也不影响父节点的布局结果。
+   * 3. `constraints.isTight` 父节点传递的布局约束为严格约束（最大和最小宽度相等且最大和最小高度相等，符合该约束的尺寸仅有一种），
+   * 4. `!isRenderNode(this.parentNode)` 父节点不是可渲染节点，故布局只能从本节点开始。
+   *
+   */
+  _relayoutBoundary = null;
+  /**
+   * **为子节点提供新的坐标系**
+   * @description
+   * 若为`false`, 子节点的`position`将等于其`offset`加上本节点的`position`；
+   * 若为`true`，子节点的`position`将直接等于其`offset`（相当于本节点为子节点的坐标系原点）
+   *
+   * 用于如`ViewContainer`这样的为子节点提供了新的坐标参考系的组件中
+   *
+   * **请务必在对象初始化完成前确定，后续不应再修改**，若为`true`，
+   *
+   * 请考虑在`performLayout`中调用子节点的`layout`时传递为子节点提供的控件工厂(可能是`hmUI.widget.GROUP`或`VIEW_CONTAINER`之类的实例).
+   */
+  isNewCoordOrigin = false;
+  /**
+   * **上一次`layout`时获得的控件工厂**
+   * @description
+   * 所谓控件工厂，是指`hmUI`、`GROUP`实例或`VIEW_CONTAINER`实例等，拥有符合接口要求的`createWidget`和`deleteWidget`的方法的对象。
+   * 请注意区分`hmUI`中的其他方法，控件工厂不一定都实现了这些方法。
+   *
+   * 在下一次`layout`或取消挂载或转为孤立树等发生前有效。
+   */
+  _widgetFactory = null;
+  /**
+   * **上一次`layout()`时获得的布局约束**
+   * @description 布局约束，是指该节点的尺寸的允许范围。
+   * 布局约束由`minHeight`，`maxHeight`，`minWidth`和`maxWidth`四个属性构成，详见`Constraints`
+   *
+   * 应仅当从未布局过时为`null`，其它任何时候都不得将该变量设置为空.
+   */
+  _constraints = null;
+  /**
+   * **渲染就绪状态**
+   *
+   * 即子节点是否被挂载在可渲染的树上（即根节点是否连接了AsukaUI）
+   *
+   * 仅当该属性为`true`时，才注册重新布局请求(即调用 `AsukaUI#addRelayoutNode` 或 `AsukaUI#requestRelayout` 方法)
+   */
+  _attached = false;
+  /**
+   * **框架中心**
+   * @description
+   * 提供处理布局、放置请求，处理基本默认事件，管理活动视图等核心任务。
+   *
+   * 仅当`this._attach`为`true`时，才允许调用其`AsukaUI#addRelayoutNode` 或 `AsukaUI#requestRelayout` 等方法
+   *
+   * 目前由AsukaUI创建节点时设置，不应自行修改)
+   *
+   */
+  _core = null;
+  /**
+   * **布局尺寸仅由父节点传递的约束决定**
+   * @description
+   * 该节点的Size是否只与父节点传递的Constrains有关，而不与其它任何因素（如子节点的布局）有关。
+   *
+   * 换句话说，当父节点传递的布局约束不变时，本节点的子树无论发生产生何种布局变化，本节点的布局尺寸都不变，
+   * 父节点就不需要重新布局（布局尺寸是父节点在布局时会参考子节点的唯一因素）
+   *
+   * 设置为`true`时，该节点将被标记为重布局边界(RelayoutBoundary)，其及其子节点产生的任何布局脏标记都不会传递给父节点，从而实现优化。
+   * **如果为`true`，请在`performResize`中计算本节点的布局尺寸，不要在`performLayout`里做出任何计算或改变布局尺寸的操作。**
+   *
+   * 该属性由子类自行按需设置。
+   * 除了对象初始化完成前，**请在改变本属性后调用`markSizedByParentChanged`，**保证布局结果得到正确更新。
+   */
+  sizedByParent = false;
   /**
    * **有条件地更新子树重布局边界**
    * @description
@@ -2344,10 +2353,7 @@ class RenderNodeWithNoChild extends RenderNode {
   }
 }
 class RenderNodeWithSingleChild extends RenderNode {
-  constructor() {
-    super(...arguments);
-    this._child = null;
-  }
+  _child = null;
   set child(child) {
     if (this._child) {
       this.unmountChild(this._child);
@@ -2396,12 +2402,9 @@ class RenderNodeWithSingleChild extends RenderNode {
  * 通过双向链表存储子结构
  */
 class RenderNodeWithMultiChildren extends RenderNode {
-  constructor() {
-    super(...arguments);
-    this._firstChild = null;
-    this._lastChild = null;
-    this._childRenderNodeCount = 0;
-  }
+  _firstChild = null;
+  _lastChild = null;
+  _childRenderNodeCount = 0;
   get firstChild() {
     return this._firstChild;
   }
@@ -2461,10 +2464,7 @@ class RenderNodeWithMultiChildren extends RenderNode {
   }
 }
 class RenderNodeProxy extends RenderNodeWithSingleChild {
-  constructor() {
-    super(...arguments);
-    this.sizedByParent = false;
-  }
+  sizedByParent = false;
   performResize() {}
   performLayout() {
     assert(this._constraints != null);
@@ -2491,6 +2491,20 @@ class RenderNodeProxy extends RenderNodeWithSingleChild {
  * @description
  */
 class AsukaEvent {
+  type;
+  bubbles;
+  /** 触发事件的元素, 默认为调用`depatchEvent()`的元素 */
+  target;
+  /** 正在响应该事件的元素 */
+  currentTarget;
+  /** 该事件是否可取消 */
+  cancelable;
+  /** 该事件是否已被取消继续冒泡传播(当`cancelable`为`true`时有效) */
+  _stop = false;
+  /** 该事件是否已被立即取消继续传播(当`cancelable`为`true`时有效) */
+  _end = false;
+  /** 一个布尔值，表示 `preventDefault()` 方法是否取消了事件的默认行为。 */
+  defaultPrevented = false; // TODO is false should be the default value?
   /**
    * **创建事件对象**
    * @param type 事件类型，不区分大小写
@@ -2500,12 +2514,6 @@ class AsukaEvent {
    */
   constructor(type, opts) {
     this.type = type;
-    /** 该事件是否已被取消继续冒泡传播(当`cancelable`为`true`时有效) */
-    this._stop = false;
-    /** 该事件是否已被立即取消继续传播(当`cancelable`为`true`时有效) */
-    this._end = false;
-    /** 一个布尔值，表示 `preventDefault()` 方法是否取消了事件的默认行为。 */
-    this.defaultPrevented = false; // TODO is false should be the default value?
     this.type = type.toLowerCase();
     this.bubbles = !!(opts && opts.bubbles);
     this.cancelable = !!(opts && opts.cancelable);
@@ -2542,6 +2550,7 @@ class AsukaEvent {
  * 外界访问
  */
 class RenderView extends RenderNodeWithSingleChild {
+  #key;
   constructor({
     core,
     widgetFactory,
@@ -2553,20 +2562,19 @@ class RenderView extends RenderNodeWithSingleChild {
     }
   }) {
     super(NodeType.RENDER_NODE, '#frame');
-    _RenderView_key.set(this, void 0);
     this._widgetFactory = widgetFactory;
     this._depth = 1;
     this._size = Size.copy(size);
     this._offset = Coordinate.copy(offset);
     this._position = Coordinate.copy(offset);
     this._core = core;
-    __classPrivateFieldSet(this, _RenderView_key, key, "f");
+    this.#key = key;
     this._attached = true;
     this._relayoutBoundary = this;
     // this.isNewCoordOrigin = true;
   }
   get key() {
-    return __classPrivateFieldGet(this, _RenderView_key, "f");
+    return this.#key;
   }
   /**
    * @override
@@ -2637,12 +2645,8 @@ class RenderView extends RenderNodeWithSingleChild {
   performResize() {}
   performCommit() {}
 }
-_RenderView_key = new WeakMap();
 class RenderWidget extends RenderNodeWithNoChild {
-  constructor() {
-    super(...arguments);
-    this._displaying = false;
-  }
+  _displaying = false;
   onAttach() {
     this.markMustCommit();
   }
@@ -2666,12 +2670,9 @@ class RenderWidget extends RenderNodeWithNoChild {
  *
  */
 class RenderWidgetFactoryProvider extends RenderNodeWithSingleChild {
-  constructor() {
-    super(...arguments);
-    this._displaying = false;
-    this.sizedByParent = false;
-    this.childWidgetFactory = null;
-  }
+  _displaying = false;
+  sizedByParent = false;
+  childWidgetFactory = null;
   onAttach() {
     this.markMustCommit();
   }
@@ -2713,18 +2714,11 @@ class RenderWidgetFactoryProvider extends RenderNodeWithSingleChild {
   }
 }
 class AsukaUI {
+  viewRecord = {};
+  _activeFrame = null;
+  _nodeFactories = [];
+  static instance = null;
   constructor() {
-    this.viewRecord = {};
-    this._activeFrame = null;
-    this._nodeFactories = [];
-    /** 需要重新布局的起始节点 */
-    this._nodesNeedsLayout = [];
-    /** 需要重新放置的节点 */
-    this._nodesNeedsPlace = [];
-    /** 在布局和放置任务完成后调用的任务 */
-    this._runAfterTasks = [];
-    /** 异步管理器句柄(可能是setTimeout或者Promise之类的) */
-    this._asyncHandler = null;
     assert(AsukaUI.instance === null);
     AsukaUI.instance = this;
   }
@@ -2757,7 +2751,7 @@ class AsukaUI {
             w: mount.getProperty(hmUI.prop.W),
             h: mount.getProperty(hmUI.prop.H)
           };
-        } catch (_a) {
+        } catch {
           reportError('createFrame', Error('Get View size failed'));
         }
       }
@@ -2796,6 +2790,14 @@ class AsukaUI {
   createTextNode(text) {
     return new AsukaTextNode(text);
   }
+  /** 需要重新布局的起始节点 */
+  _nodesNeedsLayout = [];
+  /** 需要重新放置的节点 */
+  _nodesNeedsPlace = [];
+  /** 在布局和放置任务完成后调用的任务 */
+  _runAfterTasks = [];
+  /** 异步管理器句柄(可能是setTimeout或者Promise之类的) */
+  _asyncHandler = null;
   /**
    * **添加需要重新布局的节点**
    */
@@ -2893,17 +2895,18 @@ class AsukaUI {
     this._runAfterTasks = [];
   }
 }
-AsukaUI.instance = null;
 
 class PreferSizeManager {
+  _node;
+  _preferredSize = null;
   constructor(_node) {
     this._node = _node;
-    this._preferredSize = null;
-    this._defaultSize = null;
-    this._mixedSize = null;
   }
+  _defaultSize = null;
   setDefaultSize(size) {
-    this._defaultSize = size == null ? null : Object.assign({}, size);
+    this._defaultSize = size == null ? null : {
+      ...size
+    };
     let mixedSize = this._getMixedSize();
     if (!Size.equals(mixedSize, this._mixedSize)) {
       this._node.markNeedsLayout();
@@ -2913,11 +2916,11 @@ class PreferSizeManager {
   getDefaultSize() {
     return this._defaultSize;
   }
+  _mixedSize = null;
   _getMixedSize() {
-    var _a, _b, _c, _d, _e, _f, _g, _h;
     return {
-      w: (_d = (_b = (_a = this._preferredSize) === null || _a === void 0 ? void 0 : _a.w) !== null && _b !== void 0 ? _b : (_c = this._defaultSize) === null || _c === void 0 ? void 0 : _c.w) !== null && _d !== void 0 ? _d : Number.POSITIVE_INFINITY,
-      h: (_h = (_f = (_e = this._preferredSize) === null || _e === void 0 ? void 0 : _e.h) !== null && _f !== void 0 ? _f : (_g = this._defaultSize) === null || _g === void 0 ? void 0 : _g.h) !== null && _h !== void 0 ? _h : Number.POSITIVE_INFINITY
+      w: this._preferredSize?.w ?? this._defaultSize?.w ?? Number.POSITIVE_INFINITY,
+      h: this._preferredSize?.h ?? this._defaultSize?.h ?? Number.POSITIVE_INFINITY
     };
   }
   /**
@@ -2986,13 +2989,12 @@ const defaultProps$a = {
   line_width: 5
 };
 class NativeWidgetArc extends RenderWidget {
-  constructor() {
-    super(...arguments);
-    this._widget = null;
-    this._preferredSizeManager = new PreferSizeManager(this);
-    this._props = Object.assign({}, defaultProps$a);
-    this.sizedByParent = false;
-  }
+  _widget = null;
+  _preferredSizeManager = new PreferSizeManager(this);
+  _props = {
+    ...defaultProps$a
+  };
+  sizedByParent = false;
   onCommit({
     size,
     position,
@@ -3001,10 +3003,18 @@ class NativeWidgetArc extends RenderWidget {
   }) {
     if (initial) {
       assert(this._widget === null);
-      this._widget = widgetFactory.createWidget(hmUI.widget.ARC, Object.assign(Object.assign(Object.assign({}, this._props), position), size));
+      this._widget = widgetFactory.createWidget(hmUI.widget.ARC, {
+        ...this._props,
+        ...position,
+        ...size
+      });
     } else {
       assert(this._widget != null);
-      this._widget.setProperty(hmUI.prop.MORE, Object.assign(Object.assign(Object.assign({}, this._props), position), size));
+      this._widget.setProperty(hmUI.prop.MORE, {
+        ...this._props,
+        ...position,
+        ...size
+      });
     }
   }
   onDestroy(widgetFactory) {
@@ -3061,12 +3071,11 @@ const defaultProps$9 = {
   text_size: px$2(36)
 };
 class NativeWidgetButton extends RenderWidget {
-  constructor() {
-    super(...arguments);
-    this._widget = null;
-    this._preferredSizeManager = new PreferSizeManager(this).setDefaultSize(Size.infinite);
-    this._props = Object.assign({}, defaultProps$9);
-  }
+  _widget = null;
+  _preferredSizeManager = new PreferSizeManager(this).setDefaultSize(Size.infinite);
+  _props = {
+    ...defaultProps$9
+  };
   onCommit({
     size,
     position,
@@ -3075,7 +3084,10 @@ class NativeWidgetButton extends RenderWidget {
   }) {
     if (initial) {
       assert(this._widget === null);
-      this._widget = widgetFactory.createWidget(hmUI.widget.BUTTON, Object.assign(Object.assign(Object.assign(Object.assign({}, this._props), position), size), {
+      this._widget = widgetFactory.createWidget(hmUI.widget.BUTTON, {
+        ...this._props,
+        ...position,
+        ...size,
         click_func: () => {
           this.dispatchEvent(new AsukaEvent('click', {
             bubbles: true,
@@ -3088,10 +3100,14 @@ class NativeWidgetButton extends RenderWidget {
             cancelable: true
           }));
         }
-      }));
+      });
     } else {
       assert(this._widget != null);
-      this._widget.setProperty(hmUI.prop.MORE, Object.assign(Object.assign(Object.assign({}, this._props), position), size));
+      this._widget.setProperty(hmUI.prop.MORE, {
+        ...this._props,
+        ...position,
+        ...size
+      });
     }
   }
   onDestroy(widgetFactory) {
@@ -3127,9 +3143,11 @@ class NativeWidgetButton extends RenderWidget {
         {
           if (this._props.text !== value) {
             this._props.text = value;
-            if (this._widget) this._widget.setProperty(hmUI.prop.MORE, Object.assign(Object.assign(Object.assign({}, this.size), this.position), {
+            if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
+              ...this.size,
+              ...this.position,
               text: value
-            }));
+            });
           }
         }
         break;
@@ -3137,9 +3155,11 @@ class NativeWidgetButton extends RenderWidget {
         {
           if (this._props.color !== value) {
             this._props.color = value;
-            if (this._widget) this._widget.setProperty(hmUI.prop.MORE, Object.assign(Object.assign(Object.assign({}, this.size), this.position), {
+            if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
+              ...this.size,
+              ...this.position,
               color: value
-            }));
+            });
           }
         }
         break;
@@ -3149,9 +3169,11 @@ class NativeWidgetButton extends RenderWidget {
         {
           if (this._props.text_size !== value) {
             this._props.text_size = value;
-            if (this._widget) this._widget.setProperty(hmUI.prop.MORE, Object.assign(Object.assign(Object.assign({}, this.size), this.position), {
+            if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
+              ...this.size,
+              ...this.position,
               text_size: value
-            }));
+            });
           }
         }
         break;
@@ -3161,9 +3183,11 @@ class NativeWidgetButton extends RenderWidget {
         {
           if (this._props.normal_color !== value) {
             this._props.normal_color = value;
-            if (this._widget) this._widget.setProperty(hmUI.prop.MORE, Object.assign(Object.assign(Object.assign({}, this.size), this.position), {
+            if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
+              ...this.size,
+              ...this.position,
               normal_color: value
-            }));
+            });
           }
         }
         break;
@@ -3173,9 +3197,11 @@ class NativeWidgetButton extends RenderWidget {
         {
           if (this._props.press_color !== value) {
             this._props.press_color = value;
-            if (this._widget) this._widget.setProperty(hmUI.prop.MORE, Object.assign(Object.assign(Object.assign({}, this.size), this.position), {
+            if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
+              ...this.size,
+              ...this.position,
               press_color: value
-            }));
+            });
           }
         }
         break;
@@ -3184,9 +3210,11 @@ class NativeWidgetButton extends RenderWidget {
         {
           if (this._props.radius !== value) {
             this._props.radius = value;
-            if (this._widget) this._widget.setProperty(hmUI.prop.MORE, Object.assign(Object.assign(Object.assign({}, this.size), this.position), {
+            if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
+              ...this.size,
+              ...this.position,
               radius: value
-            }));
+            });
           }
         }
         break;
@@ -3197,9 +3225,11 @@ class NativeWidgetButton extends RenderWidget {
           if (this._props.normal_src !== value) {
             this._props.normal_src = value;
             this._updateDefaultSize();
-            if (this._widget) this._widget.setProperty(hmUI.prop.MORE, Object.assign(Object.assign(Object.assign({}, this.size), this.position), {
+            if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
+              ...this.size,
+              ...this.position,
               normal_src: value
-            }));
+            });
           }
         }
         break;
@@ -3209,9 +3239,11 @@ class NativeWidgetButton extends RenderWidget {
         {
           if (this._props.press_src !== value) {
             this._props.press_src = value;
-            if (this._widget) this._widget.setProperty(hmUI.prop.MORE, Object.assign(Object.assign(Object.assign({}, this.size), this.position), {
+            if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
+              ...this.size,
+              ...this.position,
               press_src: value
-            }));
+            });
           }
         }
         break;
@@ -3221,13 +3253,12 @@ class NativeWidgetButton extends RenderWidget {
 
 const defaultProps$8 = {};
 class NativeWidgetCanvas extends RenderWidget {
-  constructor() {
-    super(...arguments);
-    this._widget = null;
-    // _preferredSizeManager = new PreferSizeManager(this);
-    this._props = Object.assign({}, defaultProps$8);
-    this.sizedByParent = true;
-  }
+  _widget = null;
+  // _preferredSizeManager = new PreferSizeManager(this);
+  _props = {
+    ...defaultProps$8
+  };
+  sizedByParent = true;
   onCommit({
     size,
     position,
@@ -3236,10 +3267,18 @@ class NativeWidgetCanvas extends RenderWidget {
   }) {
     if (initial) {
       assert(this._widget === null);
-      this._widget = widgetFactory.createWidget(hmUI.widget.CANVAS, Object.assign(Object.assign(Object.assign({}, this._props), position), size));
+      this._widget = widgetFactory.createWidget(hmUI.widget.CANVAS, {
+        ...this._props,
+        ...position,
+        ...size
+      });
     } else {
       assert(this._widget != null);
-      this._widget.setProperty(hmUI.prop.MORE, Object.assign(Object.assign(Object.assign({}, this._props), position), size));
+      this._widget.setProperty(hmUI.prop.MORE, {
+        ...this._props,
+        ...position,
+        ...size
+      });
     }
   }
   onDestroy(widgetFactory) {
@@ -3263,13 +3302,12 @@ const defaultProps$7 = {
   color: 0xff8888
 };
 class NativeWidgetCircle extends RenderWidget {
-  constructor() {
-    super(...arguments);
-    this._widget = null;
-    this._preferredSizeManager = new PreferSizeManager(this);
-    this._props = Object.assign({}, defaultProps$7);
-    this.sizedByParent = false;
-  }
+  _widget = null;
+  _preferredSizeManager = new PreferSizeManager(this);
+  _props = {
+    ...defaultProps$7
+  };
+  sizedByParent = false;
   _fromSizeAndPositionToProp(size, position) {
     let radius = min(size.h, size.w) / 2;
     return {
@@ -3286,10 +3324,16 @@ class NativeWidgetCircle extends RenderWidget {
   }) {
     if (initial) {
       assert(this._widget === null);
-      this._widget = widgetFactory.createWidget(hmUI.widget.FILL_RECT, Object.assign(Object.assign({}, this._props), this._fromSizeAndPositionToProp(size, position)));
+      this._widget = widgetFactory.createWidget(hmUI.widget.FILL_RECT, {
+        ...this._props,
+        ...this._fromSizeAndPositionToProp(size, position)
+      });
     } else {
       assert(this._widget != null);
-      this._widget.setProperty(hmUI.prop.MORE, Object.assign(Object.assign({}, this._props), this._fromSizeAndPositionToProp(size, position)));
+      this._widget.setProperty(hmUI.prop.MORE, {
+        ...this._props,
+        ...this._fromSizeAndPositionToProp(size, position)
+      });
     }
   }
   onDestroy(widgetFactory) {
@@ -3326,7 +3370,11 @@ class NativeWidgetCircle extends RenderWidget {
       case 'alpha':
         {
           this._props.alpha = value;
-          if (this._widget) this._widget.setProperty(hmUI.prop.MORE, Object.assign(Object.assign(Object.assign({}, this.size), this.position), this._props));
+          if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
+            ...this.size,
+            ...this.position,
+            ...this._props
+          });
         }
         break;
     }
@@ -3337,13 +3385,12 @@ const defaultProps$6 = {
   color: 0xcc0000
 };
 class NativeWidgetFillRect extends RenderWidget {
-  constructor() {
-    super(...arguments);
-    this._widget = null;
-    this._preferredSizeManager = new PreferSizeManager(this);
-    this._props = Object.assign({}, defaultProps$6);
-    this.sizedByParent = false;
-  }
+  _widget = null;
+  _preferredSizeManager = new PreferSizeManager(this);
+  _props = {
+    ...defaultProps$6
+  };
+  sizedByParent = false;
   onCommit({
     size,
     position,
@@ -3352,10 +3399,18 @@ class NativeWidgetFillRect extends RenderWidget {
   }) {
     if (initial) {
       assert(this._widget === null);
-      this._widget = widgetFactory.createWidget(hmUI.widget.FILL_RECT, Object.assign(Object.assign(Object.assign({}, this._props), position), size));
+      this._widget = widgetFactory.createWidget(hmUI.widget.FILL_RECT, {
+        ...this._props,
+        ...position,
+        ...size
+      });
     } else {
       assert(this._widget != null);
-      this._widget.setProperty(hmUI.prop.MORE, Object.assign(Object.assign(Object.assign({}, this._props), position), size));
+      this._widget.setProperty(hmUI.prop.MORE, {
+        ...this._props,
+        ...position,
+        ...size
+      });
     }
   }
   onDestroy(widgetFactory) {
@@ -3378,7 +3433,11 @@ class NativeWidgetFillRect extends RenderWidget {
       case 'radius':
         {
           this._props.radius = value;
-          if (this._widget) this._widget.setProperty(hmUI.prop.MORE, Object.assign(Object.assign(Object.assign({}, this.size), this.position), this._props));
+          if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
+            ...this.size,
+            ...this.position,
+            ...this._props
+          });
         }
         break;
       case 'color':
@@ -3390,7 +3449,11 @@ class NativeWidgetFillRect extends RenderWidget {
       case 'alpha':
         {
           this._props.alpha = value;
-          if (this._widget) this._widget.setProperty(hmUI.prop.MORE, Object.assign(Object.assign(Object.assign({}, this.size), this.position), this._props));
+          if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
+            ...this.size,
+            ...this.position,
+            ...this._props
+          });
         }
         break;
     }
@@ -3399,13 +3462,12 @@ class NativeWidgetFillRect extends RenderWidget {
 
 const defaultProps$5 = {};
 class NativeWidgetImage extends RenderWidget {
-  constructor() {
-    super(...arguments);
-    this._widget = null;
-    this._props = Object.assign({}, defaultProps$5);
-    this._preferredSizeManager = new PreferSizeManager(this);
-    this.sizedByParent = false;
-  }
+  _widget = null;
+  _props = {
+    ...defaultProps$5
+  };
+  _preferredSizeManager = new PreferSizeManager(this);
+  sizedByParent = false;
   onCommit({
     size,
     position,
@@ -3414,10 +3476,18 @@ class NativeWidgetImage extends RenderWidget {
   }) {
     if (initial) {
       assert(this._widget === null);
-      this._widget = widgetFactory.createWidget(hmUI.widget.FILL_RECT, Object.assign(Object.assign(Object.assign({}, this._props), position), size));
+      this._widget = widgetFactory.createWidget(hmUI.widget.FILL_RECT, {
+        ...this._props,
+        ...position,
+        ...size
+      });
     } else {
       assert(this._widget != null);
-      this._widget.setProperty(hmUI.prop.MORE, Object.assign(Object.assign(Object.assign({}, this._props), position), size));
+      this._widget.setProperty(hmUI.prop.MORE, {
+        ...this._props,
+        ...position,
+        ...size
+      });
     }
   }
   onDestroy(widgetFactory) {
@@ -3509,7 +3579,9 @@ class NativeWidgetImage extends RenderWidget {
         {
           if (value !== this._props.auto_scale) {
             this._props.auto_scale = value;
-            if (this._widget) this._widget.setProperty(hmUI.prop.MORE, Object.assign({}, this._props));
+            if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
+              ...this._props
+            });
           }
         }
         break;
@@ -3517,7 +3589,9 @@ class NativeWidgetImage extends RenderWidget {
         {
           if (value !== this._props.auto_scale_obj_fit) {
             this._props.auto_scale_obj_fit = value;
-            if (this._widget) this._widget.setProperty(hmUI.prop.MORE, Object.assign({}, this._props));
+            if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
+              ...this._props
+            });
           }
         }
         break;
@@ -3535,13 +3609,12 @@ class NativeWidgetImage extends RenderWidget {
 
 const defaultProps$4 = {};
 class NativeWidgetPolyline extends RenderWidget {
-  constructor() {
-    super(...arguments);
-    this._widget = null;
-    this._preferredSizeManager = new PreferSizeManager(this);
-    this._props = Object.assign({}, defaultProps$4);
-    this.sizedByParent = false;
-  }
+  _widget = null;
+  _preferredSizeManager = new PreferSizeManager(this);
+  _props = {
+    ...defaultProps$4
+  };
+  sizedByParent = false;
   onCommit({
     size,
     position,
@@ -3550,10 +3623,18 @@ class NativeWidgetPolyline extends RenderWidget {
   }) {
     if (initial) {
       assert(this._widget === null);
-      this._widget = widgetFactory.createWidget(hmUI.widget.GRADKIENT_POLYLINE, Object.assign(Object.assign(Object.assign({}, this._props), position), size));
+      this._widget = widgetFactory.createWidget(hmUI.widget.GRADKIENT_POLYLINE, {
+        ...this._props,
+        ...position,
+        ...size
+      });
     } else {
       assert(this._widget != null);
-      this._widget.setProperty(hmUI.prop.MORE, Object.assign(Object.assign(Object.assign({}, this._props), position), size));
+      this._widget.setProperty(hmUI.prop.MORE, {
+        ...this._props,
+        ...position,
+        ...size
+      });
     }
   }
   onDestroy(widgetFactory) {
@@ -3595,13 +3676,12 @@ const defaultProps$3 = {
 };
 // Not support bg_x bg_y bg_w bg_h, please use container or stack etc to add background decoration.
 class NativeWidgetQRCode extends RenderWidget {
-  constructor() {
-    super(...arguments);
-    this._widget = null;
-    this._preferredSizeManager = new PreferSizeManager(this);
-    this._props = Object.assign({}, defaultProps$3);
-    this.sizedByParent = false;
-  }
+  _widget = null;
+  _preferredSizeManager = new PreferSizeManager(this);
+  _props = {
+    ...defaultProps$3
+  };
+  sizedByParent = false;
   onCommit({
     size,
     position,
@@ -3610,10 +3690,18 @@ class NativeWidgetQRCode extends RenderWidget {
   }) {
     if (initial) {
       assert(this._widget === null);
-      this._widget = widgetFactory.createWidget(hmUI.widget.QRCODE, Object.assign(Object.assign(Object.assign({}, this._props), position), size));
+      this._widget = widgetFactory.createWidget(hmUI.widget.QRCODE, {
+        ...this._props,
+        ...position,
+        ...size
+      });
     } else {
       assert(this._widget != null);
-      this._widget.setProperty(hmUI.prop.MORE, Object.assign(Object.assign(Object.assign({}, this._props), position), size));
+      this._widget.setProperty(hmUI.prop.MORE, {
+        ...this._props,
+        ...position,
+        ...size
+      });
     }
   }
   onDestroy(widgetFactory) {
@@ -3635,9 +3723,11 @@ class NativeWidgetQRCode extends RenderWidget {
       case 'content':
         {
           this._props.content = value;
-          if (this._widget) this._widget.setProperty(hmUI.prop.MORE, Object.assign(Object.assign(Object.assign({}, this.position), this.size), {
+          if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
+            ...this.position,
+            ...this.size,
             content: value
-          }));
+          });
         }
         break;
     }
@@ -3648,14 +3738,13 @@ const defaultProps$2 = {
   color: 0xcc0000
 };
 class NativeWidgetRadioGroup extends RenderWidgetFactoryProvider {
-  constructor() {
-    super(...arguments);
-    this._widget = null;
-    this._props = Object.assign({}, defaultProps$2);
-    this._defaultChecked = 0;
-    this._registeredTask = null;
-    this._stateButtonWidget = [];
-  }
+  _widget = null;
+  _props = {
+    ...defaultProps$2
+  };
+  _defaultChecked = 0;
+  _registeredTask = null;
+  _stateButtonWidget = [];
   _registerAfterAsyncTask() {
     assert(this._attached);
     assert(this._core != null);
@@ -3701,11 +3790,19 @@ class NativeWidgetRadioGroup extends RenderWidgetFactoryProvider {
     assert(this._props.unselect_src != null);
     if (initial) {
       assert(this._widget === null);
-      this._widget = widgetFactory.createWidget(hmUI.widget.FILL_RECT, Object.assign(Object.assign(Object.assign({}, this._props), position), size));
+      this._widget = widgetFactory.createWidget(hmUI.widget.FILL_RECT, {
+        ...this._props,
+        ...position,
+        ...size
+      });
       this._initChildWidgetFactory();
     } else {
       assert(this._widget != null);
-      this._widget.setProperty(hmUI.prop.MORE, Object.assign(Object.assign(Object.assign({}, this._props), position), size));
+      this._widget.setProperty(hmUI.prop.MORE, {
+        ...this._props,
+        ...position,
+        ...size
+      });
     }
   }
   onDestroy(widgetFactory) {
@@ -3717,13 +3814,21 @@ class NativeWidgetRadioGroup extends RenderWidgetFactoryProvider {
       case 'select_src':
         {
           this._props.select_src = value;
-          if (this._widget) this._widget.setProperty(hmUI.prop.MORE, Object.assign(Object.assign(Object.assign({}, this.size), this.position), this._props));
+          if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
+            ...this.size,
+            ...this.position,
+            ...this._props
+          });
         }
         break;
       case 'unselect_src':
         {
           this._props.unselect_src = value;
-          if (this._widget) this._widget.setProperty(hmUI.prop.MORE, Object.assign(Object.assign(Object.assign({}, this.size), this.position), this._props));
+          if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
+            ...this.size,
+            ...this.position,
+            ...this._props
+          });
         }
         break;
     }
@@ -3734,13 +3839,12 @@ const defaultProps$1 = {
   color: 0xcc4400
 };
 class NativeWidgetStrokeRect extends RenderWidget {
-  constructor() {
-    super(...arguments);
-    this._widget = null;
-    this._preferredSizeManager = new PreferSizeManager(this);
-    this._props = Object.assign({}, defaultProps$1);
-    this.sizedByParent = false;
-  }
+  _widget = null;
+  _preferredSizeManager = new PreferSizeManager(this);
+  _props = {
+    ...defaultProps$1
+  };
+  sizedByParent = false;
   onCommit({
     size,
     position,
@@ -3749,10 +3853,18 @@ class NativeWidgetStrokeRect extends RenderWidget {
   }) {
     if (initial) {
       assert(this._widget === null);
-      this._widget = widgetFactory.createWidget(hmUI.widget.STROKE_RECT, Object.assign(Object.assign(Object.assign({}, this._props), position), size));
+      this._widget = widgetFactory.createWidget(hmUI.widget.STROKE_RECT, {
+        ...this._props,
+        ...position,
+        ...size
+      });
     } else {
       assert(this._widget != null);
-      this._widget.setProperty(hmUI.prop.MORE, Object.assign(Object.assign(Object.assign({}, this._props), position), size));
+      this._widget.setProperty(hmUI.prop.MORE, {
+        ...this._props,
+        ...position,
+        ...size
+      });
     }
   }
   onDestroy(widgetFactory) {
@@ -3775,7 +3887,11 @@ class NativeWidgetStrokeRect extends RenderWidget {
       case 'radius':
         {
           this._props.radius = value;
-          if (this._widget) this._widget.setProperty(hmUI.prop.MORE, Object.assign(Object.assign(Object.assign({}, this.size), this.position), this._props));
+          if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
+            ...this.size,
+            ...this.position,
+            ...this._props
+          });
         }
         break;
       case 'color':
@@ -3787,7 +3903,11 @@ class NativeWidgetStrokeRect extends RenderWidget {
       case 'angle':
         {
           this._props.angle = value;
-          if (this._widget) this._widget.setProperty(hmUI.prop.MORE, Object.assign(Object.assign(Object.assign({}, this.size), this.position), this._props));
+          if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
+            ...this.size,
+            ...this.position,
+            ...this._props
+          });
         }
         break;
       case 'lw':
@@ -3809,12 +3929,11 @@ const defaultProps = {
   align_v: hmUI.align.CENTER_V
 };
 class NativeWidgetText extends RenderWidget {
-  constructor() {
-    super(...arguments);
-    this._widget = null;
-    this._props = Object.assign({}, defaultProps);
-    this.sizedByParent = false;
-  }
+  _widget = null;
+  _props = {
+    ...defaultProps
+  };
+  sizedByParent = false;
   onCommit({
     size,
     position,
@@ -3823,10 +3942,18 @@ class NativeWidgetText extends RenderWidget {
   }) {
     if (initial) {
       assert(this._widget === null);
-      this._widget = widgetFactory.createWidget(hmUI.widget.TEXT, Object.assign(Object.assign(Object.assign({}, this._props), position), size));
+      this._widget = widgetFactory.createWidget(hmUI.widget.TEXT, {
+        ...this._props,
+        ...position,
+        ...size
+      });
     } else {
       assert(this._widget != null);
-      this._widget.setProperty(hmUI.prop.MORE, Object.assign(Object.assign(Object.assign({}, this._props), position), size));
+      this._widget.setProperty(hmUI.prop.MORE, {
+        ...this._props,
+        ...position,
+        ...size
+      });
     }
   }
   onDestroy(widgetFactory) {
@@ -3950,11 +4077,8 @@ const NativeBindingsFactory = {
 };
 
 class LayoutWidgetAlign extends RenderNodeWithSingleChild {
-  constructor() {
-    super(...arguments);
-    this.sizedByParent = true;
-    this._align = Alignment.center;
-  }
+  sizedByParent = true;
+  _align = Alignment.center;
   performResize() {
     assert(this._constraints != null);
     this.size = this._constraints.biggest;
@@ -4009,10 +4133,7 @@ class LayoutWidgetAlign extends RenderNodeWithSingleChild {
 }
 
 class LayoutWidgetCenter extends RenderNodeWithSingleChild {
-  constructor() {
-    super(...arguments);
-    this.sizedByParent = true;
-  }
+  sizedByParent = true;
   performResize() {
     assert(this._constraints != null);
     this.size = this._constraints.biggest;
@@ -4038,18 +4159,15 @@ class LayoutWidgetCenter extends RenderNodeWithSingleChild {
 }
 
 class LayoutWidgetFlex extends RenderNodeWithMultiChildren {
-  constructor() {
-    super(...arguments);
-    this._direction = Axis.vertical;
-    this._mainAxisAlignment = MainAxisAlignment.start;
-    this._mainAxisSize = MainAxisSize.max;
-    this._crossAxisAlignment = CrossAxisAlignment.center;
-    this._horizonDirection = HorizontalDirection.ltr;
-    this._verticalDirection = VerticalDirection.down;
-    this._textBaseline = null; // not support now
-    this._overflow = 0;
-    this.sizedByParent = false;
-  }
+  _direction = Axis.vertical;
+  _mainAxisAlignment = MainAxisAlignment.start;
+  _mainAxisSize = MainAxisSize.max;
+  _crossAxisAlignment = CrossAxisAlignment.center;
+  _horizonDirection = HorizontalDirection.ltr;
+  _verticalDirection = VerticalDirection.down;
+  _textBaseline = null; // not support now
+  _overflow = 0;
+  sizedByParent = false;
   setProperty(key, value) {
     switch (key) {
       case 'd':
@@ -4302,7 +4420,6 @@ class LayoutWidgetFlex extends RenderNodeWithMultiChildren {
     };
   }
   performLayout() {
-    var _a;
     assert(this._widgetFactory != null);
     assert(this._constraints != null);
     const constraints = this._constraints;
@@ -4340,7 +4457,7 @@ class LayoutWidgetFlex extends RenderNodeWithMultiChildren {
     // (true). The _startIsTopLeft will return null if there's only one child
     // and the relevant direction is null, in which case we arbitrarily decide
     // to flip, but that doesn't have any detectable effect.
-    const flipMainAxis = !((_a = this._startIsTopLeft(this._direction)) !== null && _a !== void 0 ? _a : true);
+    const flipMainAxis = !(this._startIsTopLeft(this._direction) ?? true);
     switch (this._mainAxisAlignment) {
       case MainAxisAlignment.start:
         leadingSpace = 0.0;
@@ -4428,11 +4545,8 @@ class LayoutWidgetFlex extends RenderNodeWithMultiChildren {
   performCommit() {}
 }
 class LayoutWidgetFlexible extends RenderNodeProxy {
-  constructor() {
-    super(...arguments);
-    this._fit = FlexFit.loose;
-    this._flex = 1;
-  }
+  _fit = FlexFit.loose;
+  _flex = 1;
   onMount() {
     assert(() => {
       if (!(this.parentNode instanceof LayoutWidgetFlex)) {
@@ -4464,24 +4578,15 @@ class LayoutWidgetFlexible extends RenderNodeProxy {
   }
 }
 class LayoutWidgetExpanded extends LayoutWidgetFlexible {
-  constructor() {
-    super(...arguments);
-    this._fit = FlexFit.tight;
-  }
+  _fit = FlexFit.tight;
 }
 
 class LayoutWidgetColumn extends LayoutWidgetFlex {
-  constructor() {
-    super(...arguments);
-    this._direction = Axis.vertical;
-  }
+  _direction = Axis.vertical;
 }
 
 class LayoutWidgetHStack extends RenderNodeWithMultiChildren {
-  constructor() {
-    super(...arguments);
-    this.sizedByParent = true;
-  }
+  sizedByParent = true;
   performResize() {
     assert(this._constraints != null);
     this.size = this._constraints.biggest;
@@ -4516,11 +4621,8 @@ class LayoutWidgetHStack extends RenderNodeWithMultiChildren {
 }
 
 class LayoutWidgetPadding extends RenderNodeWithSingleChild {
-  constructor() {
-    super(...arguments);
-    this.sizedByParent = false;
-    this._padding = EdgeInsets.zero;
-  }
+  sizedByParent = false;
+  _padding = EdgeInsets.zero;
   performResize() {}
   performLayout() {
     assert(this._constraints != null);
@@ -4535,9 +4637,8 @@ class LayoutWidgetPadding extends RenderNodeWithSingleChild {
       assert(child.size != null);
       let size = this._padding.getOutterSize(child.size);
       assert(() => {
-        var _a;
         if (!this._constraints.testSize(size)) {
-          throw new Error(`Padding out of bounds, size=${JSON.stringify(size)} constraints=${(_a = this._constraints) === null || _a === void 0 ? void 0 : _a.toString()}`);
+          throw new Error(`Padding out of bounds, size=${JSON.stringify(size)} constraints=${this._constraints?.toString()}`);
         }
         return true;
       });
@@ -4566,24 +4667,17 @@ class LayoutWidgetPadding extends RenderNodeWithSingleChild {
 }
 
 class LayoutWidgetRow extends LayoutWidgetFlex {
-  constructor() {
-    super(...arguments);
-    this._direction = Axis.horizontal;
-  }
+  _direction = Axis.horizontal;
 }
 
 class LayoutWidgetSizedBox extends RenderNodeWithSingleChild {
-  constructor() {
-    super(...arguments);
-    this._width = null;
-    this._height = null;
-  }
+  _width = null;
+  _height = null;
   _generateChildConstraints() {
-    var _a, _b;
     assert(this._constraints != null);
     return Constraints.createTight({
-      w: (_a = this._width) !== null && _a !== void 0 ? _a : Number.POSITIVE_INFINITY,
-      h: (_b = this._height) !== null && _b !== void 0 ? _b : Number.POSITIVE_INFINITY
+      w: this._width ?? Number.POSITIVE_INFINITY,
+      h: this._height ?? Number.POSITIVE_INFINITY
     }).adoptBy(this._constraints);
   }
   performResize() {}
@@ -4640,10 +4734,7 @@ class LayoutWidgetSizedBox extends RenderNodeWithSingleChild {
 }
 
 class LayoutWidgetVStack extends RenderNodeWithMultiChildren {
-  constructor() {
-    super(...arguments);
-    this.sizedByParent = true;
-  }
+  sizedByParent = true;
   performResize() {
     assert(this._constraints != null);
     this.size = this._constraints.biggest;
@@ -4678,11 +4769,8 @@ class LayoutWidgetVStack extends RenderNodeWithMultiChildren {
 }
 
 class LayoutWidgetZStack extends RenderNodeWithMultiChildren {
-  constructor() {
-    super(...arguments);
-    this._align = Alignment.topLeft;
-    this._fit = StackFit.loose;
-  }
+  _align = Alignment.topLeft;
+  _fit = StackFit.loose;
   _computeSize(constraints) {
     let hasNonPositionedChild = false;
     if (this._childRenderNodeCount === 0) {
@@ -4827,15 +4915,12 @@ class LayoutWidgetZStack extends RenderNodeWithMultiChildren {
   }
 }
 class LayoutWidgetPositioned extends RenderNodeProxy {
-  constructor() {
-    super(...arguments);
-    this._left = null;
-    this._right = null;
-    this._top = null;
-    this._bottom = null;
-    this._width = null;
-    this._height = null;
-  }
+  _left = null;
+  _right = null;
+  _top = null;
+  _bottom = null;
+  _width = null;
+  _height = null;
   setProperty(key, value) {
     super.setProperty(key, value);
     switch (key) {
@@ -4974,7 +5059,7 @@ const {
     }
   },
   insertNode(parent, node, anchor) {
-    console.log(`[AsukaUI] insertNode parent=${parent.nodeName} node=${node.nodeName} anchor=${anchor === null || anchor === void 0 ? void 0 : anchor.nodeName}`);
+    console.log(`[AsukaUI] insertNode parent=${parent.nodeName} node=${node.nodeName} anchor=${anchor?.nodeName}`);
     parent.mountChild(node, anchor);
   },
   removeNode(parent, node) {
@@ -5008,6 +5093,7 @@ const {
     return next;
   }
 });
+// export * from '@cuberqaq/asuka-ui';
 // export function createRenderer() {
 //   return _createRenderer({
 //     createElement(type) {
@@ -5062,7 +5148,11 @@ const {
 //   });
 // }
 
-getDeviceInfo();
+const {
+  width,
+  height,
+  screenShape
+} = getDeviceInfo();
 var designWidth = 480;
 
 /**
@@ -5070,7 +5160,7 @@ var designWidth = 480;
  * @param {number} raw 
  */
 function px(raw) {
-  return Math.ceil(raw / designWidth * DEVICE_WIDTH);
+  return Math.ceil(raw / designWidth * width);
 }
 
 // path utils for ZeppOS

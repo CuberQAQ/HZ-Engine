@@ -1,15 +1,13 @@
 import { HZEngineCore } from "../index.js";
-import {
-  Save,
-  CustomSave,
-} from "../storage/decorator.js";
+import { WidgetFactory } from "../platform/index.js";
+import { Save, CustomSave } from "../storage/decorator.js";
 import { Storage } from "../storage/index.js";
-/// <reference path="node_modules/@zeppos/device-types/dist/index.d.ts" />
-import * as hmUI from "@zos/ui";
-import {} from "@zos/ui";
+// / <reference path="node_modules/@zeppos/device-types/dist/index.d.ts" />
+// import * as hmUI from "@zos/ui";
+// import {} from "@zos/ui";
 
-import { getDeviceInfo, SCREEN_SHAPE_SQUARE } from "@zos/device";
-const { width, height, screenShape } = getDeviceInfo();
+// import { getDeviceInfo, SCREEN_SHAPE_SQUARE } from "@zos/device";
+// const { width, height, screenShape } = getDeviceInfo();
 export class UI {
   constructor(public _core: HZEngineCore) {
     this._initUI();
@@ -56,7 +54,7 @@ export class UI {
       let newLayerList = new Map<string, UI.Layer>();
       // create new layer
       for (let key in obj) {
-        let newLayer = new UI.Layer(obj[key][0], obj[key][1]);
+        let newLayer = new UI.Layer(this._core, obj[key][0], obj[key][1]);
         newLayerList.set(key, newLayer);
         this._core.emit("afterAddLayer", newLayer);
       }
@@ -72,7 +70,7 @@ export class UI {
   addLayer(name: string, z_index: number) {
     this._core.emit("beforeAddLayer", name, z_index);
     if (this._layerList.has(name)) throw `Layer ${name} already exist`;
-    let newLayer = new UI.Layer(name, z_index);
+    let newLayer = new UI.Layer(this._core, name, z_index);
     this._layerList.set(name, newLayer);
     this._core.emit("afterAddLayer", newLayer);
   }
@@ -219,6 +217,48 @@ export class UI {
     this._routerMap.set(tag, router);
     return router;
   }
+
+  getScreenSize() {
+    let [width, height] = this._core.platform.getScreenSize();
+    return { width, height };
+  }
+  /**
+   * 根据 BasicUniversalProp 计算屏幕上的位置
+   * @param prop 包含 BasicUniversalProp 的 prop
+   * @param size (可选)图像的尺寸，若不指定，返回的anchor坐标和origin坐标一样
+   * @returns
+   */
+  calcPosition(
+    prop: UI.BasicUniversalProp,
+    size?: UI.Size
+  ): {
+    /** 锚点（算上偏移）的屏幕位置 */
+    anchor: UI.Coordinate;
+    /** 图像左上角的屏幕位置 */
+    origin: UI.Coordinate;
+  } {
+    let { width, height } = this.getScreenSize();
+    // 1. 确定 anchor
+    // 2. 通过 align 确定初始位置
+    // 3. offset
+    // 返回左上角的位置
+    let anchor_coord = {
+      x:
+        (width * ((prop.xalign ?? 0) + 1)) / 2 + // 根据 align 求出 anchor 位置
+        (prop.xoffset ?? 0), // offset
+      y:
+        (height * ((prop.yalign ?? 0) + 1)) / 2 + // 根据 align 求出 anchor 位置
+        (prop.yoffset ?? 0), // offset
+    };
+    let origin_coord = {
+      x: anchor_coord.x - (((prop.xanchor ?? 0) + 1) / 2) * (size?.width ?? 0),
+      y: anchor_coord.y - (((prop.yanchor ?? 0) + 1) / 2) * (size?.height ?? 0),
+    };
+    return {
+      anchor: anchor_coord,
+      origin: origin_coord,
+    };
+  }
 }
 
 export namespace UI {
@@ -288,49 +328,13 @@ export namespace UI {
     yoffset?: number;
   }
 
-  export function getScreenSize(): Size {
-    return {
-      width,
-      height,
-    };
-  }
-
-  /**
-   * 根据 BasicUniversalProp 计算屏幕上的位置
-   * @param prop 包含 BasicUniversalProp 的 prop
-   * @param size (可选)图像的尺寸，若不指定，返回的anchor坐标和origin坐标一样
-   * @returns 
-   */
-  export function calcPosition(
-    prop: BasicUniversalProp,
-    size?: Size
-  ): {
-    /** 锚点（算上偏移）的屏幕位置 */
-    anchor: Coordinate;
-    /** 图像左上角的屏幕位置 */
-    origin: Coordinate;
-  } {
-    // 1. 确定 anchor
-    // 2. 通过 align 确定初始位置
-    // 3. offset
-    // 返回左上角的位置
-    let anchor_coord = {
-      x:
-        (width * ((prop.xalign ?? 0) + 1)) / 2 + // 根据 align 求出 anchor 位置
-        (prop.xoffset ?? 0), // offset
-      y:
-        (height * ((prop.yalign ?? 0) + 1)) / 2 + // 根据 align 求出 anchor 位置
-        (prop.yoffset ?? 0), // offset
-    };
-    let origin_coord = {
-      x: anchor_coord.x - (((prop.xanchor ?? 0) + 1) / 2) * (size?.width ?? 0),
-      y: anchor_coord.y - (((prop.yanchor ?? 0) + 1) / 2) * (size?.height ?? 0),
-    };
-    return {
-      anchor: anchor_coord,
-      origin: origin_coord,
-    };
-  }
+  // export function getScreenSize(): Size {
+  //   let [width, height] =
+  //   return {
+  //     width,
+  //     height,
+  //   };
+  // }
 
   export interface Message {
     who: string;
@@ -372,25 +376,33 @@ export namespace UI {
   export abstract class BgImgView extends View<FgImgViewProp> {}
 
   export class Layer {
-    widgetFactory: Layer.WidgetFactory;
-    constructor(public name: string, public z_index: number) {
-      this.widgetFactory = hmUI.createWidget(
-        (hmUI.widget as any).VIEW_CONTAINER,
-        {
-          scroll_enable: 0,
-          z_index,
-        }
-      ) as unknown as Layer.WidgetFactory;
+    widgetFactory: WidgetFactory;
+    constructor(
+      public _core: HZEngineCore,
+      public name: string,
+      public z_index: number
+    ) {
+      // this.widgetFactory = hmUI.createWidget(
+      //   (hmUI.widget as any).VIEW_CONTAINER,
+      //   {
+      //     scroll_enable: 0,
+      //     z_index,
+      //   }
+      // ) as unknown as Layer.WidgetFactory;
+      this.widgetFactory = _core.platform.createUILayer({
+        z_index,
+      });
     }
     destroy() {
-      hmUI.deleteWidget(this.widgetFactory as any);
+      // hmUI.deleteWidget(this.widgetFactory as any);
+      this._core.platform.deleteUILayer(this.widgetFactory);
     }
   }
   export namespace Layer {
-    export interface WidgetFactory {
-      createWidget(widgetType: number, option: Record<string, any>): any;
-      deleteWidget(widget: any): void;
-    }
+    // export interface WidgetFactory {
+    //   createWidget(widgetType: number, option: Record<string, any>): any;
+    //   deleteWidget(widget: any): void;
+    // }
   }
 
   export class Router {

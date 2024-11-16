@@ -6,11 +6,13 @@ import { Async } from "./async/index.js";
 import { Audio } from "./audio/index.js";
 import { Config } from "./config/index.js";
 import { Debug } from "./debug/index.js";
+import Platform from "./platform/index.js";
 import { Script } from "./script/index.js";
 import { Storage } from "./storage/index.js";
 import { System } from "./system/index.js";
 import { UI } from "./ui/index.js";
 declare class HZEngineCore {
+    platform: Platform;
     private _eventCallbacks;
     storage: Storage;
     async: Async;
@@ -20,7 +22,7 @@ declare class HZEngineCore {
     config: Config;
     audio: Audio;
     debug: Debug;
-    constructor();
+    constructor(platform: Platform);
     loadProject(options: {
         projectPath: string;
         cachePath: string;

@@ -1,4 +1,4 @@
-import { HZEngineCore, Storage, UI } from "../../index.js";
+import { HZEngineCore, UI } from "../../index.js";
 
 export function menu_statement(core: HZEngineCore) {
   // menu statement start

@@ -34,7 +34,7 @@ var __runInitializers = (this && this.__runInitializers) || function (thisArg, i
 };
 import { Save, CustomSave, } from "../../storage/decorator.js";
 import { Animation } from "./animation.js";
-import { Time } from "@zos/sensor";
+// import { Time } from "@zos/sensor";
 let AnimationPlugin = (() => {
     let __nextAnimationId_decorators;
     let __nextAnimationId_initializers = [];
@@ -85,6 +85,7 @@ let AnimationPlugin = (() => {
             _core.loadPlugin("animation", () => this);
             _core.on("anime.cb", this._timerCb.bind(this));
             _core.async.addRepeatTask("anime.cb", [], 0); // 此處周期應考慮加個sync update
+            this._lastCbUtc = this._core.platform.getTime();
         }
         #_nextAnimationId_accessor_storage = __runInitializers(this, __nextAnimationId_initializers, 1);
         get _nextAnimationId() { return this.#_nextAnimationId_accessor_storage; } // self-increment
@@ -92,8 +93,8 @@ let AnimationPlugin = (() => {
         #_animationMap_accessor_storage = (__runInitializers(this, __nextAnimationId_extraInitializers), __runInitializers(this, __animationMap_initializers, {}));
         get _animationMap() { return this.#_animationMap_accessor_storage; }
         set _animationMap(value) { this.#_animationMap_accessor_storage = value; }
-        _timeSensor = (__runInitializers(this, __animationMap_extraInitializers), new Time());
-        _lastCbUtc = this._timeSensor.getTime();
+        // private _timeSensor = new Time();
+        _lastCbUtc = __runInitializers(this, __animationMap_extraInitializers);
         applyAnimation({ profile, targetView, options, }) {
             const id = this._nextAnimationId++;
             let animation = new Animation(profile, {
@@ -111,7 +112,7 @@ let AnimationPlugin = (() => {
             this._linkAnimationCb(animation, id);
             animation.goto(0);
             this._core.on("afterLoadArchive", () => {
-                this._lastCbUtc = this._timeSensor.getTime();
+                this._lastCbUtc = this._core.platform.getTime();
             });
             return id;
         }
@@ -145,7 +146,7 @@ let AnimationPlugin = (() => {
             }
         }
         _timerCb() {
-            let utc = this._timeSensor.getTime();
+            let utc = this._core.platform.getTime();
             let delta_time = (utc - this._lastCbUtc) / 1000;
             this._lastCbUtc = utc;
             // this._core.debug.log(`delta time: ${delta_time}`);

@@ -32,9 +32,9 @@ var __runInitializers = (this && this.__runInitializers) || function (thisArg, i
     }
     return useValue ? value : void 0;
 };
-/// <reference path="./zos_media.d.ts" />
+// / <reference path="./zos_media.d.ts" />
+// import { create, id } from "@zos/media";
 import { CustomSave } from "../storage/decorator.js";
-import { create, id } from "@zos/media";
 let Audio = (() => {
     let __channels_decorators;
     let __channels_initializers = [];
@@ -52,6 +52,7 @@ let Audio = (() => {
                     // clear exist channels
                     for (let key in this._channels) {
                         this._channels[key].stop();
+                        this._channels[key].onRelease();
                     }
                     let res = {};
                     for (let key in serialized) {
@@ -63,7 +64,7 @@ let Audio = (() => {
             if (_metadata) Object.defineProperty(this, Symbol.metadata, { enumerable: true, configurable: true, writable: true, value: _metadata });
         }
         _core;
-        static _hmPlayer = create(id.PLAYER);
+        // static _hmPlayer = create(id.PLAYER);
         constructor(_core) {
             __runInitializers(this, __channels_extraInitializers);
             this._core = _core;
@@ -91,12 +92,26 @@ export { Audio };
         _audio;
         // platform specific
         // universal
+        _audioPlayer;
         constructor(_audio) {
             this._audio = _audio;
-            Audio._hmPlayer.addEventListener(Audio._hmPlayer.event.PREPARE, (res) => this._onPrepared(res));
-            Audio._hmPlayer.addEventListener(Audio._hmPlayer.event.COMPLETE, () => {
+            this._audioPlayer = _audio._core.platform.createAudioPlayer();
+            this._audioPlayer.onPrepared = (success) => {
+                this._onPrepared(success);
+            };
+            this._audioPlayer.onCompleted = () => {
                 this._onCompleted();
-            });
+            };
+            // Audio._hmPlayer.addEventListener(Audio._hmPlayer.event.PREPARE, (res) =>
+            //   this._onPrepared(res)
+            // );
+            // Audio._hmPlayer.addEventListener(Audio._hmPlayer.event.COMPLETE, () => {
+            //   this._onCompleted();
+            // });
+        }
+        onRelease() {
+            this._audioPlayer.release(); // TODO
+            this._audio._core.platform.releaseAudioPlayer(this._audioPlayer);
         }
         mode = Channel.Mode.PlayInOrder;
         status = Channel.Status.Stopped;
@@ -114,7 +129,7 @@ export { Audio };
         pause() {
             if (this.status !== Channel.Status.Playing)
                 return;
-            Audio._hmPlayer.stop();
+            this._audioPlayer.stop();
             this.status = Channel.Status.Stopped;
         }
         /**
@@ -124,7 +139,7 @@ export { Audio };
             if (this.status !== Channel.Status.Playing)
                 return;
             this._audio._core.debug.log("audio channel stop");
-            Audio._hmPlayer.stop();
+            this._audioPlayer.stop();
             this._playbackList = [];
             this.currentInfo = null;
             this._nowIndex = null;
@@ -150,7 +165,7 @@ export { Audio };
         }
         _onPrepared(result) {
             if (result) {
-                let mediaInfo = Audio._hmPlayer.getMediaInfo();
+                let mediaInfo = this._audioPlayer.getMediaInfo();
                 this.currentInfo = {
                     // placeholder
                     artist: mediaInfo.artist ?? "未知",
@@ -158,12 +173,12 @@ export { Audio };
                     duration: mediaInfo.duration,
                 };
                 console.log("=== prepare succeed ===");
-                Audio._hmPlayer.start();
+                this._audioPlayer.start();
             }
             else {
                 console.log("=== prepare fail ===");
                 this.status = Channel.Status.Error;
-                Audio._hmPlayer.release();
+                this._audioPlayer.release();
             }
         }
         _onCompleted() {
@@ -207,10 +222,13 @@ export { Audio };
                     this._nowIndex = 0;
                 // otherwise onCompleted will set _nowIndex to next index
             }
-            Audio._hmPlayer.setSource(Audio._hmPlayer.source.FILE, {
-                file: this._playbackList[this._nowIndex].path,
+            // Audio._hmPlayer.setSource(Audio._hmPlayer.source.FILE, {
+            //   file: this._playbackList[this._nowIndex!].path,
+            // });
+            this._audioPlayer.setSource({
+                path: this._playbackList[this._nowIndex].path,
             });
-            Audio._hmPlayer.prepare();
+            this._audioPlayer.prepare();
             this.status = Channel.Status.Playing;
         }
     }

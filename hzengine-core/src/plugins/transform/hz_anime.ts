@@ -4,13 +4,15 @@ import {
   CustomSave,
 } from "../../storage/decorator.js";
 import { Animation, Profile, Wrapper } from "./animation.js";
-import { Time } from "@zos/sensor";
+// import { Time } from "@zos/sensor";
 
 export class AnimationPlugin {
   constructor(public _core: HZEngineCore) {
     _core.loadPlugin("animation", () => this)
     _core.on("anime.cb", this._timerCb.bind(this));
     _core.async.addRepeatTask("anime.cb", [], 0); // 此處周期應考慮加個sync update
+  
+    this._lastCbUtc = this._core.platform.getTime()
   }
 
   @Save("anime.nid")
@@ -54,9 +56,9 @@ export class AnimationPlugin {
     AnimationPlugin.AnimationItem
   > = {};
 
-  private _timeSensor = new Time();
+  // private _timeSensor = new Time();
 
-  private _lastCbUtc: number = this._timeSensor.getTime();
+  private _lastCbUtc: number;
 
   public applyAnimation<P extends Profile.PropsType>({
     profile,
@@ -84,7 +86,7 @@ export class AnimationPlugin {
     animation.goto(0);
 
     this._core.on("afterLoadArchive", () => {
-      this._lastCbUtc = this._timeSensor.getTime();
+      this._lastCbUtc = this._core.platform.getTime();
     });
     return id;
   }
@@ -136,7 +138,7 @@ export class AnimationPlugin {
   }
 
   private _timerCb() {
-    let utc = this._timeSensor.getTime();
+    let utc = this._core.platform.getTime();
     let delta_time = (utc - this._lastCbUtc) / 1000;
     this._lastCbUtc = utc;
     // this._core.debug.log(`delta time: ${delta_time}`);

@@ -1,8 +1,7 @@
-import hmUI from "@zos/ui";
 import { HZEngineCore, Storage, UI } from "../../index.js";
 import { AnimationPlugin } from "./hz_anime.js";
 import { Animation, Profile } from "./animation.js";
-import hmFS from "@zos/fs";
+// import hmFS from "@zos/fs";
 import { getTransitionMap, registerHzscriptCommands, TransitionData } from "./commands.js";
 
 export function registerPlugin(core: HZEngineCore): InstanceType {
@@ -25,7 +24,7 @@ export function registerPlugin(core: HZEngineCore): InstanceType {
       core.debug.log(`Animation profile [${name}] not found`);
       return null;
     }
-    let str = hmFS.readFileSync({
+    let str = core.platform.readFileSync({
       path: profile_item[0],
       options: {
         encoding: "utf8",
