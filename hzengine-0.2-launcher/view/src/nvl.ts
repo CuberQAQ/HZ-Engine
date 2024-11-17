@@ -6,13 +6,19 @@ import { px } from "./shared/dynamic_px.js";
 import { Fx } from "./shared/fx.js";
 import path from "./shared/path.js";
 import HzTimerAdapter from "./shared/hz_timer.js";
+import { PlatformZOS } from "./hzengine-platform-zeppos.js";
 
 export { CustomSayView as SayView, FgImgView, BgImgView, MenuView };
+
+declare interface WidgetFactory {
+  createWidget(type: any, prop: any): any;
+
+}
 
 /**
  * 显示人物角色对话的view
  */
-class CustomSayView extends UI.MessageView {
+class CustomSayView extends UI.MessageView<PlatformZOS> {
   // _fx: Fx | null = null;
   _widgets: any = null;
   enableAnim = true;
@@ -143,7 +149,7 @@ class CustomSayView extends UI.MessageView {
 /**
  * 展示人物立绘的view
  */
-class FgImgView extends UI.FgImgView {
+class FgImgView extends UI.FgImgView<PlatformZOS> {
   _widget: any = null;
   _widgetFactory = this.core.ui.getLayer(this.layer)!.widgetFactory;
   defaultProp = {
@@ -190,7 +196,7 @@ class FgImgView extends UI.FgImgView {
 /**
  * 展示背景图片、CG的view
  */
-class BgImgView extends UI.BgImgView {
+class BgImgView extends UI.BgImgView<PlatformZOS> {
   _widget: any = null;
   _widgetFactory = this.core.ui.getLayer(this.layer)!.widgetFactory;
   _calSize(size: UI.Size): UI.Size {
@@ -251,7 +257,7 @@ class BgImgView extends UI.BgImgView {
  * 展示选择菜单（用于分支选项）的view
  *
  */
-class MenuView extends UI.MenuView {
+class MenuView extends UI.MenuView<PlatformZOS> {
   _widgetFactory = this.core.ui.getLayer(this.layer)!.widgetFactory;
   _buttonWidgetList: any[] | null = null;
   _hideButtons() {

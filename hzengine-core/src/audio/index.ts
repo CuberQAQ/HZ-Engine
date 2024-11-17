@@ -3,7 +3,7 @@
 import { CustomSave, Save } from "../storage/decorator.js";
 import { HZEngineCore } from "../index.js";
 
-import { AudioPlayer } from "../platform/index.js";
+import { Platform } from "../platform/index.js";
 
 export class Audio {
   // static _hmPlayer = create(id.PLAYER);
@@ -55,7 +55,7 @@ export namespace Audio {
     // platform specific
 
     // universal
-    _audioPlayer: AudioPlayer;
+    _audioPlayer: Platform.AudioPlayer;
     constructor(public _audio: Audio) {
       this._audioPlayer = _audio._core.platform.createAudioPlayer();
 

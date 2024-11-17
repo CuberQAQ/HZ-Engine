@@ -1,6 +1,7 @@
 import { AsukaUI, RenderView } from "@cuberqaq/asuka-ui";
 import { render, store } from "@cuberqaq/asuka-ui/solid";
 import { HZEngineCore, UI } from "hzengine-core";
+import { PlatformZOS } from "./hzengine-platform-zeppos.js";
 
 export default function TestPage(core: HZEngineCore) {
   registerAsukaPage(core, "asukaTestPage", () => {
@@ -20,7 +21,7 @@ export function registerAsukaPage(
   if (!asuka) {
     asuka = new AsukaUI();
   }
-  class AsukaView extends UI.View<any> {
+  class AsukaView extends UI.View<any, PlatformZOS> {
     disposeFunc: Function | null = null;
     _widgetFactory = this.core.ui.getLayer(this.layer)!.widgetFactory;
     rootView: RenderView | null = null;

@@ -1,8 +1,8 @@
-import { HZEngineCore } from "../index.js";
+import { HZEngineCore, Platform } from "../index.js";
 import { Save } from "../storage/decorator.js";
 
-export class System {
-  constructor(public _core: HZEngineCore) {
+export class System<PlatformType extends Platform> {
+  constructor(public _core: HZEngineCore<PlatformType>) {
     _core.on("system.continue", () => {
       this._pauseTimer = null;
       this.continue();

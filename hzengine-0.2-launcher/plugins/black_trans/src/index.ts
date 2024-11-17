@@ -2,6 +2,15 @@
 import hmUI from "@zos/ui";
 import { HZEngineCore, TransformPlugin, UI } from "hzengine-core";
 
+
+import {Platform} from 'hzengine-core'
+export declare interface WidgetFactory {
+  createWidget(widgetType: number, option: Record<string, any>): any;
+  deleteWidget(widget: any): void;
+}
+
+export declare type PlatformZOS = Platform<WidgetFactory>
+
 export default function BlackTrans(core: HZEngineCore): InstanceType {
   var animationPlugin = core.plugins.get(
     "animation"
@@ -10,7 +19,7 @@ export default function BlackTrans(core: HZEngineCore): InstanceType {
     core.debug.log("animation plugin not found");
     return null;
   }
-  class BlackTransView extends UI.View<BlackTransViewProp> {
+  class BlackTransView extends UI.View<BlackTransViewProp, PlatformZOS> {
     _widget: any = null;
     _widgetFactory = this.core.ui.getLayer(this.layer)!.widgetFactory;
     _animationId: number | null = null;

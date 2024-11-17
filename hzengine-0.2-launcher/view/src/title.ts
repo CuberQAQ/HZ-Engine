@@ -6,11 +6,12 @@ import { px } from "./shared/dynamic_px.js";
 
 import { getText } from "@zos/i18n";
 import { InstanceType } from "hzengine-plugin-black-trans";
+import { PlatformZOS } from "./hzengine-platform-zeppos.js";
 
 /**
  * 游戏标题页面
  */
-export class TitleView extends UI.View<TitleViewProp> {
+export class TitleView extends UI.View<TitleViewProp, PlatformZOS> {
   _widgets: any | null = null;
   _widgetFactory = this.core.ui.getLayer(this.layer)!.widgetFactory;
   _animationPlugin: TransformPlugin.AnimationPlugin | null =

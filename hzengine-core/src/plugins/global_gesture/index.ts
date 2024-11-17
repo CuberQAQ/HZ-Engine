@@ -3,7 +3,7 @@ import { HZEngineCore, UI } from "../../index.js";
 import { System } from "../../system/index.js";
 
 export function global_gesture(core: HZEngineCore) {
-  function addTouchPad(layerInstance: UI.Layer) {
+  function addTouchPad(layerInstance: UI.Layer<any>) {
     // TODO touch pad
     core.debug.log("[TouchPad] Not implemented");
     // let touchPad = layerInstance.widgetFactory.createWidget(hmUI.widget.TEXT, {
@@ -22,7 +22,7 @@ export function global_gesture(core: HZEngineCore) {
     // });
   }
   addTouchPad(core.ui.getLayer("ct")!);
-  core.on("afterAddLayer", (layerInstance: UI.Layer) => {
+  core.on("afterAddLayer", (layerInstance: UI.Layer<any>) => {
     if (layerInstance.name !== "ct") return;
     addTouchPad(layerInstance);
   });

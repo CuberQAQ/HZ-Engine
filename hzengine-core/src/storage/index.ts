@@ -1,10 +1,10 @@
 // / <reference types="@zeppos/device-types" />
-import { HZEngineCore } from "../index.js";
+import { HZEngineCore, Platform } from "../index.js";
 // import * as this._core.platform from "@zos/fs";
 import Path from "../utils/path.js";
 // import { isFileSync } from "./fs.js";
 
-export class Storage {
+export class Storage{
   constructor(private _core: HZEngineCore) {}
 
   projectRoot: string | null = null;

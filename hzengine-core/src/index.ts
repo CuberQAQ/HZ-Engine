@@ -16,7 +16,7 @@ import { Storage } from "./storage/index.js";
 import { System } from "./system/index.js";
 import { UI } from "./ui/index.js";
 
-class HZEngineCore {
+class HZEngineCore<PlatformType extends Platform = any> {
   private _eventCallbacks: Map<string, Set<Function>> = new Map();
   public storage;
   public async;
@@ -26,7 +26,7 @@ class HZEngineCore {
   public config;
   public audio;
   public debug;
-  constructor(public platform: Platform) {
+  constructor(public platform: PlatformType) {
     // 請不要調整這裡的初始化順序，不然會有問題（裝飾器裡有時候要用到前面初始化的東西）
     this.storage = new Storage(this);
     this.async = new Async(this);
@@ -92,7 +92,7 @@ class HZEngineCore {
 
   public plugins: Map<string, unknown> = new Map();
   // Load Plugin
-  loadPlugin(name: string, plugin: Plugin) {
+  loadPlugin(name: string, plugin: Plugin<PlatformType>) {
     this.debug.log(`[HZEngine] load plugin [${name}]`);
     let slot = plugin(this);
     if (slot != undefined) this.plugins.set(name, slot);
@@ -116,7 +116,7 @@ class HZEngineCore {
   }
 }
 
-type Plugin = (core: HZEngineCore) => any;
+type Plugin<PlatformType extends Platform> = (core: HZEngineCore<PlatformType>) => any;
 
-export { HZEngineCore, UI, Storage, Script, System, Async };
+export { HZEngineCore, UI, Storage, Script, System, Async, Platform };
 export * as TransformPlugin from "./plugins/transform/index.js";

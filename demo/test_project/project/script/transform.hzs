@@ -35,25 +35,28 @@
 
     # end transform
 
-    transition fade = (fadein, fadeout) 
 
     hide girl
     "即将开始测试"
 
     "開始named transition測試"
+
+    transition fade = (fadein, fadeout) 
     show girl normal with fade
+
     girl "Ciallo"
 
     "開始unnamed transition測試"
 
-    show girl angry with (fadeout,fadein)
+    show girl angry with (fadein,fadeout)
+
     girl "Ciallo2"
 
     # girl "我将变成萤火虫"
     # show girl normal with fadeout fade_repeat
     # girl "怎么样？"
     girl "byebye"
-    hide girl with ([move_to_right_out, fadeout])
+    hide girl with (none, [move_to_right_out, fadeout])
 
     "开始say nowait测试"
 

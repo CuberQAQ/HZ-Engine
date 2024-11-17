@@ -4,6 +4,7 @@ import { HZEngineCore, UI } from "hzengine-core";
 import { px } from "./shared/dynamic_px.js";
 
 import { getText } from "@zos/i18n";
+import { PlatformZOS } from "./hzengine-platform-zeppos.js";
 const { width, height, screenShape } = getDeviceInfo();
 
 /**
@@ -12,7 +13,7 @@ const { width, height, screenShape } = getDeviceInfo();
  * @description 当你在游戏中按下实体按键，或通过其它方法唤出的快捷菜单。
  * 提供存档、设置、退出等功能
  */
-export class QuickMenu extends UI.View<QuickMenuViewProp> {
+export class QuickMenu extends UI.View<QuickMenuViewProp, PlatformZOS> {
   _widgets: any | null = null;
   _widgetFactory = this.core.ui.getLayer(this.layer)!.widgetFactory;
   onCreate(prop: QuickMenuViewProp): void {

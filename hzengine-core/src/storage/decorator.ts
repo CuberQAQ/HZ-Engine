@@ -1,4 +1,4 @@
-import { HZEngineCore, Storage } from "../index.js";
+import { HZEngineCore, Platform, Storage } from "../index.js";
 import { Async } from "../async/index.js";
 
 /**
@@ -7,6 +7,7 @@ import { Async } from "../async/index.js";
  * @returns
  */
 export function Save<
+  PlatformType extends Platform,
   This extends { _core: HZEngineCore },
   Value extends Storage.Saveable<Value>
 >(store_key: string) {
@@ -40,7 +41,11 @@ export function Save<
             false,
             ...store_key.split(".")
           ) as Value;
-          this._core.debug.log(`Load Data from Archive, store_key: ${store_key}, dataInArchive: ${JSON.stringify(dataInArchive)}`);
+          this._core.debug.log(
+            `Load Data from Archive, store_key: ${store_key}, dataInArchive: ${JSON.stringify(
+              dataInArchive
+            )}`
+          );
           target.set.call(this, dataInArchive);
         });
       });
@@ -51,11 +56,11 @@ export function Save<
     return {
       get() {
         target = target as ClassAccessorDecoratorTarget<This, Value>;
-        return archiveStateGetter(this, store_key, target.get);
+        return archiveStateGetter<PlatformType, This, Value>(this, store_key, target.get);
       },
       set(value) {
         target = target as ClassAccessorDecoratorTarget<This, Value>;
-        archiveStateSetter(this, store_key, target.set, value);
+        archiveStateSetter<PlatformType, This, Value>(this, store_key, target.set, value);
       },
     } as ClassAccessorDecoratorResult<This, Value>;
   };
@@ -67,6 +72,7 @@ export function Save<
  * @returns
  */
 export function CustomSave<
+  PlatformType extends Platform,
   This extends { _core: HZEngineCore },
   Value,
   SerializedValue extends Storage.Saveable<SerializedValue>
@@ -108,7 +114,11 @@ export function CustomSave<
             false,
             ...store_key.split(".")
           ) as SerializedValue;
-          this._core.debug.log(`Load Data from Archive, store_key: ${store_key}, dataInArchive: ${JSON.stringify(dataInArchive)}`);
+          this._core.debug.log(
+            `Load Data from Archive, store_key: ${store_key}, dataInArchive: ${JSON.stringify(
+              dataInArchive
+            )}`
+          );
           target.set.call(this, deserializer.call(this, dataInArchive));
         });
       });
@@ -116,7 +126,7 @@ export function CustomSave<
     return {
       get() {
         target = target as ClassAccessorDecoratorTarget<This, Value>;
-        return archiveStateGetterWithSerializer(
+        return archiveStateGetterWithSerializer<PlatformType, This, Value, SerializedValue>(
           this,
           store_key,
           target.get,
@@ -125,7 +135,7 @@ export function CustomSave<
       },
       set(value) {
         target = target as ClassAccessorDecoratorTarget<This, Value>;
-        archiveStateSetterWithDeserializer(
+        archiveStateSetterWithDeserializer<PlatformType, This, Value, SerializedValue>(
           this,
           store_key,
           target.set,
@@ -138,11 +148,12 @@ export function CustomSave<
 }
 
 export function SaveGetter<
-  This extends { _core: HZEngineCore },
+  PlatformType extends Platform,
+  This extends { _core: HZEngineCore<PlatformType> },
   Value extends Storage.Saveable<Value>
 >(store_key: string) {
   return (
-    target: ClassGetterDecoratorTarget<This, Value>,
+    target: ClassGetterDecoratorTarget<PlatformType, This, Value>,
     context: ClassGetterDecoratorContext<This, Value>
   ) => {
     context.addInitializer(function () {
@@ -170,10 +181,10 @@ export function SaveGetter<
       throw new Error("ArchiveStateGetter只能用于getter属性");
     }
     return function (this: This) {
-      let val = archiveStateGetter(
+      let val = archiveStateGetter<PlatformType, This, Value>(
         this,
         store_key,
-        target as ClassGetterDecoratorTarget<This, Value>
+        target as ClassGetterDecoratorTarget<PlatformType, This, Value>
       );
       return val;
     };
@@ -181,7 +192,8 @@ export function SaveGetter<
 }
 
 export function CustomSaveGetter<
-  This extends { _core: HZEngineCore },
+  PlatformType extends Platform,
+  This extends { _core: HZEngineCore<PlatformType> },
   Value,
   SerializedValue extends Storage.Saveable<SerializedValue>
 >(
@@ -189,7 +201,7 @@ export function CustomSaveGetter<
   serializer: (this: This, value: Value) => SerializedValue
 ) {
   return (
-    target: ClassGetterDecoratorTarget<This, Value>,
+    target: ClassGetterDecoratorTarget<PlatformType, This, Value>,
     context: ClassGetterDecoratorContext<This, Value>
   ) => {
     if (context.kind !== "getter") {
@@ -217,10 +229,10 @@ export function CustomSaveGetter<
       });
     });
     return function (this: This) {
-      let val = archiveStateGetterWithSerializer(
+      let val = archiveStateGetterWithSerializer<PlatformType, This, Value, SerializedValue>(
         this,
         store_key,
-        target as ClassGetterDecoratorTarget<This, Value>,
+        target as ClassGetterDecoratorTarget<PlatformType, This, Value>,
         serializer
       );
       return val;
@@ -234,11 +246,12 @@ export function CustomSaveGetter<
  * @returns
  */
 export function SaveSetter<
-  This extends { _core: HZEngineCore },
+  PlatformType extends Platform,
+  This extends { _core: HZEngineCore<PlatformType> },
   Value extends Storage.Saveable<Value>
 >(store_key: string) {
   return (
-    target: ClassSetterDecoratorTarget<This, Value>,
+    target: ClassSetterDecoratorTarget<PlatformType, This, Value>,
     context: ClassSetterDecoratorContext<This, Value>
   ) => {
     if (context.kind !== "setter") {
@@ -253,16 +266,20 @@ export function SaveSetter<
             false,
             ...store_key.split(".")
           ) as Value;
-          this._core.debug.log(`Load Data from Archive, store_key: ${store_key}, dataInArchive: ${JSON.stringify(dataInArchive)}`);
+          this._core.debug.log(
+            `Load Data from Archive, store_key: ${store_key}, dataInArchive: ${JSON.stringify(
+              dataInArchive
+            )}`
+          );
           target.call(this, dataInArchive);
         });
       });
     });
     return function (this: This, value: Value) {
-      archiveStateSetter(
+      archiveStateSetter<PlatformType, This, Value>(
         this,
         store_key,
-        target as ClassSetterDecoratorTarget<This, Value>,
+        target as ClassSetterDecoratorTarget< PlatformType, This, Value>,
         value
       );
     };
@@ -270,7 +287,8 @@ export function SaveSetter<
 }
 
 export function CustomSaveSetter<
-  This extends { _core: HZEngineCore },
+  PlatformType extends Platform,
+  This extends { _core: HZEngineCore<PlatformType> },
   Value,
   SerializedValue extends Storage.Saveable<SerializedValue>
 >(
@@ -278,7 +296,7 @@ export function CustomSaveSetter<
   deserializer: (this: This, value: SerializedValue) => Value
 ) {
   return (
-    target: ClassSetterDecoratorTarget<This, Value>,
+    target: ClassSetterDecoratorTarget<PlatformType, This, Value>,
     context: ClassSetterDecoratorContext<This, Value>
   ) => {
     if (context.kind !== "setter") {
@@ -293,16 +311,20 @@ export function CustomSaveSetter<
             false,
             ...store_key.split(".")
           ) as SerializedValue;
-          this._core.debug.log(`Load Data from Archive, store_key: ${store_key}, dataInArchive: ${JSON.stringify(dataInArchive)}`);
+          this._core.debug.log(
+            `Load Data from Archive, store_key: ${store_key}, dataInArchive: ${JSON.stringify(
+              dataInArchive
+            )}`
+          );
           target.call(this, deserializer.call(this, dataInArchive));
         });
       });
     });
     return function (this: This, value: Value) {
-      archiveStateSetterWithDeserializer(
+      archiveStateSetterWithDeserializer<PlatformType, This, Value, SerializedValue>(
         this,
         store_key,
-        target as ClassSetterDecoratorTarget<This, Value>,
+        target as ClassSetterDecoratorTarget<PlatformType, This, Value>,
         value,
         deserializer
       );
@@ -316,7 +338,8 @@ export function CustomSaveSetter<
  * @returns
  */
 function archiveStateGetter<
-  This extends { _core: HZEngineCore },
+  PlatformType extends Platform,
+  This extends { _core: HZEngineCore<PlatformType> },
   Value extends Storage.Saveable<Value>
 >(_this: This, store_key: string, old_getter: (this: This) => Value) {
   const core = _this._core;
@@ -350,7 +373,8 @@ function archiveStateGetter<
  * @returns
  */
 function archiveStateGetterWithSerializer<
-  This extends { _core: HZEngineCore },
+  PlatformType extends Platform,
+  This extends { _core: HZEngineCore<PlatformType> },
   Value,
   SerializedValue extends Storage.Saveable<SerializedValue>
 >(
@@ -385,7 +409,8 @@ function archiveStateGetterWithSerializer<
 }
 
 function archiveStateSetter<
-  This extends { _core: HZEngineCore },
+  PlatformType extends Platform,
+  This extends { _core: HZEngineCore<PlatformType> },
   Value extends Storage.Saveable<Value>
 >(
   _this: This,
@@ -411,7 +436,8 @@ function archiveStateSetter<
 }
 
 function archiveStateSetterWithDeserializer<
-  This extends { _core: HZEngineCore },
+  PlatformType extends Platform,
+  This extends { _core: HZEngineCore<PlatformType> },
   Value,
   SerializedValue extends Storage.Saveable<SerializedValue>
 >(
@@ -438,10 +464,10 @@ function archiveStateSetterWithDeserializer<
   // console.log(`setval: ${val}`);
 }
 
-type ClassGetterDecoratorTarget<This extends { _core: HZEngineCore }, Value> = (
+type ClassGetterDecoratorTarget<PlatformType extends Platform, This extends { _core: HZEngineCore<PlatformType> }, Value> = (
   this: This
 ) => Value;
-type ClassSetterDecoratorTarget<This extends { _core: HZEngineCore }, Value> = (
+type ClassSetterDecoratorTarget<PlatformType extends Platform, This extends { _core: HZEngineCore<PlatformType> }, Value> = (
   this: This,
   value: Value
 ) => void;

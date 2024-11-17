@@ -1,0 +1,25 @@
+# #轮回测试
+# *loop_test
+#     [REAL] show girl angry
+#     eval if(sd.loop_time == undefined) sd.loop_time = 1
+#     girl "这是你第[sd.loop_time++]次来到这里"
+#     menu
+#     @"继续轮回"
+#         jump loop_test
+#     @"退出"
+#         return
+#     end menu
+#     return
+
+*loop_test
+    eval if(sd.loop_time == undefined) sd.loop_time = 1
+    while true
+        girl "这是你第[sd.loop_time++]次来到这里"
+        menu
+        @"继续轮回"
+            # do nothing
+        @"退出"
+            break
+        end menu
+    end while
+    return

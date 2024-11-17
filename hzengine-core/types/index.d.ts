@@ -37,5 +37,5 @@ declare class HZEngineCore {
     emit(event: string, ...args: any[]): void;
 }
 type Plugin = (core: HZEngineCore) => any;
-export { HZEngineCore, UI, Storage, Script, System, Async };
+export { HZEngineCore, UI, Storage, Script, System, Async, Platform };
 export * as TransformPlugin from "./plugins/transform/index.js";
