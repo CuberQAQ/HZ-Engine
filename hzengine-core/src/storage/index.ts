@@ -148,7 +148,7 @@ export class Storage{
       }
       this._core.emit("beforeSaveGlobalData");
       let res = this._core.platform.writeFileSync({
-        path: Path.join(this.projectRoot, "globalData.json"),
+        path: Path.join(this.saveRoot!, "globalData.json"),
         data: JSON.stringify(this._globalData),
       }) as unknown as number; // TODO
       if (res < 0)
@@ -203,7 +203,7 @@ export class Storage{
 
       if (!this.saveRoot) throw `projectDir is null, please loadProject first`;
       let res = this._core.platform.writeFileSync({
-        path: Path.join(this.saveRoot, archiveFile),
+        path: Path.join(this.saveRoot!, archiveFile),
         data: JSON.stringify(this._archiveData),
       }) as unknown as number; //TODO
       if (res < 0)

@@ -2,10 +2,7 @@ import { Sound, sound } from "@pixi/sound";
 import { HZEngineCore, Platform } from "hzengine-core";
 import { Application, Assets, Container } from "pixi.js";
 
-export function HZEnginePlatformWeb(pixiApp: Application): Platform {
-  pixiApp.stage.sortableChildren = true;
-  //   pixiApp.stage.sortChildren();
-  return {
+const HZEnginePlatformWeb: Platform = {
     name: "",
     getScreenSize: function (): [width: number, height: number] {
       return [window.innerWidth, window.innerHeight];
@@ -19,6 +16,7 @@ export function HZEnginePlatformWeb(pixiApp: Application): Platform {
       widgetFactory.destroy();
     },
     isFileSync: function ({ path }: { path: string }): boolean {
+      
       // Assets.
       throw new Error("Function not implemented.");
     },
@@ -83,5 +81,6 @@ export function HZEnginePlatformWeb(pixiApp: Application): Platform {
     setFrameInterval: function (callback: () => void): void {
       requestAnimationFrame(callback);
     },
-  };
 }
+
+export default HZEnginePlatformWeb
