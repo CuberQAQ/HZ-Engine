@@ -1,0 +1,3 @@
+[submodule "asuka-ui"]
+	path = asuka-ui
+	url = https://github.com/CuberQAQ/asuka-ui.git
