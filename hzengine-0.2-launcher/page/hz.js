@@ -1,4 +1,4 @@
-/// <reference path="../node_modules/@zeppos/device-types/dist/index.d.ts" />
+/// <reference types="@zeppos/device-types" />
 /// <reference path="../shared/zos_media.d.ts" />
 import { create, id } from "@zos/media";
 

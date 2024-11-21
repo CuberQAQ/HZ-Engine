@@ -5,7 +5,6 @@
 import { BgImgView, FgImgView, MenuView, SayView } from "./nvl.js";
 import { InfoOpening, TitleView } from "./title.js";
 import { QuickMenu } from "./quick_menu.js";
-import TestPage from "./asuka_ui.jsx";
 export default function ViewPlugin(core) {
     // core.ui.registerView的作用是注册页面组件
     // 第一个参数是页面组件的名字，第二个参数是页面组件的类
@@ -18,5 +17,4 @@ export default function ViewPlugin(core) {
     core.ui.registerView("title", TitleView);
     core.ui.registerView("quick_menu", QuickMenu);
     core.ui.registerView("info_opening", InfoOpening);
-    TestPage(core);
 }

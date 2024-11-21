@@ -7,7 +7,6 @@ import { HZEngineCore } from "hzengine-core";
 import { BgImgView, FgImgView, MenuView, SayView } from "./nvl.js";
 import { InfoOpening, TitleView } from "./title.js";
 import { QuickMenu } from "./quick_menu.js";
-import TestPage from "./asuka_ui.jsx";
 
 
 export default function ViewPlugin(core: HZEngineCore) {
@@ -23,5 +22,4 @@ export default function ViewPlugin(core: HZEngineCore) {
   core.ui.registerView("quick_menu", QuickMenu)
   core.ui.registerView("info_opening", InfoOpening)
 
-  TestPage(core);
 }
