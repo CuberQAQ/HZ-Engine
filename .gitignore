@@ -16,3 +16,4 @@ selenium-debug.log
 local_test
 __test__
 __local__
+.env
