@@ -1,5 +1,5 @@
 import { HZEngineCore } from "../index.js";
-import { AudioPlayer } from "../platform/index.js";
+import { Platform } from "../platform/index.js";
 export declare class Audio {
     _core: HZEngineCore;
     constructor(_core: HZEngineCore);
@@ -10,7 +10,7 @@ export declare class Audio {
 export declare namespace Audio {
     class Channel {
         _audio: Audio;
-        _audioPlayer: AudioPlayer;
+        _audioPlayer: Platform.AudioPlayer;
         constructor(_audio: Audio);
         onRelease(): void;
         mode: Channel.Mode;

@@ -204,7 +204,7 @@ let UI = (() => {
         /**由調用者提供id，創建一個View，不會處理isSave，也不會更新viewMap */
         _produceViewWithId(name, layer, prop, id) {
             if (!this._viewClassMap.get(name)) {
-                throw "要创建的View不存在";
+                throw `要创建的View不存在: ${name}`;
             }
             let _ViewFactory = this._viewClassMap.get(name);
             let viewInstance = new _ViewFactory(layer, this._core);

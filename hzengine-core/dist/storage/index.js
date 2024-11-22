@@ -126,7 +126,7 @@ export class Storage {
             }
             this._core.emit("beforeSaveGlobalData");
             let res = this._core.platform.writeFileSync({
-                path: Path.join(this.projectRoot, "globalData.json"),
+                path: Path.join(this.saveRoot, "globalData.json"),
                 data: JSON.stringify(this._globalData),
             }); // TODO
             if (res < 0)

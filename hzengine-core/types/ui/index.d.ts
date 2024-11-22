@@ -1,29 +1,28 @@
-import { HZEngineCore } from "../index.js";
-import { WidgetFactory } from "../platform/index.js";
+import { HZEngineCore, Platform } from "../index.js";
 import { Storage } from "../storage/index.js";
-export declare class UI {
-    _core: HZEngineCore;
-    constructor(_core: HZEngineCore);
+export declare class UI<PlatformType extends Platform = any> {
+    _core: HZEngineCore<PlatformType>;
+    constructor(_core: HZEngineCore<PlatformType>);
     private _initUI;
     private _cleanUI;
     resetUI(): void;
     private accessor _layerList;
-    get layerList(): Map<string, UI.Layer>;
+    get layerList(): Map<string, UI.Layer<PlatformType>>;
     addLayer(name: string, z_index: number): void;
-    getLayer(name: string): UI.Layer | undefined;
+    getLayer(name: string): UI.Layer<PlatformType> | undefined;
     private _viewClassMap;
-    registerView<T extends Storage.Saveable<T>>(name: string, cls: UI.ViewClass<T>): void;
+    registerView<PropType extends Storage.Saveable<PropType>>(name: string, cls: UI.ViewClass<PropType, PlatformType>): void;
     private accessor _nextViewId;
     private accessor _viewMap;
-    getView(id: number): UI.View<Storage.Saveable<unknown>> | null;
-    createView<T extends Storage.Saveable<T>>(name: string, layer: string, prop: T, isSave: boolean): UI.View<T>;
-    updateView<T extends Storage.Saveable<T>>(viewInstance: UI.View<T>, new_prop: T): void;
-    destroyView(viewInstance: UI.View<Storage.Saveable<unknown>>): void;
+    getView(id: number): UI.View<Storage.Saveable<unknown>, PlatformType> | null;
+    createView<PropType extends Storage.Saveable<PropType>>(name: string, layer: string, prop: PropType, isSave: boolean): UI.View<PropType, PlatformType>;
+    updateView<PropType extends Storage.Saveable<PropType>>(viewInstance: UI.View<PropType, PlatformType>, new_prop: PropType): void;
+    destroyView(viewInstance: UI.View<Storage.Saveable<unknown>, PlatformType>): void;
     /**由調用者提供id，創建一個View，不會處理isSave，也不會更新viewMap */
     private _produceViewWithId;
     private accessor _routerMap;
-    getRouter(tag: string): UI.Router | undefined;
-    addRouter(tag: string, layer: string, isSave?: boolean): UI.Router;
+    getRouter(tag: string): UI.Router<PlatformType> | undefined;
+    addRouter(tag: string, layer: string, isSave?: boolean): UI.Router<PlatformType>;
     getScreenSize(): {
         width: number;
         height: number;
@@ -42,23 +41,23 @@ export declare class UI {
     };
 }
 export declare namespace UI {
-    type ViewClass<T extends Storage.Saveable<T>> = {
-        new (layer: string, core: HZEngineCore): View<T>;
+    type ViewClass<PropType extends Storage.Saveable<PropType>, PlatformType extends Platform> = {
+        new (layer: string, core: HZEngineCore<PlatformType>): View<PropType, PlatformType>;
     };
-    abstract class View<T extends Storage.Saveable<T>> {
+    abstract class View<PropType extends Storage.Saveable<PropType>, PlatformType extends Platform = any> {
         layer: string;
-        core: HZEngineCore;
+        core: HZEngineCore<PlatformType>;
         id: number | null;
         name: string | null;
         isSave: boolean;
         private _prop;
-        get prop(): T | null;
+        get prop(): PropType | null;
         private set prop(value);
-        constructor(layer: string, core: HZEngineCore);
-        create(prop: T): void;
-        protected abstract onCreate(prop: T): void;
-        commit(prop: T): void;
-        protected abstract onCommit(prop: T): void;
+        constructor(layer: string, core: HZEngineCore<PlatformType>);
+        create(prop: PropType): void;
+        protected abstract onCreate(prop: PropType): void;
+        commit(prop: PropType): void;
+        protected abstract onCommit(prop: PropType): void;
         destroy(): void;
         protected abstract onDestroy(): void;
         serialize(): View.Serialized;
@@ -83,7 +82,7 @@ export declare namespace UI {
         who: string;
         what: string;
     }
-    abstract class MessageView extends View<Message> {
+    abstract class MessageView<PlatformType extends Platform> extends View<Message, PlatformType> {
     }
     interface MenuItemData {
         text: string;
@@ -93,7 +92,7 @@ export declare namespace UI {
     type MenuViewProp = {
         itemList: MenuItemData[];
     };
-    abstract class MenuView extends View<MenuViewProp> {
+    abstract class MenuView<PlatformType extends Platform> extends View<MenuViewProp, PlatformType> {
     }
     type Coordinate = {
         x: number;
@@ -111,7 +110,7 @@ export declare namespace UI {
         offset: Coordinate;
         size: Size;
     };
-    abstract class FgImgView extends View<FgImgViewProp> {
+    abstract class FgImgView<PlatformType extends Platform> extends View<FgImgViewProp, PlatformType> {
     }
     /**
      * cg等显示在`bg`layer上的图片View
@@ -121,30 +120,30 @@ export declare namespace UI {
         offset: Coordinate;
         size: Size;
     };
-    abstract class BgImgView extends View<FgImgViewProp> {
+    abstract class BgImgView<PlatformType extends Platform> extends View<FgImgViewProp, PlatformType> {
     }
-    class Layer {
-        _core: HZEngineCore;
+    class Layer<PlatformType extends Platform> {
+        _core: HZEngineCore<PlatformType>;
         name: string;
         z_index: number;
-        widgetFactory: WidgetFactory;
-        constructor(_core: HZEngineCore, name: string, z_index: number);
+        widgetFactory: ReturnType<PlatformType["createUILayer"]>;
+        constructor(_core: HZEngineCore<PlatformType>, name: string, z_index: number);
         destroy(): void;
     }
     namespace Layer {
     }
-    class Router {
+    class Router<PlatformType extends Platform> {
         private _ui;
         tag: string;
         layer: string;
         isSave: boolean;
-        constructor(_ui: UI, tag: string, layer: string, isSave?: boolean);
+        constructor(_ui: UI<PlatformType>, tag: string, layer: string, isSave?: boolean);
         serialize(): Router.Serialized;
         defaultRouteStrategy: Router.RouteStrategy;
-        static deserialize(ui: UI, data: Router.Serialized): Router;
+        static deserialize<PlatformType extends Platform>(ui: UI<PlatformType>, data: Router.Serialized): Router<PlatformType>;
         viewStack: [view_name: string, prop: Storage.Saveable<unknown>][];
         get length(): number;
-        activeViewInstance: View<Storage.Saveable<unknown>> | null;
+        activeViewInstance: View<Storage.Saveable<unknown>, PlatformType> | null;
         push<T extends Storage.Saveable<T>>(view_name: string, prop: T, strategy?: Router.RouteStrategy): void;
         pop<T extends Storage.Saveable<T>>(back_prop?: T, strategy?: Router.RouteStrategy): void;
         replace<T extends Storage.Saveable<T>>(view_name: string, prop: T, strategy?: Router.RouteStrategy): void;
@@ -159,10 +158,10 @@ export declare namespace UI {
             viewStack: [view_name: string, prop: Storage.Saveable<unknown>][];
             activeViewId: number | null;
         }
-        interface RouteStrategy<T extends Storage.Saveable<T> = Storage.Saveable<unknown>> {
-            destroy?(viewInstance: View<T>, ui: UI): void;
-            create?(viewName: string, layer: string, prop: T, ui: UI, isSave: boolean): View<Storage.Saveable<T>>;
-            update?(viewInstance: View<T>, prop: T, ui: UI): void;
+        interface RouteStrategy<PropType extends Storage.Saveable<PropType> = Storage.Saveable<unknown>, PlatformType extends Platform = any> {
+            destroy?(viewInstance: View<PropType, PlatformType>, ui: UI<PlatformType>): void;
+            create?(viewName: string, layer: string, prop: PropType, ui: UI<PlatformType>, isSave: boolean): View<Storage.Saveable<PropType>, PlatformType>;
+            update?(viewInstance: View<PropType, PlatformType>, prop: PropType, ui: UI<PlatformType>): void;
         }
     }
 }

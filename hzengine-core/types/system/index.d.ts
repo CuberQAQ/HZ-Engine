@@ -1,7 +1,7 @@
-import { HZEngineCore } from "../index.js";
-export declare class System {
-    _core: HZEngineCore;
-    constructor(_core: HZEngineCore);
+import { HZEngineCore, Platform } from "../index.js";
+export declare class System<PlatformType extends Platform> {
+    _core: HZEngineCore<PlatformType>;
+    constructor(_core: HZEngineCore<PlatformType>);
     accessor condition: System.Condition;
     _pauseTimer: number | null;
     /**

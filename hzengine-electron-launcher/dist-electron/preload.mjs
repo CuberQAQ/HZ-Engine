@@ -1,10 +1,13 @@
 "use strict";
 const electron = require("electron");
-const fs = require("node:fs");
+const fs = require("fs");
 electron.contextBridge.exposeInMainWorld("ipcRenderer", {
   on(...args) {
     const [channel, listener] = args;
-    return electron.ipcRenderer.on(channel, (event, ...args2) => listener(event, ...args2));
+    return electron.ipcRenderer.on(
+      channel,
+      (event, ...args2) => listener(event, ...args2)
+    );
   },
   off(...args) {
     const [channel, ...omit] = args;
@@ -22,3 +25,11 @@ electron.contextBridge.exposeInMainWorld("ipcRenderer", {
   // ...
 });
 electron.contextBridge.exposeInMainWorld("fs", fs);
+electron.contextBridge.exposeInMainWorld("isFile", (path2) => {
+  try {
+    const stat = fs.statSync(path2);
+    return stat.isFile();
+  } catch (e) {
+    return false;
+  }
+});

@@ -2,29 +2,28 @@ import { useEffect, useRef } from "react";
 import "./App.css";
 import { HZEngineCore, System, UI } from "hzengine-core";
 import HZEnginePlatformWeb from "./hzengine/hzengine-platform-web";
+import { EletronViewPlugin } from "./hzengine/view/index";
 
 function App() {
-
-  const ref = useRef(null)
+  const ref = useRef(null);
 
   useEffect(() => {
     console.log(`ref=${ref.current}`);
-    
-    
-    const hzengine = new HZEngineCore(HZEnginePlatformWeb);
 
+    const hzengine = new HZEngineCore(HZEnginePlatformWeb);
+    Object.assign(window, { hz: hzengine });
     // 加载ViewPlugin插件，定义其HZEngine中的插件名字为views
     // 这个插件注册了say，fg_img，bg_img，menu，title，quick_menu等常用页面组件(view)
     // 该实例项目的view文件夹就是这个ViewPlugin插件的根目录，
     // 你可以添加自己的页面组件，也可以修改view文件夹已有的页面组件
-    // hzengine.loadPlugin("views", ViewPlugin);
+    hzengine.loadPlugin("views", EletronViewPlugin);
     // hzengine.loadPlugin("black_trans", BlackTrans);
 
     // 加载游戏项目，这里的"raw/project"是项目的根文件夹（相对于assets文件夹）
     hzengine.loadProject({
-      projectPath: "/public/hz_project",
-      cachePath: "/public/hz_project/cache",
-      savePath: "/public/hz_project/save",
+      projectPath: "./public/hz_project/project",
+      cachePath: "./public/hz_project/preload",
+      savePath: "./public/hz_project/save",
     });
 
     // 在模拟器将电量设置为0，就會認定是模拟器环境
@@ -66,7 +65,7 @@ function App() {
     //       h: 600,
     //       text: "",
     //     });
-    
+
     //     touchPad.addEventListener(hmUI.event.SELECT, (info) => {
     //       console.log("按下了屏幕");
     //       if (core.system.condition === System.Condition.Pause) {
@@ -81,9 +80,6 @@ function App() {
     //   });
     // }
     // global_gesture(hzengine);
-    
-
-
 
     // /**
     //  * 測試脚本
@@ -129,14 +125,11 @@ function App() {
     // });
 
     console.log("page.js build已顺利完成");
-
-  }, [])
+  }, []);
 
   return (
     <div className="hz_container">
-      <div className="hz_root" ref={ref}>
-
-      </div>
+      <div className="hz_root" ref={ref}></div>
     </div>
   );
 }

@@ -1,0 +1,174 @@
+{
+  "config": {
+    "game": {
+      "autoplay": { "enable": false, "ms_per_char": 150, "extra_delay": 1300 }
+    }
+  },
+  "realEnv": true,
+  "script": {
+    "statement_data": {
+      "public/hz_project/project/script/main.hzs": {
+        "14": {
+          "start_position": ["public/hz_project/project/script/main.hzs", 14],
+          "item_list": [
+            {
+              "text": "前往咖啡馆",
+              "position": ["public/hz_project/project/script/main.hzs", 15]
+            },
+            {
+              "text": "流程分支测试",
+              "position": ["public/hz_project/project/script/main.hzs", 17]
+            },
+            {
+              "text": "动画系统测试",
+              "position": ["public/hz_project/project/script/main.hzs", 43]
+            },
+            {
+              "text": "音频系统测试",
+              "position": ["public/hz_project/project/script/main.hzs", 45]
+            },
+            {
+              "text": "配置系统测试",
+              "position": ["public/hz_project/project/script/main.hzs", 47]
+            }
+          ],
+          "end_position": ["public/hz_project/project/script/main.hzs", 49]
+        },
+        "18": {
+          "start_position": ["public/hz_project/project/script/main.hzs", 18],
+          "item_list": [
+            {
+              "text": "嵌套menu测试",
+              "position": ["public/hz_project/project/script/main.hzs", 19]
+            },
+            {
+              "text": "if语句测试",
+              "position": ["public/hz_project/project/script/main.hzs", 38]
+            },
+            {
+              "text": "轮回测试",
+              "position": ["public/hz_project/project/script/main.hzs", 40]
+            }
+          ],
+          "end_position": ["public/hz_project/project/script/main.hzs", 42]
+        },
+        "20": {
+          "start_position": ["public/hz_project/project/script/main.hzs", 20],
+          "item_list": [
+            {
+              "text": "choice1",
+              "position": ["public/hz_project/project/script/main.hzs", 21]
+            },
+            {
+              "text": "choice2",
+              "position": ["public/hz_project/project/script/main.hzs", 23]
+            },
+            {
+              "text": "choice3",
+              "position": ["public/hz_project/project/script/main.hzs", 25]
+            }
+          ],
+          "end_position": ["public/hz_project/project/script/main.hzs", 35]
+        },
+        "26": {
+          "start_position": ["public/hz_project/project/script/main.hzs", 26],
+          "item_list": [
+            {
+              "text": "choice3.1",
+              "position": ["public/hz_project/project/script/main.hzs", 27]
+            },
+            {
+              "text": "choice3.2",
+              "position": ["public/hz_project/project/script/main.hzs", 29]
+            },
+            {
+              "text": "choice3.3",
+              "position": ["public/hz_project/project/script/main.hzs", 31]
+            }
+          ],
+          "end_position": ["public/hz_project/project/script/main.hzs", 33]
+        },
+        "33": {
+          "start_position": ["public/hz_project/project/script/main.hzs", 26],
+          "item_list": [
+            {
+              "text": "choice3.1",
+              "position": ["public/hz_project/project/script/main.hzs", 27]
+            },
+            {
+              "text": "choice3.2",
+              "position": ["public/hz_project/project/script/main.hzs", 29]
+            },
+            {
+              "text": "choice3.3",
+              "position": ["public/hz_project/project/script/main.hzs", 31]
+            }
+          ],
+          "end_position": ["public/hz_project/project/script/main.hzs", 33]
+        },
+        "35": {
+          "start_position": ["public/hz_project/project/script/main.hzs", 20],
+          "item_list": [
+            {
+              "text": "choice1",
+              "position": ["public/hz_project/project/script/main.hzs", 21]
+            },
+            {
+              "text": "choice2",
+              "position": ["public/hz_project/project/script/main.hzs", 23]
+            },
+            {
+              "text": "choice3",
+              "position": ["public/hz_project/project/script/main.hzs", 25]
+            }
+          ],
+          "end_position": ["public/hz_project/project/script/main.hzs", 35]
+        },
+        "42": {
+          "start_position": ["public/hz_project/project/script/main.hzs", 18],
+          "item_list": [
+            {
+              "text": "嵌套menu测试",
+              "position": ["public/hz_project/project/script/main.hzs", 19]
+            },
+            {
+              "text": "if语句测试",
+              "position": ["public/hz_project/project/script/main.hzs", 38]
+            },
+            {
+              "text": "轮回测试",
+              "position": ["public/hz_project/project/script/main.hzs", 40]
+            }
+          ],
+          "end_position": ["public/hz_project/project/script/main.hzs", 42]
+        },
+        "49": {
+          "start_position": ["public/hz_project/project/script/main.hzs", 14],
+          "item_list": [
+            {
+              "text": "前往咖啡馆",
+              "position": ["public/hz_project/project/script/main.hzs", 15]
+            },
+            {
+              "text": "流程分支测试",
+              "position": ["public/hz_project/project/script/main.hzs", 17]
+            },
+            {
+              "text": "动画系统测试",
+              "position": ["public/hz_project/project/script/main.hzs", 43]
+            },
+            {
+              "text": "音频系统测试",
+              "position": ["public/hz_project/project/script/main.hzs", 45]
+            },
+            {
+              "text": "配置系统测试",
+              "position": ["public/hz_project/project/script/main.hzs", 47]
+            }
+          ],
+          "end_position": ["public/hz_project/project/script/main.hzs", 49]
+        }
+      }
+    }
+  }
+}

@@ -11,18 +11,18 @@ import { Script } from "./script/index.js";
 import { Storage } from "./storage/index.js";
 import { System } from "./system/index.js";
 import { UI } from "./ui/index.js";
-declare class HZEngineCore {
-    platform: Platform;
+declare class HZEngineCore<PlatformType extends Platform = any> {
+    platform: PlatformType;
     private _eventCallbacks;
     storage: Storage;
     async: Async;
-    ui: UI;
+    ui: UI<PlatformType>;
     script: Script;
-    system: System;
+    system: System<PlatformType>;
     config: Config;
     audio: Audio;
     debug: Debug;
-    constructor(platform: Platform);
+    constructor(platform: PlatformType);
     loadProject(options: {
         projectPath: string;
         cachePath: string;
@@ -31,11 +31,11 @@ declare class HZEngineCore {
     start(callback?: () => unknown): void;
     end(): void;
     plugins: Map<string, unknown>;
-    loadPlugin(name: string, plugin: Plugin): void;
+    loadPlugin(name: string, plugin: Plugin<PlatformType>): void;
     on(event: string, cb: Function): void;
     off(event: string, cb: Function): boolean;
     emit(event: string, ...args: any[]): void;
 }
-type Plugin = (core: HZEngineCore) => any;
+type Plugin<PlatformType extends Platform> = (core: HZEngineCore<PlatformType>) => any;
 export { HZEngineCore, UI, Storage, Script, System, Async, Platform };
 export * as TransformPlugin from "./plugins/transform/index.js";
