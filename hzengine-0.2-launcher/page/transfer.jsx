@@ -10,12 +10,13 @@ import {
   EdgeInsets,
   LayoutManagerFactory,
   MainAxisAlignment,
-  NativeBindingsFactory,
+  // NativeBindingsFactory,
   RenderNode,
   reportError,
   StackFit,
   // Solid,
 } from "@cuberqaq/asuka-ui";
+import { NativeBindingsFactory } from "@cuberqaq/asuka-ui/zeppos"
 import {
   createSignal,
   For,
@@ -33,6 +34,10 @@ import hmFS from "@zos/fs";
 import { getDeviceInfo, SCREEN_SHAPE_ROUND } from "@zos/device";
 import { addHzpk, checkHzpk_v1, removeHzpkByUuid, unpackHzpk_v1 } from "../shared/hzpk.js";
 import { Time } from "@zos/sensor";
+
+import { setPageBrightTime } from '@zos/display'
+
+
 
 const timeSensor = new Time();
 const Conditions = {
@@ -61,6 +66,9 @@ Page(
   BasePage({
     onInit() {
       console.log("page transfer init");
+      setPageBrightTime({
+        brightTime: 11451419,
+      })
     },
 
     build() {

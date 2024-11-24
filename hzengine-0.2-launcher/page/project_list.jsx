@@ -4,9 +4,10 @@ import {
   AsukaUI,
   EdgeInsets,
   LayoutManagerFactory,
-  NativeBindingsFactory,
+  // NativeBindingsFactory,
   reportError,
 } from "@cuberqaq/asuka-ui";
+import { NativeBindingsFactory } from "@cuberqaq/asuka-ui/zeppos"
 import {
   createSignal,
   For,

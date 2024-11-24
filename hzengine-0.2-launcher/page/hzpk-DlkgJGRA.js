@@ -1,7 +1,6 @@
 import * as hmUI from '@zos/ui';
-import hmUI__default from '@zos/ui';
+import { px as px$1 } from '@zos/utils';
 import { getDeviceInfo } from '@zos/device';
-import { log, px as px$2 } from '@zos/utils';
 import hmFS from '@zos/fs';
 
 const equalFn = (a, b) => a === b;
@@ -812,15 +811,17 @@ function createRenderer(options) {
   return renderer;
 }
 
-/// <reference types="@zeppos/device-types" />
-const hmLogger = log.getLogger('AsukaUI');
-({
-  log: hmLogger.log,
-  warn: hmLogger.warn,
-  error: hmLogger.error,
-  info: hmLogger.info,
-  debug: hmLogger.debug
-});
+// / <reference types="@zeppos/device-types" />
+// import hmUI from '@zos/ui';
+// import { log, px as _px } from '@zos/utils';
+// const hmLogger = log.getLogger('AsukaUI');
+// const logger = {
+//   log: hmLogger.log,
+//   warn: hmLogger.warn,
+//   error: hmLogger.error,
+//   info: hmLogger.info,
+//   debug: hmLogger.debug,
+// };
 /**
  * **断言**
  * @description
@@ -838,106 +839,101 @@ function assert(success) {
   }
 }
 function reportError(extra, err) {
-  console.log("Reporting Error...");
-  // logger.error(`ERROR:message=${extra} err=${err}`);
-  let bg = hmUI__default.createWidget(hmUI__default.widget.FILL_RECT, {
-    x: 0,
-    y: 0,
-    w: px$1(480),
-    h: px$1(480),
-    color: 0xd05977
-  });
-  hmUI__default.createWidget(hmUI__default.widget.TEXT, {
-    x: px$1(0),
-    y: px$1(20),
-    w: px$1(480),
-    h: px$1(80),
-    text: 'ERROR!',
-    text_size: px$1(60),
-    font: 'fonts/UbuntuMono-Bold.ttf',
-    color: 0xfcfcfc,
-    align_h: hmUI__default.align.CENTER_H,
-    align_v: hmUI__default.align.CENTER_V
-  });
-  let y = px$1(100);
-  y += showSubtitle(extra, y) + px$1(10);
-  y += showSubtitle('Error Name', y) + px$1(5);
-  y += showCode(err.name ?? 'No Name Founded', y) + px$1(10);
-  y += showSubtitle('Error Message', y) + px$1(5);
-  y += showCode(err.message ?? 'No Message Founded', y) + px$1(10);
-  y += showSubtitle('Error Stack', y) + px$1(5);
-  y += showCode(err.stack ?? 'No Stack Founded', y) + px$1(10);
-  bg.setProperty(hmUI__default.prop.MORE, {
-    x: 0,
-    y: 0,
-    w: px$1(480),
-    h: y + px$1(200)
-  });
+  console.log("Reporting Error...", extra);
+  // TODO zeppos call console.error may cause crash
   throw err;
-}
-const px$1 = p => Number(px$2(p));
-const SubTitleTextSize = px$1(36);
-const SubTitleTextWidth = px$1(400);
-function showSubtitle(text, offsetY) {
-  let {
-    width,
-    height
-  } = hmUI__default.getTextLayout(text, {
-    text_size: px$1(42),
-    text_width: SubTitleTextWidth,
-    // font: "fonts/UbuntuMono-Regular.ttf",
-    wrapped: 1
-  });
-  hmUI__default.createWidget(hmUI__default.widget.TEXT, {
-    x: px$1(40),
-    y: offsetY,
-    w: px$1(400),
-    h: height,
-    text,
-    text_size: SubTitleTextSize,
-    text_style: hmUI__default.text_style.WRAP,
-    font: 'fonts/UbuntuMono-Bold.ttf',
-    color: 0xfcfcfc,
-    // align_h: hmUI.align.CENTER_H,
-    align_v: hmUI__default.align.BOTTOM
-  });
-  return height;
-}
-const CodeTextSize = px$1(30);
-const CodeTextWidth = px$1(370);
-function showCode(text, offsetY) {
-  let {
-    width,
-    height
-  } = hmUI__default.getTextLayout(text, {
-    text_size: px$1(30),
-    text_width: CodeTextWidth,
-    // font: "fonts/UbuntuMono-Regular.ttf",
-    wrapped: 1
-  });
-  if (height < px$1(45)) height = px$1(45);
-  hmUI__default.createWidget(hmUI__default.widget.FILL_RECT, {
-    x: px$1(40),
-    y: offsetY,
-    w: px$1(400),
-    radius: px$1(8),
-    h: height,
-    color: 0x6f2641
-  });
-  hmUI__default.createWidget(hmUI__default.widget.TEXT, {
-    x: px$1(55),
-    y: offsetY,
-    w: CodeTextWidth,
-    h: height,
-    text,
-    text_size: CodeTextSize,
-    text_style: hmUI__default.text_style.WRAP,
-    font: 'fonts/UbuntuMono-Regular.ttf',
-    color: 0xeeeeee,
-    // align_h: hmUI.align.CENTER_H,
-    align_v: hmUI__default.align.CENTER_V
-  });
-  return height;
+  //     let bg = hmUI.createWidget(hmUI.widget.FILL_RECT, {
+  //       x: 0,
+  //       y: 0,
+  //       w: px(480),
+  //       h: px(480),
+  //       color: 0xd05977,
+  //     });
+  //     let title = hmUI.createWidget(hmUI.widget.TEXT, {
+  //       x: px(0),
+  //       y: px(20),
+  //       w: px(480),
+  //       h: px(80),
+  //       text: 'ERROR!',
+  //       text_size: px(60),
+  //       font: 'fonts/UbuntuMono-Bold.ttf',
+  //       color: 0xfcfcfc,
+  //       align_h: hmUI.align.CENTER_H,
+  //       align_v: hmUI.align.CENTER_V,
+  //     });
+  //     let y = px(100);
+  //     y += showSubtitle(extra, y) + px(10);
+  //     y += showSubtitle('Error Name', y) + px(5);
+  //     y += showCode((err as Error).name ?? 'No Name Founded', y) + px(10);
+  //     y += showSubtitle('Error Message', y) + px(5);
+  //     y += showCode((err as Error).message ?? 'No Message Founded', y) + px(10);
+  //     y += showSubtitle('Error Stack', y) + px(5);
+  //     y += showCode((err as Error).stack ?? 'No Stack Founded', y) + px(10);
+  //     bg.setProperty(hmUI.prop.MORE, {
+  //       x: 0,
+  //       y: 0,
+  //       w: px(480),
+  //       h: y + px(200),
+  //     } as any);
+  //     throw err;
+  // }
+  // const px = (p: number) => Number(_px(p));
+  // const SubTitleTextSize = px(36);
+  // const SubTitleTextWidth = px(400);
+  // function showSubtitle(text: string, offsetY: number): number {
+  //   let { width, height } = hmUI.getTextLayout(text, {
+  //     text_size: px(42),
+  //     text_width: SubTitleTextWidth,
+  //     // font: "fonts/UbuntuMono-Regular.ttf",
+  //     wrapped: 1,
+  //   } as any);
+  //   let text1 = hmUI.createWidget(hmUI.widget.TEXT, {
+  //     x: px(40),
+  //     y: offsetY,
+  //     w: px(400),
+  //     h: height,
+  //     text,
+  //     text_size: SubTitleTextSize,
+  //     text_style: hmUI.text_style.WRAP,
+  //     font: 'fonts/UbuntuMono-Bold.ttf',
+  //     color: 0xfcfcfc,
+  //     // align_h: hmUI.align.CENTER_H,
+  //     align_v: hmUI.align.BOTTOM,
+  //   });
+  //   return height;
+  // }
+  // const CodeTextSize = px(30);
+  // const CodeTextWidth = px(370);
+  // function showCode(text: string, offsetY: number): number {
+  //   let { width, height } = hmUI.getTextLayout(text, {
+  //     text_size: px(30),
+  //     text_width: CodeTextWidth,
+  //     // font: "fonts/UbuntuMono-Regular.ttf",
+  //     wrapped: 1,
+  //   } as any);
+  //   if (height < px(45)) height = px(45);
+  //   let bg = hmUI.createWidget(hmUI.widget.FILL_RECT, {
+  //     x: px(40),
+  //     y: offsetY,
+  //     w: px(400),
+  //     radius: px(8),
+  //     h: height,
+  //     color: 0x6f2641,
+  //   });
+  //   let text1 = hmUI.createWidget(hmUI.widget.TEXT, {
+  //     x: px(55),
+  //     y: offsetY,
+  //     w: CodeTextWidth,
+  //     h: height,
+  //     text,
+  //     text_size: CodeTextSize,
+  //     text_style: hmUI.text_style.WRAP,
+  //     font: 'fonts/UbuntuMono-Regular.ttf',
+  //     color: 0xeeeeee,
+  //     // align_h: hmUI.align.CENTER_H,
+  //     align_v: hmUI.align.CENTER_V,
+  //   });
+  //   return height;
 }
 
 function min(a, b) {
@@ -1603,6 +1599,8 @@ function findWhere(arr, ref, returnIndex, byValueOnly) {
 // import { AsukaLayoutNode } from "./asuka-layout";
 // import { defineStyleReflection } from "./layout-bridge";
 // import { splice, findWhere, createAttributeFilter, isElement } from "./util";
+// import { getDeviceInfo } from '@zos/device';
+// import * as hmUI from '@zos/ui';
 /**
  * **节点类**
  */
@@ -2714,11 +2712,13 @@ class RenderWidgetFactoryProvider extends RenderNodeWithSingleChild {
   }
 }
 class AsukaUI {
+  platform;
   viewRecord = {};
   _activeFrame = null;
   _nodeFactories = [];
   static instance = null;
-  constructor() {
+  constructor(platform) {
+    this.platform = platform;
     assert(AsukaUI.instance === null);
     AsukaUI.instance = this;
   }
@@ -2729,32 +2729,27 @@ class AsukaUI {
     // TODO
     this._activeFrame = frame;
   }
-  mountView(mount = hmUI, options) {
+  mountView(mount, options) {
     let size = options && options.size;
     let offset = options && options.offset || {
       x: 0,
       y: 0
     };
     if (!size) {
-      if (mount === hmUI) {
-        let {
-          width,
-          height
-        } = getDeviceInfo();
-        size = {
-          w: width,
-          h: height
-        };
-      } else {
-        try {
-          size = {
-            w: mount.getProperty(hmUI.prop.W),
-            h: mount.getProperty(hmUI.prop.H)
-          };
-        } catch {
-          reportError('createFrame', Error('Get View size failed'));
-        }
-      }
+      //   if (mount === hmUI) {
+      //     let { width, height } = getDeviceInfo();
+      //     size = { w: width, h: height };
+      //   } else {
+      //     try {
+      //       size = {
+      //         w: (mount as any).getProperty(hmUI.prop.W),
+      //         h: (mount as any).getProperty(hmUI.prop.H),
+      //       };
+      //     } catch {
+      //       reportError('createFrame', Error('Get View size failed'));
+      //     }
+      //   }
+      size = this.platform.getWidgetFactorySize(mount);
     }
     if (!size) throw Error('Get View size failed');
     let view = new RenderView({
@@ -2895,1186 +2890,6 @@ class AsukaUI {
     this._runAfterTasks = [];
   }
 }
-
-class PreferSizeManager {
-  _node;
-  _preferredSize = null;
-  constructor(_node) {
-    this._node = _node;
-  }
-  _defaultSize = null;
-  setDefaultSize(size) {
-    this._defaultSize = size == null ? null : {
-      ...size
-    };
-    let mixedSize = this._getMixedSize();
-    if (!Size.equals(mixedSize, this._mixedSize)) {
-      this._node.markNeedsLayout();
-    }
-    return this;
-  }
-  getDefaultSize() {
-    return this._defaultSize;
-  }
-  _mixedSize = null;
-  _getMixedSize() {
-    return {
-      w: this._preferredSize?.w ?? this._defaultSize?.w ?? Number.POSITIVE_INFINITY,
-      h: this._preferredSize?.h ?? this._defaultSize?.h ?? Number.POSITIVE_INFINITY
-    };
-  }
-  /**
-   * **根据已有属性选择最合适的尺寸**
-   *
-   * 请在`performLayout`中调用，本方法会将变化后的结果修改至宿主的`size`
-   */
-  chooseSize() {
-    assert(this._node._constraints != null);
-    assert(Constraints.isValid(this._node._constraints));
-    this._mixedSize = this._getMixedSize();
-    // assert(()=>{
-    //   if(this._mixedSize?.h == null || this._mixedSize?.w == null){
-    //     throw new Error(`PreferSizeManager.chooseSize() error: ${this._mixedSize?.h} ${this._mixedSize?.w}, at ${this._node.nodeName}`)
-    //   }
-    //   return true
-    // })
-    this._node.size = this._node._constraints.constrain(this._mixedSize);
-  }
-  setProperty(key, value) {
-    switch (key) {
-      case 'w':
-      case 'width':
-        {
-          let val = Number(value);
-          if (!isNaN(val)) {
-            val = max(val, 0);
-            if (this._preferredSize === null || this._preferredSize.w !== val) {
-              if (this._preferredSize === null) {
-                this._preferredSize = {
-                  w: null,
-                  h: null
-                };
-              }
-              this._preferredSize.w = val;
-              this._node.markNeedsLayout();
-            }
-          }
-        }
-        break;
-      case 'h':
-      case 'height':
-        {
-          let val = Number(value);
-          if (!isNaN(val)) {
-            val = max(val, 0);
-            if (this._preferredSize === null || this._preferredSize.h !== val) {
-              if (this._preferredSize === null) {
-                this._preferredSize = {
-                  w: null,
-                  h: null
-                };
-              }
-              this._preferredSize.h = val;
-              this._node.markNeedsLayout();
-            }
-          }
-        }
-        break;
-    }
-  }
-}
-
-const defaultProps$a = {
-  color: 0xcc0000,
-  line_width: 5
-};
-class NativeWidgetArc extends RenderWidget {
-  _widget = null;
-  _preferredSizeManager = new PreferSizeManager(this);
-  _props = {
-    ...defaultProps$a
-  };
-  sizedByParent = false;
-  onCommit({
-    size,
-    position,
-    widgetFactory,
-    initial
-  }) {
-    if (initial) {
-      assert(this._widget === null);
-      this._widget = widgetFactory.createWidget(hmUI.widget.ARC, {
-        ...this._props,
-        ...position,
-        ...size
-      });
-    } else {
-      assert(this._widget != null);
-      this._widget.setProperty(hmUI.prop.MORE, {
-        ...this._props,
-        ...position,
-        ...size
-      });
-    }
-  }
-  onDestroy(widgetFactory) {
-    assert(widgetFactory !== null && this._widget !== null);
-    widgetFactory.deleteWidget(this._widget);
-  }
-  performResize() {
-    assert(Constraints.isValid(this._constraints));
-    this.size = this._constraints.biggest;
-  }
-  performLayout() {
-    this._preferredSizeManager.chooseSize();
-    // assert(()=>{throw Error("Test Point 2")})
-  }
-  setProperty(key, value) {
-    this._preferredSizeManager.setProperty(key, value);
-    switch (key) {
-      case 'color':
-        {
-          this._props.color = value;
-          if (this._widget) this._widget.setProperty(hmUI.prop.COLOR, value);
-        }
-        break;
-      case 's':
-      case 'sa':
-      case 'start':
-      case 'start_angle':
-        {
-          this._props.start_angle = value;
-          if (this._widget) this._widget.setProperty(hmUI.prop.START_ANGLE, value);
-        }
-        break;
-      case 'e':
-      case 'ea':
-      case 'end':
-      case 'end_angle':
-        {
-          this._props.end_angle = value;
-          if (this._widget) this._widget.setProperty(hmUI.prop.END_ANGLE, value);
-        }
-        break;
-      case 'lw':
-      case 'line_width':
-        {
-          this._props.line_width = value;
-          if (this._widget) this._widget.setProperty(hmUI.prop.LINE_WIDTH, value);
-        }
-        break;
-    }
-  }
-}
-
-const defaultProps$9 = {
-  text_size: px$2(36)
-};
-class NativeWidgetButton extends RenderWidget {
-  _widget = null;
-  _preferredSizeManager = new PreferSizeManager(this).setDefaultSize(Size.infinite);
-  _props = {
-    ...defaultProps$9
-  };
-  onCommit({
-    size,
-    position,
-    widgetFactory,
-    initial
-  }) {
-    if (initial) {
-      assert(this._widget === null);
-      this._widget = widgetFactory.createWidget(hmUI.widget.BUTTON, {
-        ...this._props,
-        ...position,
-        ...size,
-        click_func: () => {
-          this.dispatchEvent(new AsukaEvent('click', {
-            bubbles: true,
-            cancelable: true
-          }));
-        },
-        longpress_func: () => {
-          this.dispatchEvent(new AsukaEvent('longpress', {
-            bubbles: true,
-            cancelable: true
-          }));
-        }
-      });
-    } else {
-      assert(this._widget != null);
-      this._widget.setProperty(hmUI.prop.MORE, {
-        ...this._props,
-        ...position,
-        ...size
-      });
-    }
-  }
-  onDestroy(widgetFactory) {
-    assert(widgetFactory !== null && this._widget !== null);
-    widgetFactory.deleteWidget(this._widget);
-  }
-  performResize() {
-    assert(Constraints.isValid(this._constraints));
-    this.size = this._constraints.biggest;
-  }
-  performLayout() {
-    this._preferredSizeManager.chooseSize();
-    // assert(()=>{throw Error("Test Point 2")})
-  }
-  _updateDefaultSize() {
-    if (this._props.normal_src) {
-      let {
-        width,
-        height
-      } = hmUI.getImageInfo(this._props.normal_src);
-      this._preferredSizeManager.setDefaultSize({
-        w: width,
-        h: height
-      });
-    }
-  }
-  setProperty(key, value) {
-    super.setProperty(key, value);
-    this._preferredSizeManager.setProperty(key, value);
-    console.log(`set ${key} to ${value}`);
-    switch (key) {
-      case 'text':
-        {
-          if (this._props.text !== value) {
-            this._props.text = value;
-            if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
-              ...this.size,
-              ...this.position,
-              text: value
-            });
-          }
-        }
-        break;
-      case 'color':
-        {
-          if (this._props.color !== value) {
-            this._props.color = value;
-            if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
-              ...this.size,
-              ...this.position,
-              color: value
-            });
-          }
-        }
-        break;
-      case 'size':
-      case 'ts':
-      case 'text_size':
-        {
-          if (this._props.text_size !== value) {
-            this._props.text_size = value;
-            if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
-              ...this.size,
-              ...this.position,
-              text_size: value
-            });
-          }
-        }
-        break;
-      case 'nc':
-      case 'ncolor':
-      case 'normal_color':
-        {
-          if (this._props.normal_color !== value) {
-            this._props.normal_color = value;
-            if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
-              ...this.size,
-              ...this.position,
-              normal_color: value
-            });
-          }
-        }
-        break;
-      case 'pc':
-      case 'pcolor':
-      case 'press_color':
-        {
-          if (this._props.press_color !== value) {
-            this._props.press_color = value;
-            if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
-              ...this.size,
-              ...this.position,
-              press_color: value
-            });
-          }
-        }
-        break;
-      case 'r':
-      case 'radius':
-        {
-          if (this._props.radius !== value) {
-            this._props.radius = value;
-            if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
-              ...this.size,
-              ...this.position,
-              radius: value
-            });
-          }
-        }
-        break;
-      case 'ns':
-      case 'nsrc':
-      case 'normal_src':
-        {
-          if (this._props.normal_src !== value) {
-            this._props.normal_src = value;
-            this._updateDefaultSize();
-            if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
-              ...this.size,
-              ...this.position,
-              normal_src: value
-            });
-          }
-        }
-        break;
-      case 'ps':
-      case 'psrc':
-      case 'press_src':
-        {
-          if (this._props.press_src !== value) {
-            this._props.press_src = value;
-            if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
-              ...this.size,
-              ...this.position,
-              press_src: value
-            });
-          }
-        }
-        break;
-    }
-  }
-}
-
-const defaultProps$8 = {};
-class NativeWidgetCanvas extends RenderWidget {
-  _widget = null;
-  // _preferredSizeManager = new PreferSizeManager(this);
-  _props = {
-    ...defaultProps$8
-  };
-  sizedByParent = true;
-  onCommit({
-    size,
-    position,
-    widgetFactory,
-    initial
-  }) {
-    if (initial) {
-      assert(this._widget === null);
-      this._widget = widgetFactory.createWidget(hmUI.widget.CANVAS, {
-        ...this._props,
-        ...position,
-        ...size
-      });
-    } else {
-      assert(this._widget != null);
-      this._widget.setProperty(hmUI.prop.MORE, {
-        ...this._props,
-        ...position,
-        ...size
-      });
-    }
-  }
-  onDestroy(widgetFactory) {
-    assert(widgetFactory !== null && this._widget !== null);
-    widgetFactory.deleteWidget(this._widget);
-  }
-  performResize() {
-    assert(Constraints.isValid(this._constraints));
-    this.size = this._constraints.biggest;
-  }
-  performLayout() {
-    // this._preferredSizeManager.chooseSize();
-    // assert(()=>{throw Error("Test Point 2")})
-  }
-  setProperty(key, value) {
-    super.setProperty(key, value);
-  }
-}
-
-const defaultProps$7 = {
-  color: 0xff8888
-};
-class NativeWidgetCircle extends RenderWidget {
-  _widget = null;
-  _preferredSizeManager = new PreferSizeManager(this);
-  _props = {
-    ...defaultProps$7
-  };
-  sizedByParent = false;
-  _fromSizeAndPositionToProp(size, position) {
-    let radius = min(size.h, size.w) / 2;
-    return {
-      radius,
-      center_x: position.x + size.w / 2 - radius,
-      center_y: position.y + size.h / 2 - radius
-    };
-  }
-  onCommit({
-    size,
-    position,
-    widgetFactory,
-    initial
-  }) {
-    if (initial) {
-      assert(this._widget === null);
-      this._widget = widgetFactory.createWidget(hmUI.widget.FILL_RECT, {
-        ...this._props,
-        ...this._fromSizeAndPositionToProp(size, position)
-      });
-    } else {
-      assert(this._widget != null);
-      this._widget.setProperty(hmUI.prop.MORE, {
-        ...this._props,
-        ...this._fromSizeAndPositionToProp(size, position)
-      });
-    }
-  }
-  onDestroy(widgetFactory) {
-    assert(widgetFactory !== null && this._widget !== null);
-    widgetFactory.deleteWidget(this._widget);
-  }
-  performResize() {
-    assert(Constraints.isValid(this._constraints));
-    this.size = this._constraints.biggest;
-  }
-  performLayout() {
-    this._preferredSizeManager.chooseSize();
-    // assert(()=>{throw Error("Test Point 2")})
-  }
-  setProperty(key, value) {
-    super.setProperty(key, value);
-    this._preferredSizeManager.setProperty(key, value);
-    switch (key) {
-      case 'r':
-      case 'radius':
-        {
-          this._preferredSizeManager.setDefaultSize({
-            w: value,
-            h: value
-          });
-        }
-        break;
-      case 'color':
-        {
-          this._props.color = value;
-          if (this._widget) this._widget.setProperty(hmUI.prop.COLOR, value);
-        }
-        break;
-      case 'alpha':
-        {
-          this._props.alpha = value;
-          if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
-            ...this.size,
-            ...this.position,
-            ...this._props
-          });
-        }
-        break;
-    }
-  }
-}
-
-const defaultProps$6 = {
-  color: 0xcc0000
-};
-class NativeWidgetFillRect extends RenderWidget {
-  _widget = null;
-  _preferredSizeManager = new PreferSizeManager(this);
-  _props = {
-    ...defaultProps$6
-  };
-  sizedByParent = false;
-  onCommit({
-    size,
-    position,
-    widgetFactory,
-    initial
-  }) {
-    if (initial) {
-      assert(this._widget === null);
-      this._widget = widgetFactory.createWidget(hmUI.widget.FILL_RECT, {
-        ...this._props,
-        ...position,
-        ...size
-      });
-    } else {
-      assert(this._widget != null);
-      this._widget.setProperty(hmUI.prop.MORE, {
-        ...this._props,
-        ...position,
-        ...size
-      });
-    }
-  }
-  onDestroy(widgetFactory) {
-    assert(widgetFactory !== null && this._widget !== null);
-    widgetFactory.deleteWidget(this._widget);
-  }
-  performResize() {
-    assert(Constraints.isValid(this._constraints));
-    this.size = this._constraints.biggest;
-  }
-  performLayout() {
-    this._preferredSizeManager.chooseSize();
-    // assert(()=>{throw Error("Test Point 2")})
-  }
-  setProperty(key, value) {
-    super.setProperty(key, value);
-    this._preferredSizeManager.setProperty(key, value);
-    switch (key) {
-      case 'r':
-      case 'radius':
-        {
-          this._props.radius = value;
-          if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
-            ...this.size,
-            ...this.position,
-            ...this._props
-          });
-        }
-        break;
-      case 'color':
-        {
-          this._props.color = value;
-          if (this._widget) this._widget.setProperty(hmUI.prop.COLOR, value);
-        }
-        break;
-      case 'alpha':
-        {
-          this._props.alpha = value;
-          if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
-            ...this.size,
-            ...this.position,
-            ...this._props
-          });
-        }
-        break;
-    }
-  }
-}
-
-const defaultProps$5 = {};
-class NativeWidgetImage extends RenderWidget {
-  _widget = null;
-  _props = {
-    ...defaultProps$5
-  };
-  _preferredSizeManager = new PreferSizeManager(this);
-  sizedByParent = false;
-  onCommit({
-    size,
-    position,
-    widgetFactory,
-    initial
-  }) {
-    if (initial) {
-      assert(this._widget === null);
-      this._widget = widgetFactory.createWidget(hmUI.widget.FILL_RECT, {
-        ...this._props,
-        ...position,
-        ...size
-      });
-    } else {
-      assert(this._widget != null);
-      this._widget.setProperty(hmUI.prop.MORE, {
-        ...this._props,
-        ...position,
-        ...size
-      });
-    }
-  }
-  onDestroy(widgetFactory) {
-    assert(widgetFactory !== null && this._widget !== null);
-    widgetFactory.deleteWidget(this._widget);
-  }
-  performResize() {}
-  performLayout() {}
-  _updateDefaultSize() {
-    if (this._props.src) {
-      let {
-        width,
-        height
-      } = hmUI.getImageInfo(this._props.src);
-      this._preferredSizeManager.setDefaultSize({
-        w: width,
-        h: height
-      });
-    }
-  }
-  setProperty(key, value) {
-    super.setProperty(key, value);
-    this._preferredSizeManager.setProperty(key, value);
-    switch (key) {
-      case 'color':
-        if (value !== this._props.color) {
-          this._props.color = value;
-          if (this._widget) this._widget.setProperty(hmUI.prop.COLOR, value);
-        }
-        break;
-      // case 'alpha':
-      //   {
-      //     if (value !== this._props.alpha) {
-      //       this._props.alpha = value;
-      //       if (this._widget)
-      //         this._widget.setProperty(hmUI.prop.MORE, { ...this._props });
-      //     }
-      //   }
-      //   break;
-      case 'pos_x':
-        {
-          if (value !== this._props.pos_x) {
-            this._props.pos_x = value;
-            if (this._widget) this._widget.setProperty(hmUI.prop.POS_X, value);
-          }
-        }
-        break;
-      case 'pos_y':
-        {
-          if (value !== this._props.pos_y) {
-            this._props.pos_y = value;
-            if (this._widget) this._widget.setProperty(hmUI.prop.POS_Y, value);
-          }
-        }
-        break;
-      case 'angle':
-        {
-          if (value !== this._props.angle) {
-            this._props.angle = value;
-            if (this._widget) this._widget.setProperty(hmUI.prop.ANGLE, value);
-          }
-        }
-        break;
-      case 'center_x':
-        {
-          if (value !== this._props.center_x) {
-            this._props.center_x = value;
-            if (this._widget) this._widget.setProperty(hmUI.prop.CENTER_X, value);
-          }
-        }
-        break;
-      case 'center_y':
-        {
-          if (value !== this._props.center_y) {
-            this._props.center_y = value;
-            if (this._widget) this._widget.setProperty(hmUI.prop.CENTER_Y, value);
-          }
-        }
-        break;
-      case 'alpha':
-        {
-          if (value !== this._props.alpha) {
-            this._props.alpha = value;
-            if (this._widget) this._widget.setProperty(hmUI.prop.ALPHA, value);
-          }
-        }
-        break;
-      case 'auto_scale':
-        {
-          if (value !== this._props.auto_scale) {
-            this._props.auto_scale = value;
-            if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
-              ...this._props
-            });
-          }
-        }
-        break;
-      case 'auto_scale_obj_fit':
-        {
-          if (value !== this._props.auto_scale_obj_fit) {
-            this._props.auto_scale_obj_fit = value;
-            if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
-              ...this._props
-            });
-          }
-        }
-        break;
-      case 'src':
-        {
-          if (value !== this._props.src) {
-            this._props.src = value;
-            if (this._widget) this._widget.setProperty(hmUI.prop.SRC, value);
-          }
-        }
-        break;
-    }
-  }
-}
-
-const defaultProps$4 = {};
-class NativeWidgetPolyline extends RenderWidget {
-  _widget = null;
-  _preferredSizeManager = new PreferSizeManager(this);
-  _props = {
-    ...defaultProps$4
-  };
-  sizedByParent = false;
-  onCommit({
-    size,
-    position,
-    widgetFactory,
-    initial
-  }) {
-    if (initial) {
-      assert(this._widget === null);
-      this._widget = widgetFactory.createWidget(hmUI.widget.GRADKIENT_POLYLINE, {
-        ...this._props,
-        ...position,
-        ...size
-      });
-    } else {
-      assert(this._widget != null);
-      this._widget.setProperty(hmUI.prop.MORE, {
-        ...this._props,
-        ...position,
-        ...size
-      });
-    }
-  }
-  onDestroy(widgetFactory) {
-    assert(widgetFactory !== null && this._widget !== null);
-    widgetFactory.deleteWidget(this._widget);
-  }
-  performResize() {
-    assert(Constraints.isValid(this._constraints));
-    this.size = this._constraints.biggest;
-  }
-  performLayout() {
-    this._preferredSizeManager.chooseSize();
-    // assert(()=>{throw Error("Test Point 2")})
-  }
-  setProperty(key, value) {
-    super.setProperty(key, value);
-    this._preferredSizeManager.setProperty(key, value);
-    switch (key) {
-      case 'color':
-      case 'line_color':
-        {
-          this._props.line_color = value;
-          if (this._widget) this._widget.setProperty(hmUI.prop.LINE_COLOR, value);
-        }
-        break;
-      case 'lw':
-      case 'line_width':
-        {
-          this._props.line_width = value;
-          if (this._widget) this._widget.setProperty(hmUI.prop.LINE_WIDTH, value);
-        }
-        break;
-    }
-  }
-}
-
-const defaultProps$3 = {
-  content: 'null'
-};
-// Not support bg_x bg_y bg_w bg_h, please use container or stack etc to add background decoration.
-class NativeWidgetQRCode extends RenderWidget {
-  _widget = null;
-  _preferredSizeManager = new PreferSizeManager(this);
-  _props = {
-    ...defaultProps$3
-  };
-  sizedByParent = false;
-  onCommit({
-    size,
-    position,
-    widgetFactory,
-    initial
-  }) {
-    if (initial) {
-      assert(this._widget === null);
-      this._widget = widgetFactory.createWidget(hmUI.widget.QRCODE, {
-        ...this._props,
-        ...position,
-        ...size
-      });
-    } else {
-      assert(this._widget != null);
-      this._widget.setProperty(hmUI.prop.MORE, {
-        ...this._props,
-        ...position,
-        ...size
-      });
-    }
-  }
-  onDestroy(widgetFactory) {
-    assert(widgetFactory !== null && this._widget !== null);
-    widgetFactory.deleteWidget(this._widget);
-  }
-  performResize() {
-    assert(Constraints.isValid(this._constraints));
-    this.size = this._constraints.biggest;
-  }
-  performLayout() {
-    this._preferredSizeManager.chooseSize();
-    // assert(()=>{throw Error("Test Point 2")})
-  }
-  setProperty(key, value) {
-    super.setProperty(key, value);
-    this._preferredSizeManager.setProperty(key, value);
-    switch (key) {
-      case 'content':
-        {
-          this._props.content = value;
-          if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
-            ...this.position,
-            ...this.size,
-            content: value
-          });
-        }
-        break;
-    }
-  }
-}
-
-const defaultProps$2 = {
-  color: 0xcc0000
-};
-class NativeWidgetRadioGroup extends RenderWidgetFactoryProvider {
-  _widget = null;
-  _props = {
-    ...defaultProps$2
-  };
-  _defaultChecked = 0;
-  _registeredTask = null;
-  _stateButtonWidget = [];
-  _registerAfterAsyncTask() {
-    assert(this._attached);
-    assert(this._core != null);
-    if (this._registeredTask !== null) {
-      this._registeredTask = () => {
-        this._registeredTask = null;
-        assert(this._widget != null);
-        if (this._stateButtonWidget.length > 0) {
-          assert(this._defaultChecked < this._stateButtonWidget.length);
-          this._widget.setProperty(hmUI.prop.INIT, this._stateButtonWidget[this._defaultChecked]);
-        }
-      };
-      this._core.addRunAfterAsync(this._registeredTask);
-    }
-  }
-  _initChildWidgetFactory() {
-    this.childWidgetFactory = {
-      createWidget: (widgetType, option) => {
-        assert(this._widget != null);
-        let widget = this._widget.createWidget(widgetType, option);
-        if (widgetType === hmUI.widget.STATE_BUTTON) {
-          this._stateButtonWidget.push(widget);
-        }
-      },
-      deleteWidget: widget => {
-        if (widget.getType() === hmUI.widget.STATE_BUTTON) {
-          //   let index = findWhere(this._stateButtonWidget, widget, true);
-          // TODO do some operations to make everything right
-          splice(this._stateButtonWidget, widget);
-        }
-        assert(this._widget != null);
-        this._widget.deleteWidget(widget);
-      }
-    };
-  }
-  onCommit({
-    size,
-    position,
-    widgetFactory,
-    initial
-  }) {
-    assert(this._props.select_src != null);
-    assert(this._props.unselect_src != null);
-    if (initial) {
-      assert(this._widget === null);
-      this._widget = widgetFactory.createWidget(hmUI.widget.FILL_RECT, {
-        ...this._props,
-        ...position,
-        ...size
-      });
-      this._initChildWidgetFactory();
-    } else {
-      assert(this._widget != null);
-      this._widget.setProperty(hmUI.prop.MORE, {
-        ...this._props,
-        ...position,
-        ...size
-      });
-    }
-  }
-  onDestroy(widgetFactory) {
-    assert(widgetFactory !== null && this._widget !== null);
-    widgetFactory.deleteWidget(this._widget);
-  }
-  setProperty(key, value) {
-    switch (key) {
-      case 'select_src':
-        {
-          this._props.select_src = value;
-          if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
-            ...this.size,
-            ...this.position,
-            ...this._props
-          });
-        }
-        break;
-      case 'unselect_src':
-        {
-          this._props.unselect_src = value;
-          if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
-            ...this.size,
-            ...this.position,
-            ...this._props
-          });
-        }
-        break;
-    }
-  }
-}
-
-const defaultProps$1 = {
-  color: 0xcc4400
-};
-class NativeWidgetStrokeRect extends RenderWidget {
-  _widget = null;
-  _preferredSizeManager = new PreferSizeManager(this);
-  _props = {
-    ...defaultProps$1
-  };
-  sizedByParent = false;
-  onCommit({
-    size,
-    position,
-    widgetFactory,
-    initial
-  }) {
-    if (initial) {
-      assert(this._widget === null);
-      this._widget = widgetFactory.createWidget(hmUI.widget.STROKE_RECT, {
-        ...this._props,
-        ...position,
-        ...size
-      });
-    } else {
-      assert(this._widget != null);
-      this._widget.setProperty(hmUI.prop.MORE, {
-        ...this._props,
-        ...position,
-        ...size
-      });
-    }
-  }
-  onDestroy(widgetFactory) {
-    assert(widgetFactory !== null && this._widget !== null);
-    widgetFactory.deleteWidget(this._widget);
-  }
-  performResize() {
-    assert(Constraints.isValid(this._constraints));
-    this.size = this._constraints.biggest;
-  }
-  performLayout() {
-    this._preferredSizeManager.chooseSize();
-    // assert(()=>{throw Error("Test Point 2")})
-  }
-  setProperty(key, value) {
-    super.setProperty(key, value);
-    this._preferredSizeManager.setProperty(key, value);
-    switch (key) {
-      case 'r':
-      case 'radius':
-        {
-          this._props.radius = value;
-          if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
-            ...this.size,
-            ...this.position,
-            ...this._props
-          });
-        }
-        break;
-      case 'color':
-        {
-          this._props.color = value;
-          if (this._widget) this._widget.setProperty(hmUI.prop.COLOR, value);
-        }
-        break;
-      case 'angle':
-        {
-          this._props.angle = value;
-          if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
-            ...this.size,
-            ...this.position,
-            ...this._props
-          });
-        }
-        break;
-      case 'lw':
-      case 'line_width':
-        {
-          this._props.line_width = value;
-          if (this._widget) this._widget.setProperty(hmUI.prop.LINE_WIDTH, value);
-        }
-        break;
-    }
-  }
-}
-
-const defaultProps = {
-  text: 'text',
-  color: 0xffffff,
-  text_size: Number(px$2(36)),
-  align_h: hmUI.align.CENTER_H,
-  align_v: hmUI.align.CENTER_V
-};
-class NativeWidgetText extends RenderWidget {
-  _widget = null;
-  _props = {
-    ...defaultProps
-  };
-  sizedByParent = false;
-  onCommit({
-    size,
-    position,
-    widgetFactory,
-    initial
-  }) {
-    if (initial) {
-      assert(this._widget === null);
-      this._widget = widgetFactory.createWidget(hmUI.widget.TEXT, {
-        ...this._props,
-        ...position,
-        ...size
-      });
-    } else {
-      assert(this._widget != null);
-      this._widget.setProperty(hmUI.prop.MORE, {
-        ...this._props,
-        ...position,
-        ...size
-      });
-    }
-  }
-  onDestroy(widgetFactory) {
-    assert(widgetFactory !== null && this._widget !== null);
-    widgetFactory.deleteWidget(this._widget);
-  }
-  performResize() {}
-  performLayout() {
-    assert(Constraints.isValid(this._constraints));
-    let {
-      width: singleLineWidth,
-      height: singleLineHeight
-    } = hmUI.getTextLayout(this._props.text, {
-      text_size: this._props.text_size,
-      text_width: 0,
-      wrapped: 0
-    });
-    if (this._props.text_style !== undefined && this._props.text_style === hmUI.text_style.WRAP) {
-      // 文字可换行
-      if (singleLineWidth > this._constraints.maxWidth) {
-        // 换行
-        let {
-          width,
-          height
-        } = hmUI.getTextLayout(this._props.text, {
-          text_size: this._props.text_size,
-          text_width: this._constraints.maxWidth,
-          wrapped: 1
-        });
-        this.size = this._constraints.constrain({
-          w: width,
-          h: height
-        });
-      } else {
-        // 单行
-        this.size = this._constraints.constrain({
-          w: singleLineWidth,
-          h: singleLineHeight
-        });
-      }
-    } else {
-      // 文字不可换行
-      this.size = this._constraints.constrain({
-        w: singleLineWidth,
-        h: singleLineHeight
-      });
-    }
-    // this.size = this._constraints!.maxSize();
-  }
-  setProperty(key, value) {
-    super.setProperty(key, value);
-    switch (key) {
-      case 'text':
-        {
-          this._props.text = '' + value;
-          if (this._widget) {
-            this._widget.setProperty(hmUI.prop.TEXT, '' + value);
-          }
-          this.markNeedsLayout();
-        }
-        break;
-      case 'color':
-        {
-          this._props.color = value;
-          if (this._widget) this._widget.setProperty(hmUI.prop.COLOR, value);
-        }
-        break;
-      case 'text_size':
-        {
-          this._props.text_size = value;
-          if (this._widget) this._widget.setProperty(hmUI.prop.TEXT_SIZE, value);
-        }
-        break;
-      case 'text_style':
-        {
-          this._props.text_style = value;
-          if (this._widget) this._widget.setProperty(hmUI.prop.TEXT_STYLE, value);
-        }
-        break;
-    }
-  }
-}
-
-const NativeBindingsFactory = {
-  createNode(type) {
-    switch (type) {
-      case 'text':
-        return new NativeWidgetText(null, type);
-      case 'fill-rect':
-      case 'fill_rect':
-      case 'fillrect':
-        return new NativeWidgetFillRect(null, type);
-      case 'stroke-rect':
-      case 'stroke_rect':
-      case 'strokerect':
-      case 'stroke':
-        return new NativeWidgetStrokeRect(null, type);
-      case 'image':
-      case 'img':
-        return new NativeWidgetImage(null, type);
-      case 'button':
-        return new NativeWidgetButton(null, type);
-      case 'circle':
-        return new NativeWidgetCircle(null, type);
-      case 'arc':
-        return new NativeWidgetArc(null, type);
-      case 'qrcode':
-        return new NativeWidgetQRCode(null, type);
-      case 'polyline':
-        return new NativeWidgetPolyline(null, type);
-      case 'canvas':
-        return new NativeWidgetCanvas(null, type);
-      case 'radio':
-      case 'radio_group':
-      case 'radiogroup':
-        return new NativeWidgetRadioGroup(null, type);
-      default:
-        return null;
-    }
-  }
-};
 
 class LayoutWidgetAlign extends RenderNodeWithSingleChild {
   sizedByParent = true;
@@ -5147,6 +3962,1186 @@ const {
 //     },
 //   });
 // }
+
+class PreferSizeManager {
+  _node;
+  _preferredSize = null;
+  constructor(_node) {
+    this._node = _node;
+  }
+  _defaultSize = null;
+  setDefaultSize(size) {
+    this._defaultSize = size == null ? null : {
+      ...size
+    };
+    let mixedSize = this._getMixedSize();
+    if (!Size.equals(mixedSize, this._mixedSize)) {
+      this._node.markNeedsLayout();
+    }
+    return this;
+  }
+  getDefaultSize() {
+    return this._defaultSize;
+  }
+  _mixedSize = null;
+  _getMixedSize() {
+    return {
+      w: this._preferredSize?.w ?? this._defaultSize?.w ?? Number.POSITIVE_INFINITY,
+      h: this._preferredSize?.h ?? this._defaultSize?.h ?? Number.POSITIVE_INFINITY
+    };
+  }
+  /**
+   * **根据已有属性选择最合适的尺寸**
+   *
+   * 请在`performLayout`中调用，本方法会将变化后的结果修改至宿主的`size`
+   */
+  chooseSize() {
+    assert(this._node._constraints != null);
+    assert(Constraints.isValid(this._node._constraints));
+    this._mixedSize = this._getMixedSize();
+    // assert(()=>{
+    //   if(this._mixedSize?.h == null || this._mixedSize?.w == null){
+    //     throw new Error(`PreferSizeManager.chooseSize() error: ${this._mixedSize?.h} ${this._mixedSize?.w}, at ${this._node.nodeName}`)
+    //   }
+    //   return true
+    // })
+    this._node.size = this._node._constraints.constrain(this._mixedSize);
+  }
+  setProperty(key, value) {
+    switch (key) {
+      case 'w':
+      case 'width':
+        {
+          let val = Number(value);
+          if (!isNaN(val)) {
+            val = max(val, 0);
+            if (this._preferredSize === null || this._preferredSize.w !== val) {
+              if (this._preferredSize === null) {
+                this._preferredSize = {
+                  w: null,
+                  h: null
+                };
+              }
+              this._preferredSize.w = val;
+              this._node.markNeedsLayout();
+            }
+          }
+        }
+        break;
+      case 'h':
+      case 'height':
+        {
+          let val = Number(value);
+          if (!isNaN(val)) {
+            val = max(val, 0);
+            if (this._preferredSize === null || this._preferredSize.h !== val) {
+              if (this._preferredSize === null) {
+                this._preferredSize = {
+                  w: null,
+                  h: null
+                };
+              }
+              this._preferredSize.h = val;
+              this._node.markNeedsLayout();
+            }
+          }
+        }
+        break;
+    }
+  }
+}
+
+const defaultProps$a = {
+  color: 0xcc0000,
+  line_width: 5
+};
+class NativeWidgetArc extends RenderWidget {
+  _widget = null;
+  _preferredSizeManager = new PreferSizeManager(this);
+  _props = {
+    ...defaultProps$a
+  };
+  sizedByParent = false;
+  onCommit({
+    size,
+    position,
+    widgetFactory,
+    initial
+  }) {
+    if (initial) {
+      assert(this._widget === null);
+      this._widget = widgetFactory.createWidget(hmUI.widget.ARC, {
+        ...this._props,
+        ...position,
+        ...size
+      });
+    } else {
+      assert(this._widget != null);
+      this._widget.setProperty(hmUI.prop.MORE, {
+        ...this._props,
+        ...position,
+        ...size
+      });
+    }
+  }
+  onDestroy(widgetFactory) {
+    assert(widgetFactory !== null && this._widget !== null);
+    widgetFactory.deleteWidget(this._widget);
+  }
+  performResize() {
+    assert(Constraints.isValid(this._constraints));
+    this.size = this._constraints.biggest;
+  }
+  performLayout() {
+    this._preferredSizeManager.chooseSize();
+    // assert(()=>{throw Error("Test Point 2")})
+  }
+  setProperty(key, value) {
+    this._preferredSizeManager.setProperty(key, value);
+    switch (key) {
+      case 'color':
+        {
+          this._props.color = value;
+          if (this._widget) this._widget.setProperty(hmUI.prop.COLOR, value);
+        }
+        break;
+      case 's':
+      case 'sa':
+      case 'start':
+      case 'start_angle':
+        {
+          this._props.start_angle = value;
+          if (this._widget) this._widget.setProperty(hmUI.prop.START_ANGLE, value);
+        }
+        break;
+      case 'e':
+      case 'ea':
+      case 'end':
+      case 'end_angle':
+        {
+          this._props.end_angle = value;
+          if (this._widget) this._widget.setProperty(hmUI.prop.END_ANGLE, value);
+        }
+        break;
+      case 'lw':
+      case 'line_width':
+        {
+          this._props.line_width = value;
+          if (this._widget) this._widget.setProperty(hmUI.prop.LINE_WIDTH, value);
+        }
+        break;
+    }
+  }
+}
+
+const defaultProps$9 = {
+  text_size: px$1(36)
+};
+class NativeWidgetButton extends RenderWidget {
+  _widget = null;
+  _preferredSizeManager = new PreferSizeManager(this).setDefaultSize(Size.infinite);
+  _props = {
+    ...defaultProps$9
+  };
+  onCommit({
+    size,
+    position,
+    widgetFactory,
+    initial
+  }) {
+    if (initial) {
+      assert(this._widget === null);
+      this._widget = widgetFactory.createWidget(hmUI.widget.BUTTON, {
+        ...this._props,
+        ...position,
+        ...size,
+        click_func: () => {
+          this.dispatchEvent(new AsukaEvent('click', {
+            bubbles: true,
+            cancelable: true
+          }));
+        },
+        longpress_func: () => {
+          this.dispatchEvent(new AsukaEvent('longpress', {
+            bubbles: true,
+            cancelable: true
+          }));
+        }
+      });
+    } else {
+      assert(this._widget != null);
+      this._widget.setProperty(hmUI.prop.MORE, {
+        ...this._props,
+        ...position,
+        ...size
+      });
+    }
+  }
+  onDestroy(widgetFactory) {
+    assert(widgetFactory !== null && this._widget !== null);
+    widgetFactory.deleteWidget(this._widget);
+  }
+  performResize() {
+    assert(Constraints.isValid(this._constraints));
+    this.size = this._constraints.biggest;
+  }
+  performLayout() {
+    this._preferredSizeManager.chooseSize();
+    // assert(()=>{throw Error("Test Point 2")})
+  }
+  _updateDefaultSize() {
+    if (this._props.normal_src) {
+      let {
+        width,
+        height
+      } = hmUI.getImageInfo(this._props.normal_src);
+      this._preferredSizeManager.setDefaultSize({
+        w: width,
+        h: height
+      });
+    }
+  }
+  setProperty(key, value) {
+    super.setProperty(key, value);
+    this._preferredSizeManager.setProperty(key, value);
+    console.log(`set ${key} to ${value}`);
+    switch (key) {
+      case 'text':
+        {
+          if (this._props.text !== value) {
+            this._props.text = value;
+            if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
+              ...this.size,
+              ...this.position,
+              text: value
+            });
+          }
+        }
+        break;
+      case 'color':
+        {
+          if (this._props.color !== value) {
+            this._props.color = value;
+            if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
+              ...this.size,
+              ...this.position,
+              color: value
+            });
+          }
+        }
+        break;
+      case 'size':
+      case 'ts':
+      case 'text_size':
+        {
+          if (this._props.text_size !== value) {
+            this._props.text_size = value;
+            if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
+              ...this.size,
+              ...this.position,
+              text_size: value
+            });
+          }
+        }
+        break;
+      case 'nc':
+      case 'ncolor':
+      case 'normal_color':
+        {
+          if (this._props.normal_color !== value) {
+            this._props.normal_color = value;
+            if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
+              ...this.size,
+              ...this.position,
+              normal_color: value
+            });
+          }
+        }
+        break;
+      case 'pc':
+      case 'pcolor':
+      case 'press_color':
+        {
+          if (this._props.press_color !== value) {
+            this._props.press_color = value;
+            if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
+              ...this.size,
+              ...this.position,
+              press_color: value
+            });
+          }
+        }
+        break;
+      case 'r':
+      case 'radius':
+        {
+          if (this._props.radius !== value) {
+            this._props.radius = value;
+            if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
+              ...this.size,
+              ...this.position,
+              radius: value
+            });
+          }
+        }
+        break;
+      case 'ns':
+      case 'nsrc':
+      case 'normal_src':
+        {
+          if (this._props.normal_src !== value) {
+            this._props.normal_src = value;
+            this._updateDefaultSize();
+            if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
+              ...this.size,
+              ...this.position,
+              normal_src: value
+            });
+          }
+        }
+        break;
+      case 'ps':
+      case 'psrc':
+      case 'press_src':
+        {
+          if (this._props.press_src !== value) {
+            this._props.press_src = value;
+            if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
+              ...this.size,
+              ...this.position,
+              press_src: value
+            });
+          }
+        }
+        break;
+    }
+  }
+}
+
+const defaultProps$8 = {};
+class NativeWidgetCanvas extends RenderWidget {
+  _widget = null;
+  // _preferredSizeManager = new PreferSizeManager(this);
+  _props = {
+    ...defaultProps$8
+  };
+  sizedByParent = true;
+  onCommit({
+    size,
+    position,
+    widgetFactory,
+    initial
+  }) {
+    if (initial) {
+      assert(this._widget === null);
+      this._widget = widgetFactory.createWidget(hmUI.widget.CANVAS, {
+        ...this._props,
+        ...position,
+        ...size
+      });
+    } else {
+      assert(this._widget != null);
+      this._widget.setProperty(hmUI.prop.MORE, {
+        ...this._props,
+        ...position,
+        ...size
+      });
+    }
+  }
+  onDestroy(widgetFactory) {
+    assert(widgetFactory !== null && this._widget !== null);
+    widgetFactory.deleteWidget(this._widget);
+  }
+  performResize() {
+    assert(Constraints.isValid(this._constraints));
+    this.size = this._constraints.biggest;
+  }
+  performLayout() {
+    // this._preferredSizeManager.chooseSize();
+    // assert(()=>{throw Error("Test Point 2")})
+  }
+  setProperty(key, value) {
+    super.setProperty(key, value);
+  }
+}
+
+const defaultProps$7 = {
+  color: 0xff8888
+};
+class NativeWidgetCircle extends RenderWidget {
+  _widget = null;
+  _preferredSizeManager = new PreferSizeManager(this);
+  _props = {
+    ...defaultProps$7
+  };
+  sizedByParent = false;
+  _fromSizeAndPositionToProp(size, position) {
+    let radius = min(size.h, size.w) / 2;
+    return {
+      radius,
+      center_x: position.x + size.w / 2 - radius,
+      center_y: position.y + size.h / 2 - radius
+    };
+  }
+  onCommit({
+    size,
+    position,
+    widgetFactory,
+    initial
+  }) {
+    if (initial) {
+      assert(this._widget === null);
+      this._widget = widgetFactory.createWidget(hmUI.widget.FILL_RECT, {
+        ...this._props,
+        ...this._fromSizeAndPositionToProp(size, position)
+      });
+    } else {
+      assert(this._widget != null);
+      this._widget.setProperty(hmUI.prop.MORE, {
+        ...this._props,
+        ...this._fromSizeAndPositionToProp(size, position)
+      });
+    }
+  }
+  onDestroy(widgetFactory) {
+    assert(widgetFactory !== null && this._widget !== null);
+    widgetFactory.deleteWidget(this._widget);
+  }
+  performResize() {
+    assert(Constraints.isValid(this._constraints));
+    this.size = this._constraints.biggest;
+  }
+  performLayout() {
+    this._preferredSizeManager.chooseSize();
+    // assert(()=>{throw Error("Test Point 2")})
+  }
+  setProperty(key, value) {
+    super.setProperty(key, value);
+    this._preferredSizeManager.setProperty(key, value);
+    switch (key) {
+      case 'r':
+      case 'radius':
+        {
+          this._preferredSizeManager.setDefaultSize({
+            w: value,
+            h: value
+          });
+        }
+        break;
+      case 'color':
+        {
+          this._props.color = value;
+          if (this._widget) this._widget.setProperty(hmUI.prop.COLOR, value);
+        }
+        break;
+      case 'alpha':
+        {
+          this._props.alpha = value;
+          if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
+            ...this.size,
+            ...this.position,
+            ...this._props
+          });
+        }
+        break;
+    }
+  }
+}
+
+const defaultProps$6 = {
+  color: 0xcc0000
+};
+class NativeWidgetFillRect extends RenderWidget {
+  _widget = null;
+  _preferredSizeManager = new PreferSizeManager(this);
+  _props = {
+    ...defaultProps$6
+  };
+  sizedByParent = false;
+  onCommit({
+    size,
+    position,
+    widgetFactory,
+    initial
+  }) {
+    if (initial) {
+      assert(this._widget === null);
+      this._widget = widgetFactory.createWidget(hmUI.widget.FILL_RECT, {
+        ...this._props,
+        ...position,
+        ...size
+      });
+    } else {
+      assert(this._widget != null);
+      this._widget.setProperty(hmUI.prop.MORE, {
+        ...this._props,
+        ...position,
+        ...size
+      });
+    }
+  }
+  onDestroy(widgetFactory) {
+    assert(widgetFactory !== null && this._widget !== null);
+    widgetFactory.deleteWidget(this._widget);
+  }
+  performResize() {
+    assert(Constraints.isValid(this._constraints));
+    this.size = this._constraints.biggest;
+  }
+  performLayout() {
+    this._preferredSizeManager.chooseSize();
+    // assert(()=>{throw Error("Test Point 2")})
+  }
+  setProperty(key, value) {
+    super.setProperty(key, value);
+    this._preferredSizeManager.setProperty(key, value);
+    switch (key) {
+      case 'r':
+      case 'radius':
+        {
+          this._props.radius = value;
+          if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
+            ...this.size,
+            ...this.position,
+            ...this._props
+          });
+        }
+        break;
+      case 'color':
+        {
+          this._props.color = value;
+          if (this._widget) this._widget.setProperty(hmUI.prop.COLOR, value);
+        }
+        break;
+      case 'alpha':
+        {
+          this._props.alpha = value;
+          if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
+            ...this.size,
+            ...this.position,
+            ...this._props
+          });
+        }
+        break;
+    }
+  }
+}
+
+const defaultProps$5 = {};
+class NativeWidgetImage extends RenderWidget {
+  _widget = null;
+  _props = {
+    ...defaultProps$5
+  };
+  _preferredSizeManager = new PreferSizeManager(this);
+  sizedByParent = false;
+  onCommit({
+    size,
+    position,
+    widgetFactory,
+    initial
+  }) {
+    if (initial) {
+      assert(this._widget === null);
+      this._widget = widgetFactory.createWidget(hmUI.widget.FILL_RECT, {
+        ...this._props,
+        ...position,
+        ...size
+      });
+    } else {
+      assert(this._widget != null);
+      this._widget.setProperty(hmUI.prop.MORE, {
+        ...this._props,
+        ...position,
+        ...size
+      });
+    }
+  }
+  onDestroy(widgetFactory) {
+    assert(widgetFactory !== null && this._widget !== null);
+    widgetFactory.deleteWidget(this._widget);
+  }
+  performResize() {}
+  performLayout() {}
+  _updateDefaultSize() {
+    if (this._props.src) {
+      let {
+        width,
+        height
+      } = hmUI.getImageInfo(this._props.src);
+      this._preferredSizeManager.setDefaultSize({
+        w: width,
+        h: height
+      });
+    }
+  }
+  setProperty(key, value) {
+    super.setProperty(key, value);
+    this._preferredSizeManager.setProperty(key, value);
+    switch (key) {
+      case 'color':
+        if (value !== this._props.color) {
+          this._props.color = value;
+          if (this._widget) this._widget.setProperty(hmUI.prop.COLOR, value);
+        }
+        break;
+      // case 'alpha':
+      //   {
+      //     if (value !== this._props.alpha) {
+      //       this._props.alpha = value;
+      //       if (this._widget)
+      //         this._widget.setProperty(hmUI.prop.MORE, { ...this._props });
+      //     }
+      //   }
+      //   break;
+      case 'pos_x':
+        {
+          if (value !== this._props.pos_x) {
+            this._props.pos_x = value;
+            if (this._widget) this._widget.setProperty(hmUI.prop.POS_X, value);
+          }
+        }
+        break;
+      case 'pos_y':
+        {
+          if (value !== this._props.pos_y) {
+            this._props.pos_y = value;
+            if (this._widget) this._widget.setProperty(hmUI.prop.POS_Y, value);
+          }
+        }
+        break;
+      case 'angle':
+        {
+          if (value !== this._props.angle) {
+            this._props.angle = value;
+            if (this._widget) this._widget.setProperty(hmUI.prop.ANGLE, value);
+          }
+        }
+        break;
+      case 'center_x':
+        {
+          if (value !== this._props.center_x) {
+            this._props.center_x = value;
+            if (this._widget) this._widget.setProperty(hmUI.prop.CENTER_X, value);
+          }
+        }
+        break;
+      case 'center_y':
+        {
+          if (value !== this._props.center_y) {
+            this._props.center_y = value;
+            if (this._widget) this._widget.setProperty(hmUI.prop.CENTER_Y, value);
+          }
+        }
+        break;
+      case 'alpha':
+        {
+          if (value !== this._props.alpha) {
+            this._props.alpha = value;
+            if (this._widget) this._widget.setProperty(hmUI.prop.ALPHA, value);
+          }
+        }
+        break;
+      case 'auto_scale':
+        {
+          if (value !== this._props.auto_scale) {
+            this._props.auto_scale = value;
+            if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
+              ...this._props
+            });
+          }
+        }
+        break;
+      case 'auto_scale_obj_fit':
+        {
+          if (value !== this._props.auto_scale_obj_fit) {
+            this._props.auto_scale_obj_fit = value;
+            if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
+              ...this._props
+            });
+          }
+        }
+        break;
+      case 'src':
+        {
+          if (value !== this._props.src) {
+            this._props.src = value;
+            if (this._widget) this._widget.setProperty(hmUI.prop.SRC, value);
+          }
+        }
+        break;
+    }
+  }
+}
+
+const defaultProps$4 = {};
+class NativeWidgetPolyline extends RenderWidget {
+  _widget = null;
+  _preferredSizeManager = new PreferSizeManager(this);
+  _props = {
+    ...defaultProps$4
+  };
+  sizedByParent = false;
+  onCommit({
+    size,
+    position,
+    widgetFactory,
+    initial
+  }) {
+    if (initial) {
+      assert(this._widget === null);
+      this._widget = widgetFactory.createWidget(hmUI.widget.GRADKIENT_POLYLINE, {
+        ...this._props,
+        ...position,
+        ...size
+      });
+    } else {
+      assert(this._widget != null);
+      this._widget.setProperty(hmUI.prop.MORE, {
+        ...this._props,
+        ...position,
+        ...size
+      });
+    }
+  }
+  onDestroy(widgetFactory) {
+    assert(widgetFactory !== null && this._widget !== null);
+    widgetFactory.deleteWidget(this._widget);
+  }
+  performResize() {
+    assert(Constraints.isValid(this._constraints));
+    this.size = this._constraints.biggest;
+  }
+  performLayout() {
+    this._preferredSizeManager.chooseSize();
+    // assert(()=>{throw Error("Test Point 2")})
+  }
+  setProperty(key, value) {
+    super.setProperty(key, value);
+    this._preferredSizeManager.setProperty(key, value);
+    switch (key) {
+      case 'color':
+      case 'line_color':
+        {
+          this._props.line_color = value;
+          if (this._widget) this._widget.setProperty(hmUI.prop.LINE_COLOR, value);
+        }
+        break;
+      case 'lw':
+      case 'line_width':
+        {
+          this._props.line_width = value;
+          if (this._widget) this._widget.setProperty(hmUI.prop.LINE_WIDTH, value);
+        }
+        break;
+    }
+  }
+}
+
+const defaultProps$3 = {
+  content: 'null'
+};
+// Not support bg_x bg_y bg_w bg_h, please use container or stack etc to add background decoration.
+class NativeWidgetQRCode extends RenderWidget {
+  _widget = null;
+  _preferredSizeManager = new PreferSizeManager(this);
+  _props = {
+    ...defaultProps$3
+  };
+  sizedByParent = false;
+  onCommit({
+    size,
+    position,
+    widgetFactory,
+    initial
+  }) {
+    if (initial) {
+      assert(this._widget === null);
+      this._widget = widgetFactory.createWidget(hmUI.widget.QRCODE, {
+        ...this._props,
+        ...position,
+        ...size
+      });
+    } else {
+      assert(this._widget != null);
+      this._widget.setProperty(hmUI.prop.MORE, {
+        ...this._props,
+        ...position,
+        ...size
+      });
+    }
+  }
+  onDestroy(widgetFactory) {
+    assert(widgetFactory !== null && this._widget !== null);
+    widgetFactory.deleteWidget(this._widget);
+  }
+  performResize() {
+    assert(Constraints.isValid(this._constraints));
+    this.size = this._constraints.biggest;
+  }
+  performLayout() {
+    this._preferredSizeManager.chooseSize();
+    // assert(()=>{throw Error("Test Point 2")})
+  }
+  setProperty(key, value) {
+    super.setProperty(key, value);
+    this._preferredSizeManager.setProperty(key, value);
+    switch (key) {
+      case 'content':
+        {
+          this._props.content = value;
+          if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
+            ...this.position,
+            ...this.size,
+            content: value
+          });
+        }
+        break;
+    }
+  }
+}
+
+const defaultProps$2 = {
+  color: 0xcc0000
+};
+class NativeWidgetRadioGroup extends RenderWidgetFactoryProvider {
+  _widget = null;
+  _props = {
+    ...defaultProps$2
+  };
+  _defaultChecked = 0;
+  _registeredTask = null;
+  _stateButtonWidget = [];
+  _registerAfterAsyncTask() {
+    assert(this._attached);
+    assert(this._core != null);
+    if (this._registeredTask !== null) {
+      this._registeredTask = () => {
+        this._registeredTask = null;
+        assert(this._widget != null);
+        if (this._stateButtonWidget.length > 0) {
+          assert(this._defaultChecked < this._stateButtonWidget.length);
+          this._widget.setProperty(hmUI.prop.INIT, this._stateButtonWidget[this._defaultChecked]);
+        }
+      };
+      this._core.addRunAfterAsync(this._registeredTask);
+    }
+  }
+  _initChildWidgetFactory() {
+    this.childWidgetFactory = {
+      createWidget: (widgetType, option) => {
+        assert(this._widget != null);
+        let widget = this._widget.createWidget(widgetType, option);
+        if (widgetType === hmUI.widget.STATE_BUTTON) {
+          this._stateButtonWidget.push(widget);
+        }
+      },
+      deleteWidget: widget => {
+        if (widget.getType() === hmUI.widget.STATE_BUTTON) {
+          //   let index = findWhere(this._stateButtonWidget, widget, true);
+          // TODO do some operations to make everything right
+          splice(this._stateButtonWidget, widget);
+        }
+        assert(this._widget != null);
+        this._widget.deleteWidget(widget);
+      }
+    };
+  }
+  onCommit({
+    size,
+    position,
+    widgetFactory,
+    initial
+  }) {
+    assert(this._props.select_src != null);
+    assert(this._props.unselect_src != null);
+    if (initial) {
+      assert(this._widget === null);
+      this._widget = widgetFactory.createWidget(hmUI.widget.FILL_RECT, {
+        ...this._props,
+        ...position,
+        ...size
+      });
+      this._initChildWidgetFactory();
+    } else {
+      assert(this._widget != null);
+      this._widget.setProperty(hmUI.prop.MORE, {
+        ...this._props,
+        ...position,
+        ...size
+      });
+    }
+  }
+  onDestroy(widgetFactory) {
+    assert(widgetFactory !== null && this._widget !== null);
+    widgetFactory.deleteWidget(this._widget);
+  }
+  setProperty(key, value) {
+    switch (key) {
+      case 'select_src':
+        {
+          this._props.select_src = value;
+          if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
+            ...this.size,
+            ...this.position,
+            ...this._props
+          });
+        }
+        break;
+      case 'unselect_src':
+        {
+          this._props.unselect_src = value;
+          if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
+            ...this.size,
+            ...this.position,
+            ...this._props
+          });
+        }
+        break;
+    }
+  }
+}
+
+const defaultProps$1 = {
+  color: 0xcc4400
+};
+class NativeWidgetStrokeRect extends RenderWidget {
+  _widget = null;
+  _preferredSizeManager = new PreferSizeManager(this);
+  _props = {
+    ...defaultProps$1
+  };
+  sizedByParent = false;
+  onCommit({
+    size,
+    position,
+    widgetFactory,
+    initial
+  }) {
+    if (initial) {
+      assert(this._widget === null);
+      this._widget = widgetFactory.createWidget(hmUI.widget.STROKE_RECT, {
+        ...this._props,
+        ...position,
+        ...size
+      });
+    } else {
+      assert(this._widget != null);
+      this._widget.setProperty(hmUI.prop.MORE, {
+        ...this._props,
+        ...position,
+        ...size
+      });
+    }
+  }
+  onDestroy(widgetFactory) {
+    assert(widgetFactory !== null && this._widget !== null);
+    widgetFactory.deleteWidget(this._widget);
+  }
+  performResize() {
+    assert(Constraints.isValid(this._constraints));
+    this.size = this._constraints.biggest;
+  }
+  performLayout() {
+    this._preferredSizeManager.chooseSize();
+    // assert(()=>{throw Error("Test Point 2")})
+  }
+  setProperty(key, value) {
+    super.setProperty(key, value);
+    this._preferredSizeManager.setProperty(key, value);
+    switch (key) {
+      case 'r':
+      case 'radius':
+        {
+          this._props.radius = value;
+          if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
+            ...this.size,
+            ...this.position,
+            ...this._props
+          });
+        }
+        break;
+      case 'color':
+        {
+          this._props.color = value;
+          if (this._widget) this._widget.setProperty(hmUI.prop.COLOR, value);
+        }
+        break;
+      case 'angle':
+        {
+          this._props.angle = value;
+          if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
+            ...this.size,
+            ...this.position,
+            ...this._props
+          });
+        }
+        break;
+      case 'lw':
+      case 'line_width':
+        {
+          this._props.line_width = value;
+          if (this._widget) this._widget.setProperty(hmUI.prop.LINE_WIDTH, value);
+        }
+        break;
+    }
+  }
+}
+
+const defaultProps = {
+  text: 'text',
+  color: 0xffffff,
+  text_size: Number(px$1(36)),
+  align_h: hmUI.align.CENTER_H,
+  align_v: hmUI.align.CENTER_V
+};
+class NativeWidgetText extends RenderWidget {
+  _widget = null;
+  _props = {
+    ...defaultProps
+  };
+  sizedByParent = false;
+  onCommit({
+    size,
+    position,
+    widgetFactory,
+    initial
+  }) {
+    if (initial) {
+      assert(this._widget === null);
+      this._widget = widgetFactory.createWidget(hmUI.widget.TEXT, {
+        ...this._props,
+        ...position,
+        ...size
+      });
+    } else {
+      assert(this._widget != null);
+      this._widget.setProperty(hmUI.prop.MORE, {
+        ...this._props,
+        ...position,
+        ...size
+      });
+    }
+  }
+  onDestroy(widgetFactory) {
+    assert(widgetFactory !== null && this._widget !== null);
+    widgetFactory.deleteWidget(this._widget);
+  }
+  performResize() {}
+  performLayout() {
+    assert(Constraints.isValid(this._constraints));
+    let {
+      width: singleLineWidth,
+      height: singleLineHeight
+    } = hmUI.getTextLayout(this._props.text, {
+      text_size: this._props.text_size,
+      text_width: 0,
+      wrapped: 0
+    });
+    if (this._props.text_style !== undefined && this._props.text_style === hmUI.text_style.WRAP) {
+      // 文字可换行
+      if (singleLineWidth > this._constraints.maxWidth) {
+        // 换行
+        let {
+          width,
+          height
+        } = hmUI.getTextLayout(this._props.text, {
+          text_size: this._props.text_size,
+          text_width: this._constraints.maxWidth,
+          wrapped: 1
+        });
+        this.size = this._constraints.constrain({
+          w: width,
+          h: height
+        });
+      } else {
+        // 单行
+        this.size = this._constraints.constrain({
+          w: singleLineWidth,
+          h: singleLineHeight
+        });
+      }
+    } else {
+      // 文字不可换行
+      this.size = this._constraints.constrain({
+        w: singleLineWidth,
+        h: singleLineHeight
+      });
+    }
+    // this.size = this._constraints!.maxSize();
+  }
+  setProperty(key, value) {
+    super.setProperty(key, value);
+    switch (key) {
+      case 'text':
+        {
+          this._props.text = '' + value;
+          if (this._widget) {
+            this._widget.setProperty(hmUI.prop.TEXT, '' + value);
+          }
+          this.markNeedsLayout();
+        }
+        break;
+      case 'color':
+        {
+          this._props.color = value;
+          if (this._widget) this._widget.setProperty(hmUI.prop.COLOR, value);
+        }
+        break;
+      case 'text_size':
+        {
+          this._props.text_size = value;
+          if (this._widget) this._widget.setProperty(hmUI.prop.TEXT_SIZE, value);
+        }
+        break;
+      case 'text_style':
+        {
+          this._props.text_style = value;
+          if (this._widget) this._widget.setProperty(hmUI.prop.TEXT_STYLE, value);
+        }
+        break;
+    }
+  }
+}
+
+const NativeBindingsFactory = {
+  createNode(type) {
+    switch (type) {
+      case 'text':
+        return new NativeWidgetText(null, type);
+      case 'fill-rect':
+      case 'fill_rect':
+      case 'fillrect':
+        return new NativeWidgetFillRect(null, type);
+      case 'stroke-rect':
+      case 'stroke_rect':
+      case 'strokerect':
+      case 'stroke':
+        return new NativeWidgetStrokeRect(null, type);
+      case 'image':
+      case 'img':
+        return new NativeWidgetImage(null, type);
+      case 'button':
+        return new NativeWidgetButton(null, type);
+      case 'circle':
+        return new NativeWidgetCircle(null, type);
+      case 'arc':
+        return new NativeWidgetArc(null, type);
+      case 'qrcode':
+        return new NativeWidgetQRCode(null, type);
+      case 'polyline':
+        return new NativeWidgetPolyline(null, type);
+      case 'canvas':
+        return new NativeWidgetCanvas(null, type);
+      case 'radio':
+      case 'radio_group':
+      case 'radiogroup':
+        return new NativeWidgetRadioGroup(null, type);
+      default:
+        return null;
+    }
+  }
+};
 
 const {
   width,

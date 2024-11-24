@@ -1,9 +1,10 @@
-import { c as createSignal, A as AsukaUI, N as NativeBindingsFactory, L as LayoutManagerFactory, r as render, a as createElement, i as insertNode, b as insert, d as createComponent, S as Switch, s as setProp, M as Match, e as effect, m as memo, E as EdgeInsets, p as px, f as MainAxisAlignment, C as CrossAxisAlignment, g as Alignment, h as StackFit, j as reportError, k as checkHzpk_v1, l as removeHzpkByUuid, u as unpackHzpk_v1, n as addHzpk } from './hzpk-i_2nB0nN.js';
+import { c as createSignal, A as AsukaUI, N as NativeBindingsFactory, L as LayoutManagerFactory, r as render, a as createElement, i as insertNode, b as insert, d as createComponent, S as Switch, s as setProp, M as Match, e as effect, m as memo, E as EdgeInsets, p as px, f as MainAxisAlignment, C as CrossAxisAlignment, g as Alignment, h as StackFit, j as reportError, k as checkHzpk_v1, l as removeHzpkByUuid, u as unpackHzpk_v1, n as addHzpk } from './hzpk-DlkgJGRA.js';
 import { BasePage } from '@zeppos/zml/base-page';
 import hmUI__default from '@zos/ui';
-import hmFS from '@zos/fs';
 import { getDeviceInfo, SCREEN_SHAPE_ROUND } from '@zos/device';
+import hmFS from '@zos/fs';
 import { Time } from '@zos/sensor';
+import { setPageBrightTime } from '@zos/display';
 import '@zos/utils';
 
 const {
@@ -33,6 +34,9 @@ let asuka = new AsukaUI();
 Page(BasePage({
   onInit() {
     console.log("page transfer init");
+    setPageBrightTime({
+      brightTime: 11451419
+    });
   },
   build() {
     try {
