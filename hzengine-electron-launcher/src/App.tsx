@@ -129,7 +129,7 @@ function App() {
 
   return (
     <div className="hz_container">
-      <div className="hz_root" ref={ref}></div>
+      <div id="hzengine-root" className="hz_root" ref={ref}></div>
     </div>
   );
 }

@@ -1,15 +1,28 @@
 import { HZEngineCore, Platform } from "hzengine-core";
 declare const fs: typeof import("node:fs");
 declare const isFile: (path: string) => boolean;
+
 const HZEnginePlatformWeb: Platform = {
   name: "",
   getScreenSize: function (): [width: number, height: number] {
     return [window.innerWidth, window.innerHeight];
   },
   createUILayer: function ({ z_index }: { z_index: number }): HTMLDivElement {
-    return document.createElement("div");
+    const div = document.createElement("div");
+    div.style.zIndex = z_index.toString();
+    div.style.position = "absolute"
+    div.style.width = "100%";
+    div.style.height = "100%";
+    div.style.left = "0px";
+    div.style.top = "0px";
+
+    const root = document.getElementById("hzengine-root");
+		root?.append(div);
+    return div
   },
-  deleteUILayer: function (widgetFactory: HTMLDivElement): void {},
+  deleteUILayer: function (widgetFactory: HTMLDivElement): void {
+    widgetFactory.remove();
+  },
   isFileSync: function ({ path }: { path: string }): boolean {
     return isFile(path)
   },
