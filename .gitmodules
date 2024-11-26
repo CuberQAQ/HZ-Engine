@@ -1,3 +1,6 @@
 [submodule "asuka-ui"]
 	path = asuka-ui
 	url = https://github.com/CuberQAQ/asuka-ui.git
+[submodule "demo/Kila-in-Memory"]
+	path = demo/Kila-in-Memory
+	url = https://github.com/LenromeCafero/Kila-in-Memory.git
