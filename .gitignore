@@ -17,3 +17,5 @@ local_test
 __test__
 __local__
 .env
+pnpm-lock.yaml
+dist-electron
