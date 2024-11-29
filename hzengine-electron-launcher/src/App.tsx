@@ -124,6 +124,11 @@ function App() {
     //   },
     // });
 
+		(ref.current! as HTMLDivElement).addEventListener("click", () => {
+      hzengine.system.continue();
+    })
+
+    hzengine.system.start();
     console.log("page.js build已顺利完成");
   }, []);
 

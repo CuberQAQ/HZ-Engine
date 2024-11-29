@@ -1,5 +1,6 @@
-import { AsukaUI, NativeBindingsFactory, LayoutManagerFactory, EdgeInsets, MainAxisAlignment, reportError } from '@cuberqaq/asuka-ui';
+import { AsukaUI, LayoutManagerFactory, EdgeInsets, MainAxisAlignment, reportError } from '@cuberqaq/asuka-ui';
 import { getText } from '@zos/i18n';
+import { NativeBindingsFactory } from "@cuberqaq/asuka-ui/zeppos"
 import { getDeviceInfo, SCREEN_SHAPE_ROUND } from '@zos/device';
 import hmUI from '@zos/ui';
 import * as hmRouter from '@zos/router';

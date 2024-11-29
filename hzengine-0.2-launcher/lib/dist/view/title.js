@@ -8,14 +8,17 @@ import { getText } from "@zos/i18n";
  * 游戏标题页面
  */
 export class TitleView extends UI.View {
-    _widgets = null;
-    _widgetFactory = this.core.ui.getLayer(this.layer).widgetFactory;
-    _animationPlugin = this.core.plugins.get("animation") ??
-        null;
-    _animation = null;
-    enable_anim = true;
-    enable_opening_anim = true;
-    opening_view_id = null;
+    constructor() {
+        super(...arguments);
+        this._widgets = null;
+        this._widgetFactory = this.core.ui.getLayer(this.layer).widgetFactory;
+        this._animationPlugin = this.core.plugins.get("animation") ??
+            null;
+        this._animation = null;
+        this.enable_anim = true;
+        this.enable_opening_anim = true;
+        this.opening_view_id = null;
+    }
     onCreate(prop) {
         // this.core.debug.log(`onCreate title view`);
         // title text widget
@@ -274,8 +277,11 @@ export class TitleView extends UI.View {
     }
 }
 export class InfoOpening extends UI.View {
-    _widgets = {};
-    _widgetFactory = this.core.ui.getLayer(this.layer).widgetFactory;
+    constructor() {
+        super(...arguments);
+        this._widgets = {};
+        this._widgetFactory = this.core.ui.getLayer(this.layer).widgetFactory;
+    }
     onCreate(prop) {
         this._widgets.bg = this._widgetFactory.createWidget(hmUI.widget.FILL_RECT, {
             x: 0,

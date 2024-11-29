@@ -1,7 +1,4 @@
-export default class HzTimerAdapter {
-    static nid = 0;
-    static idMap = new Map();
-    static listenerRegistered = false;
+class HzTimerAdapter {
     /**
      * 创建一个 ZeppTimer 适配器
      * @param {import("hzengine-core").HZEngineCore} core
@@ -9,8 +6,8 @@ export default class HzTimerAdapter {
      */
     constructor(core) {
         return class ZeppTimerLike {
-            taskId = null;
             constructor(callback, interval) {
+                this.taskId = null;
                 this.id = nid++;
                 this.callback = callback;
                 HzTimerAdapter.idMap.set(this.id, this);
@@ -37,3 +34,7 @@ export default class HzTimerAdapter {
         };
     }
 }
+HzTimerAdapter.nid = 0;
+HzTimerAdapter.idMap = new Map();
+HzTimerAdapter.listenerRegistered = false;
+export default HzTimerAdapter;

@@ -11,8 +11,11 @@ const { width, height, screenShape } = getDeviceInfo();
  * 提供存档、设置、退出等功能
  */
 export class QuickMenu extends UI.View {
-    _widgets = null;
-    _widgetFactory = this.core.ui.getLayer(this.layer).widgetFactory;
+    constructor() {
+        super(...arguments);
+        this._widgets = null;
+        this._widgetFactory = this.core.ui.getLayer(this.layer).widgetFactory;
+    }
     onCreate(prop) {
         this._widgets = {};
         // full screen mask

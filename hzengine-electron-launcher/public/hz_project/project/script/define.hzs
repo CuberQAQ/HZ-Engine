@@ -1,0 +1,16 @@
+*define 在此处定义角色、变量、转场和过渡
+    character m "我"
+    character girl "女孩"
+    character boss "老板"
+    character waiter "服务员"
+    character n "枂"
+    character k "CaferoNio"
+    character r "圆"
+    character t "三角"
+
+    $ sd.07_1 = null
+    $ sd.13_2 = null
+    $ sd.17_3 = null
+    $ sd.22_4 = null
+    $ sd.25_5 = null
+    $ sd.27_6 = null

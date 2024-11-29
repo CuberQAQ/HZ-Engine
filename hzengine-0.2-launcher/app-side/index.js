@@ -1,5 +1,5 @@
 import { BaseSideService } from "@zeppos/zml/base-side";
-import { gettext } from "i18n";
+import { __h, gettext } from "i18n";
 /// <reference path="../node_modules/@zeppos/zml/zml.d.ts" />
 const logger = Logger.getLogger("hzengine-app-side");
 let downloadLock = false
@@ -18,7 +18,14 @@ AppSideService(
     onRequest(req, res) {
       if (req.method === "device.init") {
         res(null, { status: "OK" });
-      } else {
+      }
+      else if (req.method === "redownload") {
+        settings.settingsStorage.setItem("download.url", 
+          settings.settingsStorage.getItem("download.url")
+        )
+        res(null, {status: "OK"})
+      }
+      else {
         res("Unsupported request method: " + req.method);
       }
     },

@@ -1,5 +1,6 @@
 /// <reference path="../node_modules/@zeppos/device-types/dist/index.d.ts" />
 /// <reference path="../node_modules/@zeppos/zml/zml.d.ts" />
+/// <reference types="@cuberqaq/asuka-ui/jsx-runtime" />
 import { BasePage } from "@zeppos/zml/base-page";
 import {
   Alignment,
@@ -16,7 +17,7 @@ import {
   StackFit,
   // Solid,
 } from "@cuberqaq/asuka-ui";
-import { NativeBindingsFactory } from "@cuberqaq/asuka-ui/zeppos"
+import { NativeBindingsFactory } from "@cuberqaq/asuka-ui/zeppos";
 import {
   createSignal,
   For,
@@ -25,19 +26,21 @@ import {
   render,
   Show,
   Switch,
-
-} from '@cuberqaq/asuka-ui/solid'
+} from "@cuberqaq/asuka-ui/solid";
 const { width, height, screenShape } = getDeviceInfo();
 import { px } from "../shared/dynamic_px.js";
 import hmUI from "@zos/ui";
 import hmFS from "@zos/fs";
 import { getDeviceInfo, SCREEN_SHAPE_ROUND } from "@zos/device";
-import { addHzpk, checkHzpk_v1, removeHzpkByUuid, unpackHzpk_v1 } from "../shared/hzpk.js";
+import {
+  addHzpk,
+  checkHzpk_v1,
+  removeHzpkByUuid,
+  unpackHzpk_v1,
+} from "../shared/hzpk.js";
 import { Time } from "@zos/sensor";
 
-import { setPageBrightTime } from '@zos/display'
-
-
+import { setPageBrightTime } from "@zos/display";
 
 const timeSensor = new Time();
 const Conditions = {
@@ -68,7 +71,7 @@ Page(
       console.log("page transfer init");
       setPageBrightTime({
         brightTime: 11451419,
-      })
+      });
     },
 
     build() {
@@ -115,6 +118,7 @@ Page(
                       text_style={hmUI.text_style.WRAP}
                       text="请打开 Zepp App 中本小程序的设置页面，输入 hzpk 直链 url"
                     />
+                    <button text="重新安装" nc={0x333333} pc={0x555555} h={px(60)} r={px(30)} w={px(300)} onclick={() => { this.call("redownload", {}) }} />
                   </Match>
                   <Match when={transferingState() === Conditions.DOWNLOADING}>
                     <text text="下载中" />
@@ -229,7 +233,7 @@ Page(
           // setTransferingState(Conditions.TRANSFERING);
         } else if (data.params.data === "FAILED") {
           setTransferingState(Conditions.FAILED);
-          setExtra(data.params.err)
+          setExtra(data.params.err);
         }
       } else if (data.method === "download.app_side.progress") {
         if (transferingState() === Conditions.DOWNLOADING)

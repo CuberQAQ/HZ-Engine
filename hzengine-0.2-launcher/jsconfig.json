@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "module": "ES6",
-    "moduleResolution": "node10",
+    "module": "Node16",
+    "moduleResolution": "node16",
     "checkJs": true,
     "jsx": "preserve",
     "jsxImportSource": "@cuberqaq/asuka-solid"

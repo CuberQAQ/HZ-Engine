@@ -9,13 +9,16 @@ export { CustomSayView as SayView, FgImgView, BgImgView, MenuView };
  * 显示人物角色对话的view
  */
 class CustomSayView extends UI.MessageView {
-    // _fx: Fx | null = null;
-    _widgets = null;
-    enableAnim = true;
-    _widgetFactory = this.core.ui.getLayer(this.layer).widgetFactory;
-    _what = null;
-    _animationPlugin = this.core.plugins.get("animation") ?? null;
-    _animationId = null;
+    constructor() {
+        super(...arguments);
+        // _fx: Fx | null = null;
+        this._widgets = null;
+        this.enableAnim = true;
+        this._widgetFactory = this.core.ui.getLayer(this.layer).widgetFactory;
+        this._what = null;
+        this._animationPlugin = this.core.plugins.get("animation") ?? null;
+        this._animationId = null;
+    }
     onCreate(prop) {
         let w = screenShape === SCREEN_SHAPE_SQUARE ? width : width;
         let h = screenShape === SCREEN_SHAPE_SQUARE ? height / 2 : height / 2;
@@ -128,12 +131,15 @@ class CustomSayView extends UI.MessageView {
  * 展示人物立绘的view
  */
 class FgImgView extends UI.FgImgView {
-    _widget = null;
-    _widgetFactory = this.core.ui.getLayer(this.layer).widgetFactory;
-    defaultProp = {
-        yanchor: -1,
-        yalign: -1,
-    };
+    constructor() {
+        super(...arguments);
+        this._widget = null;
+        this._widgetFactory = this.core.ui.getLayer(this.layer).widgetFactory;
+        this.defaultProp = {
+            yanchor: -1,
+            yalign: -1,
+        };
+    }
     onCreate(prop) {
         // TODO
         let position = this.core.ui.calcPosition({ ...this.defaultProp, ...prop }, prop.size).origin;
@@ -168,8 +174,11 @@ class FgImgView extends UI.FgImgView {
  * 展示背景图片、CG的view
  */
 class BgImgView extends UI.BgImgView {
-    _widget = null;
-    _widgetFactory = this.core.ui.getLayer(this.layer).widgetFactory;
+    constructor() {
+        super(...arguments);
+        this._widget = null;
+        this._widgetFactory = this.core.ui.getLayer(this.layer).widgetFactory;
+    }
     _calSize(size) {
         if (size.height >= size.width) {
             let rate = size.height / size.width;
@@ -229,8 +238,11 @@ class BgImgView extends UI.BgImgView {
  *
  */
 class MenuView extends UI.MenuView {
-    _widgetFactory = this.core.ui.getLayer(this.layer).widgetFactory;
-    _buttonWidgetList = null;
+    constructor() {
+        super(...arguments);
+        this._widgetFactory = this.core.ui.getLayer(this.layer).widgetFactory;
+        this._buttonWidgetList = null;
+    }
     _hideButtons() {
         if (this._buttonWidgetList) {
             for (let i = 0; i < this._buttonWidgetList.length; i++) {
