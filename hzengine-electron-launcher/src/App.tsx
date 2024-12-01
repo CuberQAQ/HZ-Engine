@@ -8,7 +8,8 @@ function App() {
   const ref = useRef(null);
 
   useEffect(() => {
-    console.log(`ref=${ref.current}`);
+    // console.log(`ref=${ref.current}`);
+
 
     const hzengine = new HZEngineCore(HZEnginePlatformWeb);
     Object.assign(window, { hz: hzengine });
@@ -124,7 +125,10 @@ function App() {
     //   },
     // });
 
-		(ref.current! as HTMLDivElement).addEventListener("click", () => {
+
+    const touchPad = hzengine.platform.createUILayer({ z_index: 0 }) as HTMLDivElement;
+    touchPad.style.pointerEvents = "all"
+    touchPad.addEventListener("click", () => {
       hzengine.system.continue();
     })
 

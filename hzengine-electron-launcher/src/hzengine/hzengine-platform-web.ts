@@ -10,21 +10,22 @@ const HZEnginePlatformWeb: Platform = {
   createUILayer: function ({ z_index }: { z_index: number }): HTMLDivElement {
     const div = document.createElement("div");
     div.style.zIndex = z_index.toString();
-    div.style.position = "absolute"
+    div.style.position = "absolute";
     div.style.width = "100%";
     div.style.height = "100%";
     div.style.left = "0px";
     div.style.top = "0px";
+    div.style.pointerEvents = "none";
 
     const root = document.getElementById("hzengine-root");
-		root?.append(div);
-    return div
+    root?.append(div);
+    return div;
   },
   deleteUILayer: function (widgetFactory: HTMLDivElement): void {
     widgetFactory.remove();
   },
   isFileSync: function ({ path }: { path: string }): boolean {
-    return isFile(path)
+    return isFile(path);
   },
   readdirSync: function (
     option: Platform.readdirSync.Option
@@ -55,25 +56,26 @@ const HZEnginePlatformWeb: Platform = {
     return undefined;
   },
   writeFileSync: function (option: Platform.writeFileSync.Option): void {
-    const data =
-      option.data instanceof ArrayBuffer
-        ? Buffer.from(option.data)
-        : option.data;
-    if (option.options?.encoding) {
-      return fs.writeFileSync(option.path, data, {
-        flag: "w+",
-        encoding: option.options.encoding as BufferEncoding,
-      });
-    } else return fs.writeFileSync(option.path, data, {
-      flag: "w+",
-    });
+    // const data =
+    //   option.data instanceof ArrayBuffer
+    //     ? Buffer.from(option.data)
+    //     : option.data;
+    // if (option.options?.encoding) {
+    //   return fs.writeFileSync(option.path, data, {
+    //     flag: "w+",
+    //     encoding: option.options.encoding as BufferEncoding,
+    //   });
+    // } else
+    //   return fs.writeFileSync(option.path, data, {
+    //     flag: "w+",
+    //   });
   },
   getImageInfo: function (img_path: string): {
     width: number;
     height: number;
   } {
     console.warn("[getImageInfo] Function not implemented.");
-    return {width: 0, height: 0}
+    return { width: 0, height: 0 };
   },
   getTime: function (): number {
     return Date.now();
@@ -107,7 +109,12 @@ const HZEnginePlatformWeb: Platform = {
   },
   releaseAudioPlayer: function (audio_player: Platform.AudioPlayer): void {},
   setFrameInterval: function (callback: () => void): void {
-    requestAnimationFrame(callback);
+    console.log(`[PlatformWeb] setFrameInterval`);
+    const cb = () => {
+      requestAnimationFrame(cb);
+      callback();
+    }
+    requestAnimationFrame(cb);
   },
 };
 

@@ -165,7 +165,7 @@ export class UI<PlatformType extends Platform = any> {
     id: number
   ): UI.View<PropType, PlatformType> {
     if (!this._viewClassMap.get(name)) {
-      throw `要创建的View不存在: ${name}`;
+      throw "要创建的View不存在";
     }
     let _ViewFactory = this._viewClassMap.get(name);
     let viewInstance = new _ViewFactory!(layer, this._core) as UI.View<

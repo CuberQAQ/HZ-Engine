@@ -8,6 +8,8 @@ import { Animation, Profile, Wrapper } from "./animation.js";
 
 export class AnimationPlugin {
   constructor(public _core: HZEngineCore) {
+    console.log("[AnimationPlugin] init");
+    
     _core.loadPlugin("animation", () => this)
     _core.on("anime.cb", this._timerCb.bind(this));
     _core.async.addRepeatTask("anime.cb", [], 0); // 此處周期應考慮加個sync update
@@ -177,11 +179,14 @@ export class AnimationPlugin {
     if (this._animationMap[id] !== undefined) {
       if (this._animationMap[id].destroyOnEnd) {
         let view = this._core.ui.getView(id);
-        if (!view) return;
-        this._core.ui.destroyView(view);
+        if (view) this._core.ui.destroyView(view);
       }
       delete this._animationMap[id];
+      console.log("map item", this._animationMap[id]);
+      
     }
+    else console.log("nf map item", this._animationMap[id]);
+    
   }
 }
 

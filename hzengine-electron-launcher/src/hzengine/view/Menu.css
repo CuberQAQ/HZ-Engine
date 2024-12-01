@@ -1,0 +1,28 @@
+.hz-menu {
+  position: absolute;
+  top: 3%;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: start;
+  gap: 8px;
+  pointer-events: all;
+}
+
+.hz-menu-item {
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  align-content: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px;
+  border-radius: 4px;
+  background: rgba(45, 45, 45, 0.8);
+  color: white;
+  pointer-events: all;
+  width: 50%;
+}

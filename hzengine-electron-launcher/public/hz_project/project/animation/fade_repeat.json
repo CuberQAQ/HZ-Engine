@@ -1,0 +1,33 @@
+[
+    {
+        "frame": { "alpha": 0 }
+    },
+    {
+        "repeat": 10,
+        "syncs": [
+            [
+                {
+                    "time": 0.3,
+                    "wrapper": "easeout",
+                    "frame": { "alpha": 0 }
+                },
+                {
+                    "time": 0.3,
+                    "wrapper": "easein",
+                    "frame": { "alpha": 1 }
+                }
+            ]
+        ]
+    },
+    {
+        "time": 0.3,
+        "wrapper": "easeout",
+        "frame": { "alpha": 0 }
+    },
+    {
+        "repeat": 1000,
+        "time": 0.3,
+        "wrapper": "easein",
+        "frame": { "alpha": 1 }
+    }
+]

@@ -43,16 +43,20 @@
 
 
 .hz_container {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-  background-color: lightgray;
+  width: 480px;
+  height: 480px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  overflow: hidden;
+  -webkit-user-select: none;
 }
 
 .hz_root {
   width: 480px;
   height: 480px;
   background-color: rgb(0, 0, 0);
+  pointer-events: none;
+  overflow: hidden;
 }

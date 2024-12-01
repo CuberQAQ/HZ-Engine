@@ -120,6 +120,10 @@ export class Script {
     // );
   }
 
+  hasLabel(targetLabel: string) {
+    return this._core.storage.preloadedData?.script?.labelMap?.[targetLabel] != null;
+  }
+
   return() {
     // console.log(`pending to return, stack=${JSON.stringify(this._routeStack)}`);
     let stackItem = this._callStack.pop();

@@ -1,15 +1,21 @@
 import { HZEngineCore, UI } from "hzengine-core";
-import HZEnginePlatformWeb from "../hzengine-platform-web"; 
-import ReactDOM from 'react-dom/client'
-import Say from './say'
+import HZEnginePlatformWeb from "../hzengine-platform-web";
+import ReactDOM from "react-dom/client";
+import Say from "./Say";
 import { registerReactView } from "./react-view";
+import Menu from "./Menu";
+import BgImg from "./BgImg";
+import FgImg from "./FgImg";
 export function EletronViewPlugin(core: HZEngineCore) {
   core.ui.registerView("title", EmptyView);
-  core.ui.registerView("menu", EmptyView);
-  core.ui.registerView("fg_img", EmptyView);
-  core.ui.registerView("bg_img", EmptyView);
+  // core.ui.registerView("menu", Menu);
+  registerReactView(core, "menu", Menu);
+  // core.ui.registerView("fg_img", EmptyView);
+  registerReactView(core, "fg_img", FgImg);
+  // core.ui.registerView("bg_img", EmptyView);
+  registerReactView(core, "bg_img", BgImg);
   // core.ui.registerView("say", EmptyView);
-  registerReactView(core, "say", Say)
+  registerReactView(core, "say", Say);
   core.ui.registerView("quick_menu", EmptyView);
 }
 
@@ -26,6 +32,7 @@ class EmptyView extends UI.View<any, typeof HZEnginePlatformWeb> {
     div.style.height = "100%";
     div.style.left = "0px";
     div.style.top = "0px";
+    div.style.pointerEvents = "none";
 
     this.core.debug.log(`EmptyView [${this.name}] created`, prop);
   }

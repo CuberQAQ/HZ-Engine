@@ -35,6 +35,7 @@ export declare class Script {
      * @param targetLabel
      */
     callLabel(targetLabel: string): void;
+    hasLabel(targetLabel: string): boolean;
     return(): void;
     clear(): void;
     private _locateLabel;
