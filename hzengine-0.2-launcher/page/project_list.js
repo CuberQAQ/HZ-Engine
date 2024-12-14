@@ -1,4 +1,4 @@
-import { A as AsukaUI, N as NativeBindingsFactory, L as LayoutManagerFactory, r as render, c as createSignal, o as getHzpkList, a as createElement, i as insertNode, b as insert, d as createComponent, F as For, s as setProp, q as posix, e as effect, p as px, g as Alignment, E as EdgeInsets, j as reportError } from './hzpk-DlkgJGRA.js';
+import { A as AsukaUI, a as asukauiPlatformZeppos, N as NativeBindingsFactory, L as LayoutManagerFactory, r as render, c as createSignal, q as getHzpkList, b as createElement, i as insertNode, d as insert, e as createComponent, F as For, s as setProp, t as posix, f as effect, p as px, h as Alignment, E as EdgeInsets, k as reportError } from './asukaui-platform-zeppos-D97AIcyj.js';
 import hmUI__default from '@zos/ui';
 import { getDeviceInfo, SCREEN_SHAPE_ROUND } from '@zos/device';
 import hmFS from '@zos/fs';
@@ -10,7 +10,7 @@ const {
   height,
   screenShape
 } = getDeviceInfo();
-const asuka = new AsukaUI();
+const asuka = new AsukaUI(asukauiPlatformZeppos);
 Page({
   build() {
     try {

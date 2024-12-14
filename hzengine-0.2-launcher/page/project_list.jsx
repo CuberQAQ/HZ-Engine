@@ -27,9 +27,10 @@ import {
   removeHzpkByUuid,
   unpackHzpk_v1,
 } from "../shared/hzpk.js";
+import asukauiPlatformZeppos from "../shared/asukaui-platform-zeppos.js";
 
 var designWidth = 480;
-const asuka = new AsukaUI();
+const asuka = new AsukaUI(asukauiPlatformZeppos);
 
 Page({
   build() {

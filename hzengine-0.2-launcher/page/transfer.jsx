@@ -41,6 +41,7 @@ import {
 import { Time } from "@zos/sensor";
 
 import { setPageBrightTime } from "@zos/display";
+import asukauiPlatformZeppos from "../shared/asukaui-platform-zeppos.js";
 
 const timeSensor = new Time();
 const Conditions = {
@@ -64,7 +65,7 @@ var [transferingState, setTransferingState] = createSignal(
 );
 var [extra, setExtra] = createSignal("");
 var finish_list = [];
-let asuka = new AsukaUI();
+let asuka = new AsukaUI(asukauiPlatformZeppos);
 Page(
   BasePage({
     onInit() {

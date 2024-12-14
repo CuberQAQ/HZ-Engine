@@ -153,7 +153,7 @@ let Script = (() => {
             // );
         }
         hasLabel(targetLabel) {
-            return this._core.storage.preloadedData?.script?.labelMap?.[targetLabel] != null;
+            return (this._core.storage.preloadedData?.script?.labelMap?.[targetLabel] != null);
         }
         return() {
             // console.log(`pending to return, stack=${JSON.stringify(this._routeStack)}`);
@@ -267,6 +267,7 @@ let Script = (() => {
                 ._nextRunPosition
                 ? [...this._nextRunPosition]
                 : null;
+            let covered = false;
             // Set _nextRunPosition to the current position of the statement
             this._nextRunPosition = [ctx.currentPath, ctx.currentLineIndex];
             while (this._nextRunPosition) {
@@ -308,6 +309,16 @@ let Script = (() => {
                 }
                 // Move to the next line
                 this.incrementNextPosition();
+                if (covered) {
+                    if (this._statementAnalyseStack.length === 0) {
+                        break;
+                    }
+                }
+                else {
+                    if (this._statementAnalyseStack.length > 0) {
+                        covered = true;
+                    }
+                }
             }
             this._nextRunPosition = _nextRunPositionBackup;
             // Check if the statement stack is empty

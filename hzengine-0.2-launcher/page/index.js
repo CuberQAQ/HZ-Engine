@@ -4,6 +4,7 @@ import { NativeBindingsFactory } from "@cuberqaq/asuka-ui/zeppos"
 import { getDeviceInfo, SCREEN_SHAPE_ROUND } from '@zos/device';
 import hmUI from '@zos/ui';
 import * as hmRouter from '@zos/router';
+import asukauiPlatformZeppos from '../shared/asukaui-platform-zeppos';
 getDeviceInfo();
 var designWidth = 480;
 
@@ -24,7 +25,7 @@ Page({
     try {
       // 隐藏方屏设备的顶栏
       hmUI.setStatusBarVisible(false);
-      let asuka = new AsukaUI();
+      let asuka = new AsukaUI(asukauiPlatformZeppos);
       asuka.registerNodeFactory(NativeBindingsFactory);
       asuka.registerNodeFactory(LayoutManagerFactory);
       let view = asuka.mountView();

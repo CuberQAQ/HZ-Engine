@@ -52,7 +52,11 @@ export class Script {
     ];
     this.incrementNextPosition();
 
-    let rawCommand = readline(this._core, nowRunPosition[0], nowRunPosition[1])!;
+    let rawCommand = readline(
+      this._core,
+      nowRunPosition[0],
+      nowRunPosition[1]
+    )!;
 
     // remove comment
 
@@ -121,7 +125,9 @@ export class Script {
   }
 
   hasLabel(targetLabel: string) {
-    return this._core.storage.preloadedData?.script?.labelMap?.[targetLabel] != null;
+    return (
+      this._core.storage.preloadedData?.script?.labelMap?.[targetLabel] != null
+    );
   }
 
   return() {
@@ -207,8 +213,10 @@ export class Script {
   }
 
   private _processUnsolvedCmd(cmd: string) {
-    if (cmd.trim().length === 0) return; // Empty Line
-    else if (cmd.trim().startsWith("*")) return; // Label Command
+    if (cmd.trim().length === 0)
+      return; // Empty Line
+    else if (cmd.trim().startsWith("*"))
+      return; // Label Command
     else {
       throw `Can not parse command: ${cmd}`;
     }
@@ -270,7 +278,7 @@ export class Script {
       ._nextRunPosition
       ? [...this._nextRunPosition]
       : null;
-
+    let covered: boolean = false;
     // Set _nextRunPosition to the current position of the statement
     this._nextRunPosition = [ctx.currentPath, ctx.currentLineIndex];
     while (this._nextRunPosition) {
@@ -322,6 +330,16 @@ export class Script {
 
       // Move to the next line
       this.incrementNextPosition();
+
+      if (covered) {
+        if (this._statementAnalyseStack.length === 0) {
+          break;
+        }
+      } else {
+        if (this._statementAnalyseStack.length > 0) {
+          covered = true;
+        }
+      }
     }
 
     this._nextRunPosition = _nextRunPositionBackup;
@@ -505,7 +523,7 @@ export namespace Script {
     export function splitCommas(rawtext: string): string[] {
       let slicedArgs = splitStr2Objs(rawtext);
       // console.log(`splitCommas rawtext: ${rawtext}, slicedArgs: ${JSON.stringify(slicedArgs)}`);
-      
+
       let res: string[] = [];
       for (let i = 0; i < slicedArgs.length; i++) {
         if (slicedArgs[i].isQuoted) res.push(`"${slicedArgs[i].str}"`);
@@ -514,12 +532,12 @@ export namespace Script {
         else {
           slicedArgs[i].str.split(",").forEach((str) => {
             str = str.trim();
-            if (str) res.push(str)
+            if (str) res.push(str);
           });
         }
       }
       // console.log(`splitCommas res: ${JSON.stringify(res)}`);
-      
+
       return res;
     }
     export function parseTuple(rawtext: string) {
@@ -532,7 +550,7 @@ export namespace Script {
       }
       rawtext = rawtext.slice(1, rawtext.length - 1);
       // console.log(`parseTuple rawtext: ${rawtext}`);
-      
+
       return parseHzsArgs(rawtext);
     }
     export function parseArray(rawtext: string) {
@@ -555,11 +573,11 @@ export namespace Script {
         else return str;
       });
       // console.log(`parseHzsArgs from: "${rawtext}" ; res: ${JSON.stringify(res)}`);
-      
+
       return res;
     }
 
-    type TupleOrArr = (string | TupleOrArr)[]
+    type TupleOrArr = (string | TupleOrArr)[];
   }
   export type MiddlewareForAnalyseStatement = (
     ctx: ContextForAnalyseStatement,
@@ -598,7 +616,7 @@ export namespace Script {
   export type StatementStackItem = [
     identifier: string,
     start_position: [path: string, index: number],
-    statement_data: Storage.JSONValue
+    statement_data: Storage.JSONValue,
   ];
   export type StatementStack = StatementStackItem[];
   export type StatementData = NonNullable<Storage.JSONValue>;

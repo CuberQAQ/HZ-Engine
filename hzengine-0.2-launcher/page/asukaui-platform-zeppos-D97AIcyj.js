@@ -1,4 +1,5 @@
 import * as hmUI from '@zos/ui';
+import hmUI__default from '@zos/ui';
 import { px as px$1 } from '@zos/utils';
 import { getDeviceInfo } from '@zos/device';
 import hmFS from '@zos/fs';
@@ -5794,4 +5795,31 @@ function removeHzpkByUuid(uuid) {
   }
 }
 
-export { AsukaUI as A, CrossAxisAlignment as C, EdgeInsets as E, For as F, LayoutManagerFactory as L, Match as M, NativeBindingsFactory as N, Switch as S, createElement as a, insert as b, createSignal as c, createComponent as d, effect as e, MainAxisAlignment as f, Alignment as g, StackFit as h, insertNode as i, reportError as j, checkHzpk_v1 as k, removeHzpkByUuid as l, memo as m, addHzpk as n, getHzpkList as o, px as p, posix as q, render as r, setProp as s, unpackHzpk_v1 as u };
+/**
+ * @type {import("@cuberqaq/asuka-ui").Platform}
+ */
+var asukauiPlatformZeppos = AsukaUIPlatformZeppOS = {
+  getWidgetFactorySize(mount) {
+    if (mount === hmUI__default) {
+      let {
+        width,
+        height
+      } = getDeviceInfo();
+      size = {
+        w: width,
+        h: height
+      };
+    } else {
+      try {
+        size = {
+          w: mount.getProperty(hmUI__default.prop.W),
+          h: mount.getProperty(hmUI__default.prop.H)
+        };
+      } catch {
+        reportError("createFrame", Error("Get View size failed"));
+      }
+    }
+  }
+};
+
+export { AsukaUI as A, CrossAxisAlignment as C, EdgeInsets as E, For as F, LayoutManagerFactory as L, Match as M, NativeBindingsFactory as N, Switch as S, asukauiPlatformZeppos as a, createElement as b, createSignal as c, insert as d, createComponent as e, effect as f, MainAxisAlignment as g, Alignment as h, insertNode as i, StackFit as j, reportError as k, checkHzpk_v1 as l, memo as m, removeHzpkByUuid as n, addHzpk as o, px as p, getHzpkList as q, render as r, setProp as s, posix as t, unpackHzpk_v1 as u };
