@@ -1,7 +1,7 @@
 import { HZEngineCore, UI } from "hzengine-core";
 import HZEnginePlatformWeb from "../hzengine-platform-web";
 import ReactDOM from "react-dom/client";
-import Say from "./Say";
+import Say from "./say";
 import { registerReactView } from "./react-view";
 import Menu from "./Menu";
 import BgImg from "./BgImg";
