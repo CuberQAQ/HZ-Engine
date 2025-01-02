@@ -218,7 +218,7 @@ class BgImgView extends UI.BgImgView<PlatformZOS> {
     // TODO
     let size = this._calSize(prop.size);
     let position = this.core.ui.calcPosition(prop, size).origin;
-    this._widget = this._widgetFactory.createWidget(hmUI.widget.IMG, {
+    let _p = {
       // x: (width - size.width) / 2 + prop.offset.x,
       // y: (height - size.height) / 2 + prop.offset.y,
       ...position,
@@ -229,12 +229,15 @@ class BgImgView extends UI.BgImgView<PlatformZOS> {
       ...{
         alpha: prop.alpha && ~~(prop.alpha * 255),
       },
-    });
+    }
+    console.log("FgImgView Prop = ", JSON.stringify(_p));
+    
+    this._widget = this._widgetFactory.createWidget(hmUI.widget.IMG, _p);
   }
   onCommit(prop: UI.FgImgViewProp & UI.BasicUniversalProp): void {
     let size = this._calSize(prop.size);
     let position = this.core.ui.calcPosition(prop, size).origin;
-    this._widget.setProperty(hmUI.prop.MORE, {
+    let _p = {
       // x: (width - size.width) / 2 + prop.offset.x,
       // y: (height - size.height) / 2 + prop.offset.y,
       ...position,
@@ -245,7 +248,9 @@ class BgImgView extends UI.BgImgView<PlatformZOS> {
       ...{
         alpha: prop.alpha && ~~(prop.alpha * 255),
       },
-    });
+    }
+    console.log("FgImgView Prop = ", JSON.stringify(_p));
+    this._widget.setProperty(hmUI.prop.MORE, _p);
   }
   onDestroy(): void {
     hmUI.deleteWidget(this._widget);

@@ -3,9 +3,9 @@ import { getText } from '@zos/i18n';
 import { NativeBindingsFactory } from "@cuberqaq/asuka-ui/zeppos"
 import { getDeviceInfo, SCREEN_SHAPE_ROUND } from '@zos/device';
 import hmUI from '@zos/ui';
+import hmFS from '@zos/fs';
 import * as hmRouter from '@zos/router';
 import asukauiPlatformZeppos from '../shared/asukaui-platform-zeppos';
-getDeviceInfo();
 var designWidth = 480;
 
 /**
@@ -22,13 +22,19 @@ const {
 } = getDeviceInfo();
 Page({
   build() {
+
+
+    console.log(`Test IMG: \
+list=${hmFS.readdirSync({path:"data://games/f9c5b194-2f3e-4418-a454-4ab019d78643/image/bg"})} \
+size=${JSON.stringify(hmUI.getImageInfo("data://games/f9c5b194-2f3e-4418-a454-4ab019d78643/image/bg/bg cafe.png"))}`)
+
     try {
       // 隐藏方屏设备的顶栏
       hmUI.setStatusBarVisible(false);
       let asuka = new AsukaUI(asukauiPlatformZeppos);
       asuka.registerNodeFactory(NativeBindingsFactory);
       asuka.registerNodeFactory(LayoutManagerFactory);
-      let view = asuka.mountView();
+      let view = asuka.mountView(hmUI);
       // padding (圆形屏幕两边留空)
       let outside_padding = asuka.createNode("padding");
       outside_padding.setProperty("padding", EdgeInsets.symmetric({

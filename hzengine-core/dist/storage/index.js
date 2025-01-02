@@ -2,15 +2,33 @@
 import Path from "../utils/path.js";
 // import { isFileSync } from "./fs.js";
 export class Storage {
-    _core;
     constructor(_core) {
         this._core = _core;
+        this.projectRoot = null;
+        this.cacheRoot = null;
+        this.saveRoot = null;
+        this.preloadedData = null;
+        this.packageData = null;
+        // Storage Data
+        /**
+         * 全局数据
+         * 其中的数据不会跟随存档保存，而是直接存储在全局数据文件中
+         * 如：设置、CG解锁情况等
+         */
+        this._globalData = null;
+        /**
+         * 存档数据
+         * 其中的数据会跟随存档保存
+         * 如：脚本执行位置即调用栈，攻略度等
+         */
+        this._archiveData = null;
+        /**
+         * 保存全局数据
+         * 可以多次調用，實際上會異步儲存，也就是在一個宏任務中即使調用多次，也只會在宏任務結束後儲存一次
+         */
+        this._saveGlobalDataTimerId = null;
+        this._saveArchiveDataTimerId = null;
     }
-    projectRoot = null;
-    cacheRoot = null;
-    saveRoot = null;
-    preloadedData = null;
-    packageData = null;
     loadProject(options) {
         this._core.emit("beforeLoadProject");
         if (!this._core.platform.readdirSync({ path: options.projectPath })) {
@@ -37,13 +55,6 @@ export class Storage {
             options: { encoding: "utf8" },
         }));
     }
-    // Storage Data
-    /**
-     * 全局数据
-     * 其中的数据不会跟随存档保存，而是直接存储在全局数据文件中
-     * 如：设置、CG解锁情况等
-     */
-    _globalData = null;
     get globalData() {
         if (!this._globalData) {
             this.loadGlobalData();
@@ -58,12 +69,6 @@ export class Storage {
     get gd() {
         return this.globalData;
     }
-    /**
-     * 存档数据
-     * 其中的数据会跟随存档保存
-     * 如：脚本执行位置即调用栈，攻略度等
-     */
-    _archiveData = null;
     get archiveData() {
         if (!this._archiveData) {
             this.loadArchiveData();
@@ -108,11 +113,6 @@ export class Storage {
         }
         this._core.emit("afterLoadGlobalData");
     }
-    /**
-     * 保存全局数据
-     * 可以多次調用，實際上會異步儲存，也就是在一個宏任務中即使調用多次，也只會在宏任務結束後儲存一次
-     */
-    _saveGlobalDataTimerId = null;
     saveGlobalData() {
         if (!this.projectRoot) {
             throw "projectDir is null, please loadProject first";
@@ -163,7 +163,6 @@ export class Storage {
             this._core.emit("initArchiveData");
         }
     }
-    _saveArchiveDataTimerId = null;
     /**
      * 保存存档数据
      * 可以多次調用，實際上會異步儲存，也就是在一個宏任務中即使調用多次，也只會在宏任務結束後儲存一次

@@ -1,4 +1,5 @@
-import * as hmUI$1 from '@zos/ui';
+import * as hmUI from '@zos/ui';
+import hmUI__default from '@zos/ui';
 import { px as px$1 } from '@zos/utils';
 import { getDeviceInfo } from '@zos/device';
 import hmFS from '@zos/fs';
@@ -4070,14 +4071,14 @@ class NativeWidgetArc extends RenderWidget {
   }) {
     if (initial) {
       assert(this._widget === null);
-      this._widget = widgetFactory.createWidget(hmUI$1.widget.ARC, {
+      this._widget = widgetFactory.createWidget(hmUI.widget.ARC, {
         ...this._props,
         ...position,
         ...size
       });
     } else {
       assert(this._widget != null);
-      this._widget.setProperty(hmUI$1.prop.MORE, {
+      this._widget.setProperty(hmUI.prop.MORE, {
         ...this._props,
         ...position,
         ...size
@@ -4102,7 +4103,7 @@ class NativeWidgetArc extends RenderWidget {
       case 'color':
         {
           this._props.color = value;
-          if (this._widget) this._widget.setProperty(hmUI$1.prop.COLOR, value);
+          if (this._widget) this._widget.setProperty(hmUI.prop.COLOR, value);
         }
         break;
       case 's':
@@ -4111,7 +4112,7 @@ class NativeWidgetArc extends RenderWidget {
       case 'start_angle':
         {
           this._props.start_angle = value;
-          if (this._widget) this._widget.setProperty(hmUI$1.prop.START_ANGLE, value);
+          if (this._widget) this._widget.setProperty(hmUI.prop.START_ANGLE, value);
         }
         break;
       case 'e':
@@ -4120,14 +4121,14 @@ class NativeWidgetArc extends RenderWidget {
       case 'end_angle':
         {
           this._props.end_angle = value;
-          if (this._widget) this._widget.setProperty(hmUI$1.prop.END_ANGLE, value);
+          if (this._widget) this._widget.setProperty(hmUI.prop.END_ANGLE, value);
         }
         break;
       case 'lw':
       case 'line_width':
         {
           this._props.line_width = value;
-          if (this._widget) this._widget.setProperty(hmUI$1.prop.LINE_WIDTH, value);
+          if (this._widget) this._widget.setProperty(hmUI.prop.LINE_WIDTH, value);
         }
         break;
     }
@@ -4151,7 +4152,7 @@ class NativeWidgetButton extends RenderWidget {
   }) {
     if (initial) {
       assert(this._widget === null);
-      this._widget = widgetFactory.createWidget(hmUI$1.widget.BUTTON, {
+      this._widget = widgetFactory.createWidget(hmUI.widget.BUTTON, {
         ...this._props,
         ...position,
         ...size,
@@ -4170,7 +4171,7 @@ class NativeWidgetButton extends RenderWidget {
       });
     } else {
       assert(this._widget != null);
-      this._widget.setProperty(hmUI$1.prop.MORE, {
+      this._widget.setProperty(hmUI.prop.MORE, {
         ...this._props,
         ...position,
         ...size
@@ -4194,7 +4195,7 @@ class NativeWidgetButton extends RenderWidget {
       let {
         width,
         height
-      } = hmUI$1.getImageInfo(this._props.normal_src);
+      } = hmUI.getImageInfo(this._props.normal_src);
       this._preferredSizeManager.setDefaultSize({
         w: width,
         h: height
@@ -4210,7 +4211,7 @@ class NativeWidgetButton extends RenderWidget {
         {
           if (this._props.text !== value) {
             this._props.text = value;
-            if (this._widget) this._widget.setProperty(hmUI$1.prop.MORE, {
+            if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
               ...this.size,
               ...this.position,
               text: value
@@ -4222,7 +4223,7 @@ class NativeWidgetButton extends RenderWidget {
         {
           if (this._props.color !== value) {
             this._props.color = value;
-            if (this._widget) this._widget.setProperty(hmUI$1.prop.MORE, {
+            if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
               ...this.size,
               ...this.position,
               color: value
@@ -4236,7 +4237,7 @@ class NativeWidgetButton extends RenderWidget {
         {
           if (this._props.text_size !== value) {
             this._props.text_size = value;
-            if (this._widget) this._widget.setProperty(hmUI$1.prop.MORE, {
+            if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
               ...this.size,
               ...this.position,
               text_size: value
@@ -4250,7 +4251,7 @@ class NativeWidgetButton extends RenderWidget {
         {
           if (this._props.normal_color !== value) {
             this._props.normal_color = value;
-            if (this._widget) this._widget.setProperty(hmUI$1.prop.MORE, {
+            if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
               ...this.size,
               ...this.position,
               normal_color: value
@@ -4264,7 +4265,7 @@ class NativeWidgetButton extends RenderWidget {
         {
           if (this._props.press_color !== value) {
             this._props.press_color = value;
-            if (this._widget) this._widget.setProperty(hmUI$1.prop.MORE, {
+            if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
               ...this.size,
               ...this.position,
               press_color: value
@@ -4277,7 +4278,7 @@ class NativeWidgetButton extends RenderWidget {
         {
           if (this._props.radius !== value) {
             this._props.radius = value;
-            if (this._widget) this._widget.setProperty(hmUI$1.prop.MORE, {
+            if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
               ...this.size,
               ...this.position,
               radius: value
@@ -4292,7 +4293,7 @@ class NativeWidgetButton extends RenderWidget {
           if (this._props.normal_src !== value) {
             this._props.normal_src = value;
             this._updateDefaultSize();
-            if (this._widget) this._widget.setProperty(hmUI$1.prop.MORE, {
+            if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
               ...this.size,
               ...this.position,
               normal_src: value
@@ -4306,7 +4307,7 @@ class NativeWidgetButton extends RenderWidget {
         {
           if (this._props.press_src !== value) {
             this._props.press_src = value;
-            if (this._widget) this._widget.setProperty(hmUI$1.prop.MORE, {
+            if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
               ...this.size,
               ...this.position,
               press_src: value
@@ -4334,14 +4335,14 @@ class NativeWidgetCanvas extends RenderWidget {
   }) {
     if (initial) {
       assert(this._widget === null);
-      this._widget = widgetFactory.createWidget(hmUI$1.widget.CANVAS, {
+      this._widget = widgetFactory.createWidget(hmUI.widget.CANVAS, {
         ...this._props,
         ...position,
         ...size
       });
     } else {
       assert(this._widget != null);
-      this._widget.setProperty(hmUI$1.prop.MORE, {
+      this._widget.setProperty(hmUI.prop.MORE, {
         ...this._props,
         ...position,
         ...size
@@ -4391,13 +4392,13 @@ class NativeWidgetCircle extends RenderWidget {
   }) {
     if (initial) {
       assert(this._widget === null);
-      this._widget = widgetFactory.createWidget(hmUI$1.widget.FILL_RECT, {
+      this._widget = widgetFactory.createWidget(hmUI.widget.FILL_RECT, {
         ...this._props,
         ...this._fromSizeAndPositionToProp(size, position)
       });
     } else {
       assert(this._widget != null);
-      this._widget.setProperty(hmUI$1.prop.MORE, {
+      this._widget.setProperty(hmUI.prop.MORE, {
         ...this._props,
         ...this._fromSizeAndPositionToProp(size, position)
       });
@@ -4431,13 +4432,13 @@ class NativeWidgetCircle extends RenderWidget {
       case 'color':
         {
           this._props.color = value;
-          if (this._widget) this._widget.setProperty(hmUI$1.prop.COLOR, value);
+          if (this._widget) this._widget.setProperty(hmUI.prop.COLOR, value);
         }
         break;
       case 'alpha':
         {
           this._props.alpha = value;
-          if (this._widget) this._widget.setProperty(hmUI$1.prop.MORE, {
+          if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
             ...this.size,
             ...this.position,
             ...this._props
@@ -4466,14 +4467,14 @@ class NativeWidgetFillRect extends RenderWidget {
   }) {
     if (initial) {
       assert(this._widget === null);
-      this._widget = widgetFactory.createWidget(hmUI$1.widget.FILL_RECT, {
+      this._widget = widgetFactory.createWidget(hmUI.widget.FILL_RECT, {
         ...this._props,
         ...position,
         ...size
       });
     } else {
       assert(this._widget != null);
-      this._widget.setProperty(hmUI$1.prop.MORE, {
+      this._widget.setProperty(hmUI.prop.MORE, {
         ...this._props,
         ...position,
         ...size
@@ -4500,7 +4501,7 @@ class NativeWidgetFillRect extends RenderWidget {
       case 'radius':
         {
           this._props.radius = value;
-          if (this._widget) this._widget.setProperty(hmUI$1.prop.MORE, {
+          if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
             ...this.size,
             ...this.position,
             ...this._props
@@ -4510,13 +4511,13 @@ class NativeWidgetFillRect extends RenderWidget {
       case 'color':
         {
           this._props.color = value;
-          if (this._widget) this._widget.setProperty(hmUI$1.prop.COLOR, value);
+          if (this._widget) this._widget.setProperty(hmUI.prop.COLOR, value);
         }
         break;
       case 'alpha':
         {
           this._props.alpha = value;
-          if (this._widget) this._widget.setProperty(hmUI$1.prop.MORE, {
+          if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
             ...this.size,
             ...this.position,
             ...this._props
@@ -4543,14 +4544,14 @@ class NativeWidgetImage extends RenderWidget {
   }) {
     if (initial) {
       assert(this._widget === null);
-      this._widget = widgetFactory.createWidget(hmUI$1.widget.FILL_RECT, {
+      this._widget = widgetFactory.createWidget(hmUI.widget.FILL_RECT, {
         ...this._props,
         ...position,
         ...size
       });
     } else {
       assert(this._widget != null);
-      this._widget.setProperty(hmUI$1.prop.MORE, {
+      this._widget.setProperty(hmUI.prop.MORE, {
         ...this._props,
         ...position,
         ...size
@@ -4568,7 +4569,7 @@ class NativeWidgetImage extends RenderWidget {
       let {
         width,
         height
-      } = hmUI$1.getImageInfo(this._props.src);
+      } = hmUI.getImageInfo(this._props.src);
       this._preferredSizeManager.setDefaultSize({
         w: width,
         h: height
@@ -4582,7 +4583,7 @@ class NativeWidgetImage extends RenderWidget {
       case 'color':
         if (value !== this._props.color) {
           this._props.color = value;
-          if (this._widget) this._widget.setProperty(hmUI$1.prop.COLOR, value);
+          if (this._widget) this._widget.setProperty(hmUI.prop.COLOR, value);
         }
         break;
       // case 'alpha':
@@ -4598,7 +4599,7 @@ class NativeWidgetImage extends RenderWidget {
         {
           if (value !== this._props.pos_x) {
             this._props.pos_x = value;
-            if (this._widget) this._widget.setProperty(hmUI$1.prop.POS_X, value);
+            if (this._widget) this._widget.setProperty(hmUI.prop.POS_X, value);
           }
         }
         break;
@@ -4606,7 +4607,7 @@ class NativeWidgetImage extends RenderWidget {
         {
           if (value !== this._props.pos_y) {
             this._props.pos_y = value;
-            if (this._widget) this._widget.setProperty(hmUI$1.prop.POS_Y, value);
+            if (this._widget) this._widget.setProperty(hmUI.prop.POS_Y, value);
           }
         }
         break;
@@ -4614,7 +4615,7 @@ class NativeWidgetImage extends RenderWidget {
         {
           if (value !== this._props.angle) {
             this._props.angle = value;
-            if (this._widget) this._widget.setProperty(hmUI$1.prop.ANGLE, value);
+            if (this._widget) this._widget.setProperty(hmUI.prop.ANGLE, value);
           }
         }
         break;
@@ -4622,7 +4623,7 @@ class NativeWidgetImage extends RenderWidget {
         {
           if (value !== this._props.center_x) {
             this._props.center_x = value;
-            if (this._widget) this._widget.setProperty(hmUI$1.prop.CENTER_X, value);
+            if (this._widget) this._widget.setProperty(hmUI.prop.CENTER_X, value);
           }
         }
         break;
@@ -4630,7 +4631,7 @@ class NativeWidgetImage extends RenderWidget {
         {
           if (value !== this._props.center_y) {
             this._props.center_y = value;
-            if (this._widget) this._widget.setProperty(hmUI$1.prop.CENTER_Y, value);
+            if (this._widget) this._widget.setProperty(hmUI.prop.CENTER_Y, value);
           }
         }
         break;
@@ -4638,7 +4639,7 @@ class NativeWidgetImage extends RenderWidget {
         {
           if (value !== this._props.alpha) {
             this._props.alpha = value;
-            if (this._widget) this._widget.setProperty(hmUI$1.prop.ALPHA, value);
+            if (this._widget) this._widget.setProperty(hmUI.prop.ALPHA, value);
           }
         }
         break;
@@ -4646,7 +4647,7 @@ class NativeWidgetImage extends RenderWidget {
         {
           if (value !== this._props.auto_scale) {
             this._props.auto_scale = value;
-            if (this._widget) this._widget.setProperty(hmUI$1.prop.MORE, {
+            if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
               ...this._props
             });
           }
@@ -4656,7 +4657,7 @@ class NativeWidgetImage extends RenderWidget {
         {
           if (value !== this._props.auto_scale_obj_fit) {
             this._props.auto_scale_obj_fit = value;
-            if (this._widget) this._widget.setProperty(hmUI$1.prop.MORE, {
+            if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
               ...this._props
             });
           }
@@ -4666,7 +4667,7 @@ class NativeWidgetImage extends RenderWidget {
         {
           if (value !== this._props.src) {
             this._props.src = value;
-            if (this._widget) this._widget.setProperty(hmUI$1.prop.SRC, value);
+            if (this._widget) this._widget.setProperty(hmUI.prop.SRC, value);
           }
         }
         break;
@@ -4690,14 +4691,14 @@ class NativeWidgetPolyline extends RenderWidget {
   }) {
     if (initial) {
       assert(this._widget === null);
-      this._widget = widgetFactory.createWidget(hmUI$1.widget.GRADKIENT_POLYLINE, {
+      this._widget = widgetFactory.createWidget(hmUI.widget.GRADKIENT_POLYLINE, {
         ...this._props,
         ...position,
         ...size
       });
     } else {
       assert(this._widget != null);
-      this._widget.setProperty(hmUI$1.prop.MORE, {
+      this._widget.setProperty(hmUI.prop.MORE, {
         ...this._props,
         ...position,
         ...size
@@ -4724,14 +4725,14 @@ class NativeWidgetPolyline extends RenderWidget {
       case 'line_color':
         {
           this._props.line_color = value;
-          if (this._widget) this._widget.setProperty(hmUI$1.prop.LINE_COLOR, value);
+          if (this._widget) this._widget.setProperty(hmUI.prop.LINE_COLOR, value);
         }
         break;
       case 'lw':
       case 'line_width':
         {
           this._props.line_width = value;
-          if (this._widget) this._widget.setProperty(hmUI$1.prop.LINE_WIDTH, value);
+          if (this._widget) this._widget.setProperty(hmUI.prop.LINE_WIDTH, value);
         }
         break;
     }
@@ -4757,14 +4758,14 @@ class NativeWidgetQRCode extends RenderWidget {
   }) {
     if (initial) {
       assert(this._widget === null);
-      this._widget = widgetFactory.createWidget(hmUI$1.widget.QRCODE, {
+      this._widget = widgetFactory.createWidget(hmUI.widget.QRCODE, {
         ...this._props,
         ...position,
         ...size
       });
     } else {
       assert(this._widget != null);
-      this._widget.setProperty(hmUI$1.prop.MORE, {
+      this._widget.setProperty(hmUI.prop.MORE, {
         ...this._props,
         ...position,
         ...size
@@ -4790,7 +4791,7 @@ class NativeWidgetQRCode extends RenderWidget {
       case 'content':
         {
           this._props.content = value;
-          if (this._widget) this._widget.setProperty(hmUI$1.prop.MORE, {
+          if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
             ...this.position,
             ...this.size,
             content: value
@@ -4821,7 +4822,7 @@ class NativeWidgetRadioGroup extends RenderWidgetFactoryProvider {
         assert(this._widget != null);
         if (this._stateButtonWidget.length > 0) {
           assert(this._defaultChecked < this._stateButtonWidget.length);
-          this._widget.setProperty(hmUI$1.prop.INIT, this._stateButtonWidget[this._defaultChecked]);
+          this._widget.setProperty(hmUI.prop.INIT, this._stateButtonWidget[this._defaultChecked]);
         }
       };
       this._core.addRunAfterAsync(this._registeredTask);
@@ -4832,12 +4833,12 @@ class NativeWidgetRadioGroup extends RenderWidgetFactoryProvider {
       createWidget: (widgetType, option) => {
         assert(this._widget != null);
         let widget = this._widget.createWidget(widgetType, option);
-        if (widgetType === hmUI$1.widget.STATE_BUTTON) {
+        if (widgetType === hmUI.widget.STATE_BUTTON) {
           this._stateButtonWidget.push(widget);
         }
       },
       deleteWidget: widget => {
-        if (widget.getType() === hmUI$1.widget.STATE_BUTTON) {
+        if (widget.getType() === hmUI.widget.STATE_BUTTON) {
           //   let index = findWhere(this._stateButtonWidget, widget, true);
           // TODO do some operations to make everything right
           splice(this._stateButtonWidget, widget);
@@ -4857,7 +4858,7 @@ class NativeWidgetRadioGroup extends RenderWidgetFactoryProvider {
     assert(this._props.unselect_src != null);
     if (initial) {
       assert(this._widget === null);
-      this._widget = widgetFactory.createWidget(hmUI$1.widget.FILL_RECT, {
+      this._widget = widgetFactory.createWidget(hmUI.widget.FILL_RECT, {
         ...this._props,
         ...position,
         ...size
@@ -4865,7 +4866,7 @@ class NativeWidgetRadioGroup extends RenderWidgetFactoryProvider {
       this._initChildWidgetFactory();
     } else {
       assert(this._widget != null);
-      this._widget.setProperty(hmUI$1.prop.MORE, {
+      this._widget.setProperty(hmUI.prop.MORE, {
         ...this._props,
         ...position,
         ...size
@@ -4881,7 +4882,7 @@ class NativeWidgetRadioGroup extends RenderWidgetFactoryProvider {
       case 'select_src':
         {
           this._props.select_src = value;
-          if (this._widget) this._widget.setProperty(hmUI$1.prop.MORE, {
+          if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
             ...this.size,
             ...this.position,
             ...this._props
@@ -4891,7 +4892,7 @@ class NativeWidgetRadioGroup extends RenderWidgetFactoryProvider {
       case 'unselect_src':
         {
           this._props.unselect_src = value;
-          if (this._widget) this._widget.setProperty(hmUI$1.prop.MORE, {
+          if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
             ...this.size,
             ...this.position,
             ...this._props
@@ -4920,14 +4921,14 @@ class NativeWidgetStrokeRect extends RenderWidget {
   }) {
     if (initial) {
       assert(this._widget === null);
-      this._widget = widgetFactory.createWidget(hmUI$1.widget.STROKE_RECT, {
+      this._widget = widgetFactory.createWidget(hmUI.widget.STROKE_RECT, {
         ...this._props,
         ...position,
         ...size
       });
     } else {
       assert(this._widget != null);
-      this._widget.setProperty(hmUI$1.prop.MORE, {
+      this._widget.setProperty(hmUI.prop.MORE, {
         ...this._props,
         ...position,
         ...size
@@ -4954,7 +4955,7 @@ class NativeWidgetStrokeRect extends RenderWidget {
       case 'radius':
         {
           this._props.radius = value;
-          if (this._widget) this._widget.setProperty(hmUI$1.prop.MORE, {
+          if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
             ...this.size,
             ...this.position,
             ...this._props
@@ -4964,13 +4965,13 @@ class NativeWidgetStrokeRect extends RenderWidget {
       case 'color':
         {
           this._props.color = value;
-          if (this._widget) this._widget.setProperty(hmUI$1.prop.COLOR, value);
+          if (this._widget) this._widget.setProperty(hmUI.prop.COLOR, value);
         }
         break;
       case 'angle':
         {
           this._props.angle = value;
-          if (this._widget) this._widget.setProperty(hmUI$1.prop.MORE, {
+          if (this._widget) this._widget.setProperty(hmUI.prop.MORE, {
             ...this.size,
             ...this.position,
             ...this._props
@@ -4981,7 +4982,7 @@ class NativeWidgetStrokeRect extends RenderWidget {
       case 'line_width':
         {
           this._props.line_width = value;
-          if (this._widget) this._widget.setProperty(hmUI$1.prop.LINE_WIDTH, value);
+          if (this._widget) this._widget.setProperty(hmUI.prop.LINE_WIDTH, value);
         }
         break;
     }
@@ -4992,8 +4993,8 @@ const defaultProps = {
   text: 'text',
   color: 0xffffff,
   text_size: Number(px$1(36)),
-  align_h: hmUI$1.align.CENTER_H,
-  align_v: hmUI$1.align.CENTER_V
+  align_h: hmUI.align.CENTER_H,
+  align_v: hmUI.align.CENTER_V
 };
 class NativeWidgetText extends RenderWidget {
   _widget = null;
@@ -5009,14 +5010,14 @@ class NativeWidgetText extends RenderWidget {
   }) {
     if (initial) {
       assert(this._widget === null);
-      this._widget = widgetFactory.createWidget(hmUI$1.widget.TEXT, {
+      this._widget = widgetFactory.createWidget(hmUI.widget.TEXT, {
         ...this._props,
         ...position,
         ...size
       });
     } else {
       assert(this._widget != null);
-      this._widget.setProperty(hmUI$1.prop.MORE, {
+      this._widget.setProperty(hmUI.prop.MORE, {
         ...this._props,
         ...position,
         ...size
@@ -5033,19 +5034,19 @@ class NativeWidgetText extends RenderWidget {
     let {
       width: singleLineWidth,
       height: singleLineHeight
-    } = hmUI$1.getTextLayout(this._props.text, {
+    } = hmUI.getTextLayout(this._props.text, {
       text_size: this._props.text_size,
       text_width: 0,
       wrapped: 0
     });
-    if (this._props.text_style !== undefined && this._props.text_style === hmUI$1.text_style.WRAP) {
+    if (this._props.text_style !== undefined && this._props.text_style === hmUI.text_style.WRAP) {
       // 文字可换行
       if (singleLineWidth > this._constraints.maxWidth) {
         // 换行
         let {
           width,
           height
-        } = hmUI$1.getTextLayout(this._props.text, {
+        } = hmUI.getTextLayout(this._props.text, {
           text_size: this._props.text_size,
           text_width: this._constraints.maxWidth,
           wrapped: 1
@@ -5077,7 +5078,7 @@ class NativeWidgetText extends RenderWidget {
         {
           this._props.text = '' + value;
           if (this._widget) {
-            this._widget.setProperty(hmUI$1.prop.TEXT, '' + value);
+            this._widget.setProperty(hmUI.prop.TEXT, '' + value);
           }
           this.markNeedsLayout();
         }
@@ -5085,19 +5086,19 @@ class NativeWidgetText extends RenderWidget {
       case 'color':
         {
           this._props.color = value;
-          if (this._widget) this._widget.setProperty(hmUI$1.prop.COLOR, value);
+          if (this._widget) this._widget.setProperty(hmUI.prop.COLOR, value);
         }
         break;
       case 'text_size':
         {
           this._props.text_size = value;
-          if (this._widget) this._widget.setProperty(hmUI$1.prop.TEXT_SIZE, value);
+          if (this._widget) this._widget.setProperty(hmUI.prop.TEXT_SIZE, value);
         }
         break;
       case 'text_style':
         {
           this._props.text_style = value;
-          if (this._widget) this._widget.setProperty(hmUI$1.prop.TEXT_STYLE, value);
+          if (this._widget) this._widget.setProperty(hmUI.prop.TEXT_STYLE, value);
         }
         break;
     }
@@ -5799,7 +5800,7 @@ function removeHzpkByUuid(uuid) {
  */
 var asukauiPlatformZeppos = AsukaUIPlatformZeppOS = {
   getWidgetFactorySize(mount) {
-    if (mount === hmUI) {
+    if (mount === hmUI__default) {
       let {
         width,
         height
@@ -5811,11 +5812,11 @@ var asukauiPlatformZeppos = AsukaUIPlatformZeppOS = {
     } else {
       try {
         size = {
-          w: mount.getProperty(hmUI.prop.W),
-          h: mount.getProperty(hmUI.prop.H)
+          w: mount.getProperty(hmUI__default.prop.W),
+          h: mount.getProperty(hmUI__default.prop.H)
         };
-      } catch {
-        reportError("createFrame", Error("Get View size failed"));
+      } catch (e) {
+        reportError("createFrame", e);
       }
     }
   }

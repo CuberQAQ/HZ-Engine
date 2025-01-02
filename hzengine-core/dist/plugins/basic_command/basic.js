@@ -100,9 +100,11 @@ export function sayAction(core, who, what, wait) {
         router = core.ui.getRouter(say_view_tag);
     }
     if (!router.length) {
+        // @ts-ignore
         router.push(say_view_name, message);
     }
     else {
+        // @ts-ignore
         router.update(message);
     }
     if (wait) {

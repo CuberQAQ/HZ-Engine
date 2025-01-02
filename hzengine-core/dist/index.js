@@ -14,18 +14,10 @@ import { Storage } from "./storage/index.js";
 import { System } from "./system/index.js";
 import { UI } from "./ui/index.js";
 class HZEngineCore {
-    platform;
-    _eventCallbacks = new Map();
-    storage;
-    async;
-    ui;
-    script;
-    system;
-    config;
-    audio;
-    debug;
     constructor(platform) {
         this.platform = platform;
+        this._eventCallbacks = new Map();
+        this.plugins = new Map();
         // 請不要調整這裡的初始化順序，不然會有問題（裝飾器裡有時候要用到前面初始化的東西）
         this.storage = new Storage(this);
         this.async = new Async(this);
@@ -46,8 +38,9 @@ class HZEngineCore {
     start(callback) {
         // this.system.start()
         Async.nextTick(() => {
+            var _a;
             this.debug.log("[HZEngine] Game Start");
-            let title = this.storage.packageData?.name;
+            let title = (_a = this.storage.packageData) === null || _a === void 0 ? void 0 : _a.name;
             if (title == null) {
                 throw `[HZEngine] project name is null, please loadProject first or check your project.json format`;
             }
@@ -61,12 +54,13 @@ class HZEngineCore {
             //     title,
             //   });
             // });
-            callback?.();
+            callback === null || callback === void 0 ? void 0 : callback();
         });
     }
     end() {
+        var _a;
         this.debug.log("[HZEngine] Game End, return to title");
-        let title = this.storage.packageData?.name;
+        let title = (_a = this.storage.packageData) === null || _a === void 0 ? void 0 : _a.name;
         if (title == null) {
             throw `[HZEngine] project name is null, please loadProject first or check your project.json format`;
         }
@@ -78,7 +72,6 @@ class HZEngineCore {
             title,
         });
     }
-    plugins = new Map();
     // Load Plugin
     loadPlugin(name, plugin) {
         this.debug.log(`[HZEngine] load plugin [${name}]`);
@@ -96,10 +89,12 @@ class HZEngineCore {
         }
     }
     off(event, cb) {
-        return !!this._eventCallbacks.get(event)?.delete(cb);
+        var _a;
+        return !!((_a = this._eventCallbacks.get(event)) === null || _a === void 0 ? void 0 : _a.delete(cb));
     }
     emit(event, ...args) {
-        this._eventCallbacks.get(event)?.forEach((cb) => {
+        var _a;
+        (_a = this._eventCallbacks.get(event)) === null || _a === void 0 ? void 0 : _a.forEach((cb) => {
             cb(...args);
         });
     }

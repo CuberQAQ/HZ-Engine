@@ -7,6 +7,7 @@ export function img(core) {
         core.debug.log("[IMG Plugin] Info: Transform plugin not set up");
     // show command
     core.script.use((ctx, next) => {
+        var _a;
         if (ctx.rawtext.trim().split(" ")[0].toLowerCase() !== "show")
             return next();
         if (ctx.slicedArgs.length === 1)
@@ -22,11 +23,12 @@ export function img(core) {
             name_key += ctx.slicedArgs[i].str + " ";
         }
         name_key = name_key.trim().toLowerCase();
-        let path = core.storage.preloadedData.image.nameMap[name_key]?.[0];
+        let path = (_a = core.storage.preloadedData.image.nameMap[name_key]) === null || _a === void 0 ? void 0 : _a[0];
         if (!path)
             throw `Show Command: image with name_key [${name_key}] not found `;
         // let size = (hmUI as any).getImageInfo(path);
         let size = core.platform.getImageInfo(path);
+        console.log(`IMG: path: ${path}, size: ${JSON.stringify(size)}`);
         if (!size)
             throw `Show Command: read size of [${path}] failed`;
         showAction(tag, path, size, parsedRes.strategy);
@@ -52,7 +54,8 @@ export function img(core) {
             router = core.ui.getRouter(tag_prefixed);
         }
         Async.nextTick(() => {
-            router.replace(show_view_name, prop, routerStrategy ?? undefined);
+            // @ts-ignore
+            router.replace(show_view_name, prop, routerStrategy !== null && routerStrategy !== void 0 ? routerStrategy : undefined);
         });
     }
     // hide command
@@ -75,11 +78,12 @@ export function img(core) {
             throw `Hide Command: router with tag [${tag}] not found `;
         }
         Async.nextTick(() => {
-            router.clear(routerStrategy ?? undefined);
+            router.clear(routerStrategy !== null && routerStrategy !== void 0 ? routerStrategy : undefined);
         });
     }
     // scene command
     core.script.use((ctx, next) => {
+        var _a;
         if (ctx.rawtext.trim().split(" ")[0].toLowerCase() !== "scene")
             return next();
         if (ctx.slicedArgs.length === 1)
@@ -95,7 +99,7 @@ export function img(core) {
             name_key += ctx.slicedArgs[i].str + " ";
         }
         name_key = name_key.trim().toLowerCase();
-        let path = core.storage.preloadedData.image.nameMap[name_key]?.[0];
+        let path = (_a = core.storage.preloadedData.image.nameMap[name_key]) === null || _a === void 0 ? void 0 : _a[0];
         if (!path)
             throw `Scene Command: image with name_key [${name_key}] not found `;
         // let size = (hmUI as any).getImageInfo(path);
@@ -125,13 +129,17 @@ export function img(core) {
             router = core.ui.getRouter(tag_prefixed);
         }
         if (!router.length) {
+            // @ts-ignore
             Async.nextTick(() => {
-                router.push(scene_view_name, prop, routerStrategy ?? undefined);
+                // @ts-ignore
+                router.push(scene_view_name, prop, routerStrategy !== null && routerStrategy !== void 0 ? routerStrategy : undefined);
             });
         }
         else {
+            // @ts-ignore
             Async.nextTick(() => {
-                router.update(prop, routerStrategy ?? undefined);
+                // @ts-ignore
+                router.update(prop, routerStrategy !== null && routerStrategy !== void 0 ? routerStrategy : undefined);
             });
         }
     }

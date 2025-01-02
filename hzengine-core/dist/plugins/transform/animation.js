@@ -4,15 +4,27 @@
  * @date 2024/10/2
  * @author CuberQAQ
  */
+var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {
+    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
+    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
+    return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
+};
+var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {
+    if (kind === "m") throw new TypeError("Private method is not writable");
+    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a setter");
+    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
+    return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
+};
+var _ActiveTrackNode_currentSection, _ActiveTrackNode_currentIndex, _ActiveTrackNode_currentTrack;
 export class Animation {
-    normalizedProfile;
-    initProps = {};
-    activeRootTrack = null;
-    lastTime = 0;
-    onFrame = null;
-    onEnd = null;
-    customWrappers = {};
     constructor(profile, options) {
+        this.initProps = {};
+        this.activeRootTrack = null;
+        this.lastTime = 0;
+        this.onFrame = null;
+        this.onEnd = null;
+        this.customWrappers = {};
+        this.onStop = null;
         this.normalizedProfile = Profile.normalize(profile);
         console.log(`Animation: ${JSON.stringify(profile)}`);
         if (options) {
@@ -20,12 +32,12 @@ export class Animation {
             options.wrappers && (this.customWrappers = options.wrappers);
         }
     }
-    onStop = null;
     serialize() {
+        var _a;
         return {
             normalizedProfile: this.normalizedProfile,
             initProps: this.initProps,
-            activeRootTrack: this.activeRootTrack?.serialize(),
+            activeRootTrack: (_a = this.activeRootTrack) === null || _a === void 0 ? void 0 : _a.serialize(),
             lastTime: this.lastTime,
         };
     }
@@ -105,10 +117,9 @@ export class Animation {
         return section;
     }
     _getWrapper(wrapper) {
+        var _a, _b;
         if (typeof wrapper === "string") {
-            return (this.customWrappers[wrapper] ??
-                buildInWrappers[wrapper] ??
-                buildInWrappers.none);
+            return ((_b = (_a = this.customWrappers[wrapper]) !== null && _a !== void 0 ? _a : buildInWrappers[wrapper]) !== null && _b !== void 0 ? _b : buildInWrappers.none);
         }
         else if (wrapper === undefined) {
             return buildInWrappers.none;
@@ -117,10 +128,10 @@ export class Animation {
             return wrapper;
     }
     _calcWrappedProps(former_props, props, wrapper, progress) {
-        let _former_props = { ...former_props };
+        let _former_props = Object.assign({}, former_props);
         let wrapper_func = this._getWrapper(wrapper);
         let wraped_prog = wrapper_func(progress);
-        let res = { ..._former_props };
+        let res = Object.assign({}, _former_props);
         for (let key in props) {
             if (typeof props[key] === "number") {
                 if (_former_props[key] == undefined)
@@ -172,45 +183,43 @@ export var Profile;
     Profile.normalize = normalize;
 })(Profile || (Profile = {}));
 export class ActiveTrackNode {
-    animation;
-    accessKeys;
-    currentIndex;
-    repeated = 0;
-    status = ActiveTrackNode.Status.Playing;
-    now_time = 0;
-    #currentSection = null;
-    #currentIndex = null;
     get currentSection() {
-        if (this.#currentSection === null) {
+        if (__classPrivateFieldGet(this, _ActiveTrackNode_currentSection, "f") === null) {
             if (this.currentIndex === null) {
-                this.#currentSection = this.animation._accessProfile(this.accessKeys);
+                __classPrivateFieldSet(this, _ActiveTrackNode_currentSection, this.animation._accessProfile(this.accessKeys), "f");
             }
             else {
-                this.#currentSection = this.currentTrack[this.currentIndex];
+                __classPrivateFieldSet(this, _ActiveTrackNode_currentSection, this.currentTrack[this.currentIndex], "f");
             }
-            this.#currentIndex = this.currentIndex;
+            __classPrivateFieldSet(this, _ActiveTrackNode_currentIndex, this.currentIndex, "f");
         }
-        else if (this.currentIndex !== this.#currentIndex) {
-            this.#currentSection = this.currentTrack[this.currentIndex];
-            this.#currentIndex = this.currentIndex;
+        else if (this.currentIndex !== __classPrivateFieldGet(this, _ActiveTrackNode_currentIndex, "f")) {
+            __classPrivateFieldSet(this, _ActiveTrackNode_currentSection, this.currentTrack[this.currentIndex], "f");
+            __classPrivateFieldSet(this, _ActiveTrackNode_currentIndex, this.currentIndex, "f");
         }
-        return this.#currentSection;
+        return __classPrivateFieldGet(this, _ActiveTrackNode_currentSection, "f");
     }
-    #currentTrack = null;
     get currentTrack() {
-        if (this.#currentTrack === null && this.currentIndex !== null) {
-            this.#currentTrack = this.animation._accessProfile(this.accessKeys);
+        if (__classPrivateFieldGet(this, _ActiveTrackNode_currentTrack, "f") === null && this.currentIndex !== null) {
+            __classPrivateFieldSet(this, _ActiveTrackNode_currentTrack, this.animation._accessProfile(this.accessKeys), "f");
         }
-        return this.#currentTrack;
+        return __classPrivateFieldGet(this, _ActiveTrackNode_currentTrack, "f");
     }
-    lastProps = {};
-    nowProps = {};
     constructor(animation, { accessKeys, index, initProps, }) {
         this.animation = animation;
+        this.repeated = 0;
+        this.status = ActiveTrackNode.Status.Playing;
+        this.now_time = 0;
+        _ActiveTrackNode_currentSection.set(this, null);
+        _ActiveTrackNode_currentIndex.set(this, null);
+        _ActiveTrackNode_currentTrack.set(this, null);
+        this.lastProps = {};
+        this.nowProps = {};
+        this.activeSyncs = [];
         this.accessKeys = accessKeys;
         this.currentIndex = index;
-        this.lastProps = { ...initProps };
-        this.nowProps = { ...initProps };
+        this.lastProps = Object.assign({}, initProps);
+        this.nowProps = Object.assign({}, initProps);
     }
     serialize() {
         return {
@@ -245,6 +254,7 @@ export class ActiveTrackNode {
      */
     step(delta_time) {
         // console.log(`node step: ${delta_time}`);
+        var _a;
         // if (this.status === ActiveTrackNode.Status.Pause) return delta_time;
         // because we should proceed async list
         // normal
@@ -258,13 +268,13 @@ export class ActiveTrackNode {
             if (this.status === ActiveTrackNode.Status.Playing) {
                 if (this.currentSection.time === undefined ||
                     this.currentSection.time <= 0) {
-                    this.nowProps = { ...this.nowProps, ...this.currentSection.frame };
+                    this.nowProps = Object.assign(Object.assign({}, this.nowProps), this.currentSection.frame);
                 }
                 else {
                     if (this.now_time + delta_time >= this.currentSection.time) {
                         // this.now_time = this.currentSection.time
                         delta_time -= this.currentSection.time - this.now_time;
-                        this.nowProps = { ...this.nowProps, ...this.currentSection.frame };
+                        this.nowProps = Object.assign(Object.assign({}, this.nowProps), this.currentSection.frame);
                     }
                     else {
                         this.now_time += delta_time;
@@ -272,7 +282,7 @@ export class ActiveTrackNode {
                         // calc
                         let progress = this.now_time / this.currentSection.time;
                         // console.log(`progress: ${progress}`);
-                        this.nowProps = this.animation._calcWrappedProps(this.lastProps, this.currentSection.frame ?? {}, this.currentSection.wrapper, progress);
+                        this.nowProps = this.animation._calcWrappedProps(this.lastProps, (_a = this.currentSection.frame) !== null && _a !== void 0 ? _a : {}, this.currentSection.wrapper, progress);
                         break;
                     }
                 }
@@ -311,7 +321,7 @@ export class ActiveTrackNode {
                 else {
                     // continue this section
                     this.now_time = 0;
-                    this.nowProps = { ...this.lastProps };
+                    this.nowProps = Object.assign({}, this.lastProps);
                     continue;
                 }
             }
@@ -336,14 +346,13 @@ export class ActiveTrackNode {
             return false;
         }
         else {
-            this.lastProps = { ...this.nowProps };
+            this.lastProps = Object.assign({}, this.nowProps);
             this.repeated = 0;
             this.now_time = 0;
             this.currentIndex++;
             return true;
         }
     }
-    activeSyncs = [];
     initSyncs() {
         // console.log("init syncs");
         let activeSyncs = [];
@@ -413,6 +422,7 @@ export class ActiveTrackNode {
         return res;
     }
 }
+_ActiveTrackNode_currentSection = new WeakMap(), _ActiveTrackNode_currentIndex = new WeakMap(), _ActiveTrackNode_currentTrack = new WeakMap();
 (function (ActiveTrackNode) {
     let Status;
     (function (Status) {

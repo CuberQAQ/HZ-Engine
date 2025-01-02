@@ -7,6 +7,7 @@ import hmUI from "@zos/ui";
  */
 export default AsukaUIPlatformZeppOS = {
   getWidgetFactorySize(mount) {
+    let size;
     if (mount === hmUI) {
       let { width, height } = getDeviceInfo();
       size = { w: width, h: height };
@@ -16,9 +17,10 @@ export default AsukaUIPlatformZeppOS = {
           w: mount.getProperty(hmUI.prop.W),
           h: mount.getProperty(hmUI.prop.H),
         };
-      } catch {
-        reportError("createFrame", Error("Get View size failed"));
+      } catch(e) {
+        reportError("createFrame", e);
       }
     }
+    return size;
   },
 };

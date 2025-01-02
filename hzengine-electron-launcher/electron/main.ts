@@ -36,7 +36,7 @@ function createWindow() {
     width: 480,
     height: 480,
     // frame: false,
-    resizable: false,
+    // resizable: false,
     center: true,
     transparent: true
   })

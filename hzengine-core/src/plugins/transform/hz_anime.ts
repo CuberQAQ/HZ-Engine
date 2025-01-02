@@ -73,7 +73,8 @@ export class AnimationPlugin {
   }): number {
     const id = this._nextAnimationId++;
     let animation = new Animation(profile, {
-      initProps: targetView.prop ?? {},
+    // @ts-ignore
+    initProps: targetView.prop ?? {},
       wrappers: options?.customWrappers,
     });
     if (!targetView.id) throw "targetView.id must be not null";

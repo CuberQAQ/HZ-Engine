@@ -163,6 +163,7 @@ export class Animation<P extends Profile.PropsType = unknown> {
 
 export namespace Animation {
   export interface Options<P extends Profile.PropsType> {
+    // @ts-ignore
     initProps?: Partial<P>;
     wrappers?: Record<string, Wrapper>;
   }

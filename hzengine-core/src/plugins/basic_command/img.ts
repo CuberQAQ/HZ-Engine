@@ -31,6 +31,8 @@ export function img(core: HZEngineCore) {
       throw `Show Command: image with name_key [${name_key}] not found `;
     // let size = (hmUI as any).getImageInfo(path);
     let size = core.platform.getImageInfo(path);
+    console.log(`IMG: path: ${path}, size: ${JSON.stringify(size)}`);
+    
     if (!size) throw `Show Command: read size of [${path}] failed`;
     showAction(tag, path, size, parsedRes.strategy);
   });
@@ -62,6 +64,7 @@ export function img(core: HZEngineCore) {
       router = core.ui.getRouter(tag_prefixed)!;
     }
     Async.nextTick(() => {
+    // @ts-ignore
       router.replace<UI.FgImgViewProp>(
         show_view_name,
         prop,
@@ -156,7 +159,9 @@ export function img(core: HZEngineCore) {
       router = core.ui.getRouter(tag_prefixed)!;
     }
     if (!router.length) {
+    // @ts-ignore
       Async.nextTick(() => {
+    // @ts-ignore
         router.push<UI.BgImgViewProp>(
           scene_view_name,
           prop,
@@ -164,8 +169,10 @@ export function img(core: HZEngineCore) {
         );
       });
     } else {
+    // @ts-ignore
       Async.nextTick(() => {
-        router.update<UI.BgImgViewProp>(prop, routerStrategy ?? undefined);
+    // @ts-ignore
+    router.update<UI.BgImgViewProp>(prop, routerStrategy ?? undefined);
       });
     }
   }

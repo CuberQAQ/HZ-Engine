@@ -29,7 +29,6 @@
     "typescript": "^5.6.3"
   },
   "dependencies": {
-    "@zeppos/zml": "^0.0.29",
-    "hzengine-plugin-black-trans": "file:plugins/black_trans"
+    "@zeppos/zml": "^0.0.29"
   }
 }

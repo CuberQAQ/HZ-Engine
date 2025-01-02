@@ -1,5 +1,5 @@
 import { BaseSideService } from "@zeppos/zml/base-side";
-import { __h, gettext } from "i18n";
+import { gettext } from "i18n";
 /// <reference path="../node_modules/@zeppos/zml/zml.d.ts" />
 const logger = Logger.getLogger("hzengine-app-side");
 let downloadLock = false

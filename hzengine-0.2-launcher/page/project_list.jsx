@@ -55,7 +55,7 @@ Page({
 
       asuka.registerNodeFactory(NativeBindingsFactory);
       asuka.registerNodeFactory(LayoutManagerFactory);
-      let view = asuka.mountView();
+      let view = asuka.mountView(hmUI);
 
       render(() => {
         let [hzpk_list, setHzpk_list] = createSignal(getHzpkList());
@@ -64,6 +64,7 @@ Page({
           <padding
             padding={EdgeInsets.symmetric({
               horizontal: screenShape === SCREEN_SHAPE_ROUND ? px(40) : px(0),
+              vertical: screenShape === SCREEN_SHAPE_ROUND ? px(30) : px(0),
             })}
           >
             <vstack>

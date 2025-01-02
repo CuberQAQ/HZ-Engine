@@ -4,6 +4,8 @@ import { HZEngineCore, System, UI } from "hzengine-core";
 import HZEnginePlatformWeb from "./hzengine/hzengine-platform-web";
 import { EletronViewPlugin } from "./hzengine/view/index";
 
+const game_folder = "hz_project"
+
 function App() {
   const ref = useRef(null);
 
@@ -22,9 +24,9 @@ function App() {
 
     // 加载游戏项目，这里的"raw/project"是项目的根文件夹（相对于assets文件夹）
     hzengine.loadProject({
-      projectPath: "./public/hz_project/project",
-      cachePath: "./public/hz_project/preload",
-      savePath: "./public/hz_project/save",
+      projectPath: `./public/${game_folder}/project`,
+      cachePath: `./public/${game_folder}/preload`,
+      savePath: `./public/${game_folder}/save`,
     });
 
     // 在模拟器将电量设置为0，就會認定是模拟器环境

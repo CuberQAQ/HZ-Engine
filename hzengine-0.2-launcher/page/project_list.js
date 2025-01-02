@@ -1,4 +1,4 @@
-import { A as AsukaUI, a as asukauiPlatformZeppos, N as NativeBindingsFactory, L as LayoutManagerFactory, r as render, c as createSignal, q as getHzpkList, b as createElement, i as insertNode, d as insert, e as createComponent, F as For, s as setProp, t as posix, f as effect, p as px, h as Alignment, E as EdgeInsets, k as reportError } from './asukaui-platform-zeppos-D97AIcyj.js';
+import { A as AsukaUI, a as asukauiPlatformZeppos, N as NativeBindingsFactory, L as LayoutManagerFactory, r as render, c as createSignal, q as getHzpkList, b as createElement, i as insertNode, d as insert, e as createComponent, F as For, s as setProp, t as posix, f as effect, p as px, h as Alignment, E as EdgeInsets, k as reportError } from './asukaui-platform-zeppos-C9n-TeRQ.js';
 import hmUI__default from '@zos/ui';
 import { getDeviceInfo, SCREEN_SHAPE_ROUND } from '@zos/device';
 import hmFS from '@zos/fs';
@@ -34,7 +34,7 @@ Page({
 
       asuka.registerNodeFactory(NativeBindingsFactory);
       asuka.registerNodeFactory(LayoutManagerFactory);
-      let view = asuka.mountView();
+      let view = asuka.mountView(hmUI__default);
       render(() => {
         let [hzpk_list, setHzpk_list] = createSignal(getHzpkList());
         // throw new Error(JSON.stringify(hzpk_list()));
@@ -110,7 +110,8 @@ Page({
             })()]
           }));
           effect(_$p => setProp(_el$, "padding", EdgeInsets.symmetric({
-            horizontal: screenShape === SCREEN_SHAPE_ROUND ? px(40) : px(0)
+            horizontal: screenShape === SCREEN_SHAPE_ROUND ? px(40) : px(0),
+            vertical: screenShape === SCREEN_SHAPE_ROUND ? px(30) : px(0)
           }), _$p));
           return _el$;
         })();

@@ -32,18 +32,145 @@ var __runInitializers = (this && this.__runInitializers) || function (thisArg, i
     }
     return useValue ? value : void 0;
 };
+var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {
+    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
+    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
+    return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
+};
+var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {
+    if (kind === "m") throw new TypeError("Private method is not writable");
+    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a setter");
+    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
+    return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
+};
 import { Save, CustomSave, } from "../../storage/decorator.js";
 import { Animation } from "./animation.js";
 // import { Time } from "@zos/sensor";
 let AnimationPlugin = (() => {
+    var _a, _AnimationPlugin__nextAnimationId_accessor_storage, _AnimationPlugin__animationMap_accessor_storage;
     let __nextAnimationId_decorators;
     let __nextAnimationId_initializers = [];
     let __nextAnimationId_extraInitializers = [];
     let __animationMap_decorators;
     let __animationMap_initializers = [];
     let __animationMap_extraInitializers = [];
-    return class AnimationPlugin {
-        static {
+    return _a = class AnimationPlugin {
+            constructor(_core) {
+                this._core = _core;
+                _AnimationPlugin__nextAnimationId_accessor_storage.set(this, __runInitializers(this, __nextAnimationId_initializers, 1));
+                _AnimationPlugin__animationMap_accessor_storage.set(this, (__runInitializers(this, __nextAnimationId_extraInitializers), __runInitializers(this, __animationMap_initializers, {})));
+                // private _timeSensor = new Time();
+                this._lastCbUtc = __runInitializers(this, __animationMap_extraInitializers);
+                this._nextTempAnimationId = -1; // self-decrement
+                this._tempAnimationMap = {};
+                console.log("[AnimationPlugin] init");
+                _core.loadPlugin("animation", () => this);
+                _core.on("anime.cb", this._timerCb.bind(this));
+                _core.async.addRepeatTask("anime.cb", [], 0); // 此處周期應考慮加個sync update
+                this._lastCbUtc = this._core.platform.getTime();
+            }
+            get _nextAnimationId() { return __classPrivateFieldGet(this, _AnimationPlugin__nextAnimationId_accessor_storage, "f"); } // self-increment
+            set _nextAnimationId(value) { __classPrivateFieldSet(this, _AnimationPlugin__nextAnimationId_accessor_storage, value, "f"); }
+            get _animationMap() { return __classPrivateFieldGet(this, _AnimationPlugin__animationMap_accessor_storage, "f"); }
+            set _animationMap(value) { __classPrivateFieldSet(this, _AnimationPlugin__animationMap_accessor_storage, value, "f"); }
+            applyAnimation({ profile, targetView, options, }) {
+                var _b, _c, _d;
+                const id = this._nextAnimationId++;
+                let animation = new Animation(profile, {
+                    // @ts-ignore
+                    initProps: (_b = targetView.prop) !== null && _b !== void 0 ? _b : {},
+                    wrappers: options === null || options === void 0 ? void 0 : options.customWrappers,
+                });
+                if (!targetView.id)
+                    throw "targetView.id must be not null";
+                this._animationMap[id] = {
+                    destroyOnEnd: (_c = options === null || options === void 0 ? void 0 : options.destroyOnEnd) !== null && _c !== void 0 ? _c : false,
+                    isSave: (_d = options === null || options === void 0 ? void 0 : options.isSave) !== null && _d !== void 0 ? _d : true,
+                    instance: animation,
+                    targetViewId: targetView.id,
+                };
+                this._linkAnimationCb(animation, id);
+                animation.goto(0);
+                this._core.on("afterLoadArchive", () => {
+                    this._lastCbUtc = this._core.platform.getTime();
+                });
+                return id;
+            }
+            stopAnimation(id) {
+                if (this._animationMap[id] !== undefined) {
+                    this._animationMap[id].instance.stop();
+                    delete this._animationMap[id];
+                }
+            }
+            createTempAnimation({ profile, onFrame, onEnd, initProps, wrappers, }) {
+                let id = this._nextTempAnimationId--;
+                let animation = new Animation(profile, {
+                    initProps,
+                    wrappers,
+                });
+                animation.onFrame = onFrame !== null && onFrame !== void 0 ? onFrame : null;
+                animation.onEnd = () => {
+                    if (onEnd)
+                        onEnd();
+                    delete this._tempAnimationMap[id];
+                };
+                this._tempAnimationMap[id] = animation;
+                return id;
+            }
+            clearTempAnimation(id) {
+                if (this._tempAnimationMap[id] !== undefined) {
+                    this._tempAnimationMap[id].stop();
+                    delete this._tempAnimationMap[id];
+                }
+            }
+            _timerCb() {
+                let utc = this._core.platform.getTime();
+                let delta_time = (utc - this._lastCbUtc) / 1000;
+                this._lastCbUtc = utc;
+                // this._core.debug.log(`delta time: ${delta_time}`);
+                for (let id in this._animationMap) {
+                    this._animationMap[id].instance.step(delta_time);
+                }
+                for (let id in this._tempAnimationMap) {
+                    this._tempAnimationMap[id].step(delta_time);
+                }
+            }
+            _frameCb(props, id) {
+                if (this._animationMap[id] !== undefined) {
+                    let view = this._core.ui.getView(this._animationMap[id].targetViewId);
+                    if (!view) {
+                        this._core.debug.log(`view ${id} not found, stop animation`);
+                        this.stopAnimation(id); // TODO
+                        return;
+                    }
+                    view.commit(props);
+                    // this._core.debug.log(`update view ${view.name} with ${JSON.stringify(props)}`);
+                }
+            }
+            _linkAnimationCb(animation, id) {
+                animation.onFrame = (props) => {
+                    // console.log("onFrame cb");
+                    this._frameCb(props, id);
+                };
+                animation.onEnd = () => this._endCb(id);
+            }
+            _endCb(id) {
+                if (this._animationMap[id] !== undefined) {
+                    if (this._animationMap[id].destroyOnEnd) {
+                        let view = this._core.ui.getView(id);
+                        if (view)
+                            this._core.ui.destroyView(view);
+                    }
+                    delete this._animationMap[id];
+                    console.log("map item", this._animationMap[id]);
+                }
+                else
+                    console.log("nf map item", this._animationMap[id]);
+            }
+        },
+        _AnimationPlugin__nextAnimationId_accessor_storage = new WeakMap(),
+        _AnimationPlugin__animationMap_accessor_storage = new WeakMap(),
+        (() => {
             const _metadata = typeof Symbol === "function" && Symbol.metadata ? Object.create(null) : void 0;
             __nextAnimationId_decorators = [Save("anime.nid")];
             __animationMap_decorators = [CustomSave("anime.map", function (obj) {
@@ -75,121 +202,10 @@ let AnimationPlugin = (() => {
                     }
                     return res;
                 })];
-            __esDecorate(this, null, __nextAnimationId_decorators, { kind: "accessor", name: "_nextAnimationId", static: false, private: false, access: { has: obj => "_nextAnimationId" in obj, get: obj => obj._nextAnimationId, set: (obj, value) => { obj._nextAnimationId = value; } }, metadata: _metadata }, __nextAnimationId_initializers, __nextAnimationId_extraInitializers);
-            __esDecorate(this, null, __animationMap_decorators, { kind: "accessor", name: "_animationMap", static: false, private: false, access: { has: obj => "_animationMap" in obj, get: obj => obj._animationMap, set: (obj, value) => { obj._animationMap = value; } }, metadata: _metadata }, __animationMap_initializers, __animationMap_extraInitializers);
-            if (_metadata) Object.defineProperty(this, Symbol.metadata, { enumerable: true, configurable: true, writable: true, value: _metadata });
-        }
-        _core;
-        constructor(_core) {
-            this._core = _core;
-            console.log("[AnimationPlugin] init");
-            _core.loadPlugin("animation", () => this);
-            _core.on("anime.cb", this._timerCb.bind(this));
-            _core.async.addRepeatTask("anime.cb", [], 0); // 此處周期應考慮加個sync update
-            this._lastCbUtc = this._core.platform.getTime();
-        }
-        #_nextAnimationId_accessor_storage = __runInitializers(this, __nextAnimationId_initializers, 1);
-        get _nextAnimationId() { return this.#_nextAnimationId_accessor_storage; } // self-increment
-        set _nextAnimationId(value) { this.#_nextAnimationId_accessor_storage = value; }
-        #_animationMap_accessor_storage = (__runInitializers(this, __nextAnimationId_extraInitializers), __runInitializers(this, __animationMap_initializers, {}));
-        get _animationMap() { return this.#_animationMap_accessor_storage; }
-        set _animationMap(value) { this.#_animationMap_accessor_storage = value; }
-        // private _timeSensor = new Time();
-        _lastCbUtc = __runInitializers(this, __animationMap_extraInitializers);
-        applyAnimation({ profile, targetView, options, }) {
-            const id = this._nextAnimationId++;
-            let animation = new Animation(profile, {
-                initProps: targetView.prop ?? {},
-                wrappers: options?.customWrappers,
-            });
-            if (!targetView.id)
-                throw "targetView.id must be not null";
-            this._animationMap[id] = {
-                destroyOnEnd: options?.destroyOnEnd ?? false,
-                isSave: options?.isSave ?? true,
-                instance: animation,
-                targetViewId: targetView.id,
-            };
-            this._linkAnimationCb(animation, id);
-            animation.goto(0);
-            this._core.on("afterLoadArchive", () => {
-                this._lastCbUtc = this._core.platform.getTime();
-            });
-            return id;
-        }
-        stopAnimation(id) {
-            if (this._animationMap[id] !== undefined) {
-                this._animationMap[id].instance.stop();
-                delete this._animationMap[id];
-            }
-        }
-        _nextTempAnimationId = -1; // self-decrement
-        _tempAnimationMap = {};
-        createTempAnimation({ profile, onFrame, onEnd, initProps, wrappers, }) {
-            let id = this._nextTempAnimationId--;
-            let animation = new Animation(profile, {
-                initProps,
-                wrappers,
-            });
-            animation.onFrame = onFrame ?? null;
-            animation.onEnd = () => {
-                if (onEnd)
-                    onEnd();
-                delete this._tempAnimationMap[id];
-            };
-            this._tempAnimationMap[id] = animation;
-            return id;
-        }
-        clearTempAnimation(id) {
-            if (this._tempAnimationMap[id] !== undefined) {
-                this._tempAnimationMap[id].stop();
-                delete this._tempAnimationMap[id];
-            }
-        }
-        _timerCb() {
-            let utc = this._core.platform.getTime();
-            let delta_time = (utc - this._lastCbUtc) / 1000;
-            this._lastCbUtc = utc;
-            // this._core.debug.log(`delta time: ${delta_time}`);
-            for (let id in this._animationMap) {
-                this._animationMap[id].instance.step(delta_time);
-            }
-            for (let id in this._tempAnimationMap) {
-                this._tempAnimationMap[id].step(delta_time);
-            }
-        }
-        _frameCb(props, id) {
-            if (this._animationMap[id] !== undefined) {
-                let view = this._core.ui.getView(this._animationMap[id].targetViewId);
-                if (!view) {
-                    this._core.debug.log(`view ${id} not found, stop animation`);
-                    this.stopAnimation(id); // TODO
-                    return;
-                }
-                view.commit(props);
-                // this._core.debug.log(`update view ${view.name} with ${JSON.stringify(props)}`);
-            }
-        }
-        _linkAnimationCb(animation, id) {
-            animation.onFrame = (props) => {
-                // console.log("onFrame cb");
-                this._frameCb(props, id);
-            };
-            animation.onEnd = () => this._endCb(id);
-        }
-        _endCb(id) {
-            if (this._animationMap[id] !== undefined) {
-                if (this._animationMap[id].destroyOnEnd) {
-                    let view = this._core.ui.getView(id);
-                    if (view)
-                        this._core.ui.destroyView(view);
-                }
-                delete this._animationMap[id];
-                console.log("map item", this._animationMap[id]);
-            }
-            else
-                console.log("nf map item", this._animationMap[id]);
-        }
-    };
+            __esDecorate(_a, null, __nextAnimationId_decorators, { kind: "accessor", name: "_nextAnimationId", static: false, private: false, access: { has: obj => "_nextAnimationId" in obj, get: obj => obj._nextAnimationId, set: (obj, value) => { obj._nextAnimationId = value; } }, metadata: _metadata }, __nextAnimationId_initializers, __nextAnimationId_extraInitializers);
+            __esDecorate(_a, null, __animationMap_decorators, { kind: "accessor", name: "_animationMap", static: false, private: false, access: { has: obj => "_animationMap" in obj, get: obj => obj._animationMap, set: (obj, value) => { obj._animationMap = value; } }, metadata: _metadata }, __animationMap_initializers, __animationMap_extraInitializers);
+            if (_metadata) Object.defineProperty(_a, Symbol.metadata, { enumerable: true, configurable: true, writable: true, value: _metadata });
+        })(),
+        _a;
 })();
 export { AnimationPlugin };

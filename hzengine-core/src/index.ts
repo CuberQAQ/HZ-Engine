@@ -118,5 +118,5 @@ class HZEngineCore<PlatformType extends Platform = any> {
 
 type Plugin<PlatformType extends Platform> = (core: HZEngineCore<PlatformType>) => any;
 
-export { HZEngineCore, UI, Storage, Script, System, Async, Platform };
+export { HZEngineCore, UI, Storage, Script, System, Async, type Platform };
 export * as TransformPlugin from "./plugins/transform/index.js";

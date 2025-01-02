@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { ipcRenderer, contextBridge } from "electron";
+import { ipcRenderer, contextBridge, } from "electron";
 import fs from "fs";
 import path from "path";
 // --------- Expose some API to the Renderer process ---------
@@ -36,3 +36,8 @@ contextBridge.exposeInMainWorld("isFile", (path: string) => {
     return false;
   }
 });
+// contextBridge.exposeInMainWorld("openProject", () => {
+//   return dialog.showOpenDialog({
+//     properties: ["openDirectory"],
+//   })
+// })

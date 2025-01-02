@@ -1,4 +1,4 @@
-import { c as createSignal, A as AsukaUI, a as asukauiPlatformZeppos, N as NativeBindingsFactory, L as LayoutManagerFactory, r as render, b as createElement, i as insertNode, d as insert, e as createComponent, S as Switch, s as setProp, M as Match, f as effect, p as px, m as memo, E as EdgeInsets, g as MainAxisAlignment, C as CrossAxisAlignment, h as Alignment, j as StackFit, k as reportError, l as checkHzpk_v1, n as removeHzpkByUuid, u as unpackHzpk_v1, o as addHzpk } from './asukaui-platform-zeppos-D97AIcyj.js';
+import { c as createSignal, A as AsukaUI, a as asukauiPlatformZeppos, N as NativeBindingsFactory, L as LayoutManagerFactory, r as render, b as createElement, i as insertNode, d as insert, e as createComponent, S as Switch, s as setProp, M as Match, f as effect, p as px, m as memo, E as EdgeInsets, g as MainAxisAlignment, C as CrossAxisAlignment, h as Alignment, j as StackFit, k as reportError, l as checkHzpk_v1, n as removeHzpkByUuid, u as unpackHzpk_v1, o as addHzpk } from './asukaui-platform-zeppos-C9n-TeRQ.js';
 import { BasePage } from '@zeppos/zml/base-page';
 import hmUI__default from '@zos/ui';
 import { getDeviceInfo, SCREEN_SHAPE_ROUND } from '@zos/device';
@@ -57,7 +57,7 @@ Page(BasePage({
 
       asuka.registerNodeFactory(NativeBindingsFactory);
       asuka.registerNodeFactory(LayoutManagerFactory);
-      let view = asuka.mountView();
+      let view = asuka.mountView(hmUI__default);
       render(() => {
         const _self$ = this;
         return (() => {

@@ -9,8 +9,8 @@ import hmUI, { setStatusBarVisible } from "@zos/ui";
 import * as hmFS from "@zos/fs";
 import { Time, Battery } from "@zos/sensor";
 import BlackTrans from '../lib/dist/plugins/black_trans/index'
+import ViewPlugin from '../lib/dist/view/index.js'
 
-import View from "../lib/dist/view/index";
 import {
   onKey,
   KEY_EVENT_CLICK,
