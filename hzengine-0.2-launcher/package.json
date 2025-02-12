@@ -21,7 +21,7 @@
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@zeppos/device-types": "^3.0.0",
     "babel-preset-solid": "^1.8.15",
-    "esbuild": "^0.24.0",
+    "esbuild": "^0.25.0",
     "rollup": "^4.24.3",
     "rollup-plugin-esbuild": "^6.1.1",
     "rollup-plugin-typescript2": "^0.36.0",
