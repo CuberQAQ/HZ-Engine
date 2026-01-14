@@ -1,7 +1,6 @@
 {
   "name": "hzengine-core",
-  "version": "0.1.1-dev",
-  "private": true,
+  "version": "0.1.2-dev",
   "description": "An Visual Novel Engine for Zepp OS",
   "main": "./dist/index.js",
   "types": "./src/index.ts",
