@@ -34,9 +34,9 @@ const HZLayout: React.FC<HZLayoutProps> = ({
 
   const boxStyle: CSSProperties = {
     position: 'absolute',
-    transform: `translate(${xanchor * -50}%, ${yanchor * -50}%)`,
-    // top: `calc(50% + ${yalign * 50}% + ${yoffset}px)`,
-    // left: `calc(50% + ${xalign * 50}% + ${xoffset}px)`,
+    transform: `translate(${xanchor * -50 -50}%, ${yanchor * -50 -50}%)`,
+    top: `calc(${yalign * 50 + 50}% + ${yoffset}px)`,
+    left: `calc(${xalign * 50 + 50}% + ${xoffset}px)`,
     width: width || 'auto',
     height: height || 'auto'
   };

@@ -5,7 +5,7 @@ import { Async, HZEngineCore, TransformPlugin, UI } from "hzengine-core";
 import { px } from "./shared/dynamic_px.js";
 
 import { getText } from "@zos/i18n";
-import { InstanceType } from "hzengine-plugin-black-trans";
+import { InstanceType } from "../plugins/black_trans/index.js";
 import { PlatformZOS } from "./hzengine-platform-zeppos.js";
 
 /**

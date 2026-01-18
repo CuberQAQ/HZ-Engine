@@ -133,7 +133,7 @@ export function menu_statement(core) {
         // parse menu item string
         let parsed_item_list = [];
         for (let item of menu_data.item_list) {
-            parsed_item_list.push(Object.assign(Object.assign({}, item), { text: core.script.parseString(item.text) }));
+            parsed_item_list.push({ ...item, text: core.script.parseString(item.text) });
         }
         return { itemList: parsed_item_list };
     }

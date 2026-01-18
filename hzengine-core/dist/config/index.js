@@ -1,13 +1,13 @@
 export class Config {
+    _core;
     constructor(_core) {
         this._core = _core;
         _core.on("initGlobalData", () => {
-            _core.storage.setSaveableData(_core.storage.globalData, true, Object.assign({}, defaultConfig), "config");
+            _core.storage.setSaveableData(_core.storage.globalData, true, { ...defaultConfig }, "config");
         });
         _core.on("afterLoadGlobalData", () => {
-            var _a;
-            if (!((_a = _core.storage.globalData) === null || _a === void 0 ? void 0 : _a.config)) {
-                _core.storage.setSaveableData(_core.storage.globalData, true, Object.assign({}, defaultConfig), "config");
+            if (!_core.storage.globalData?.config) {
+                _core.storage.setSaveableData(_core.storage.globalData, true, { ...defaultConfig }, "config");
             }
             _core.storage.saveGlobalData();
         });

@@ -1,9 +1,9 @@
 {
-  "name": "empty",
+  "name": "awa",
   "version": "1.0.0",
-  "description": "",
-  "main": "app.js",
+  "description": "aa",
   "type": "module",
+  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "tsc --watch"
@@ -29,6 +29,9 @@
     "typescript": "^5.6.3"
   },
   "dependencies": {
-    "@zeppos/zml": "^0.0.29"
+    "@cuberqaq/asuka-ui": "file:../asuka-ui",
+    "@silver-zepp/profiler": "^0.8.0",
+    "@zeppos/zml": "^0.0.29",
+    "hzengine-core": "file:../hzengine-core"
   }
 }

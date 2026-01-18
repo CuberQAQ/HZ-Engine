@@ -146,7 +146,7 @@ export class Animation<P extends Profile.PropsType = unknown> {
       if (typeof props[key] === "number") {
         if (_former_props[key] == undefined) _former_props[key] = 0;
         res[key] =
-          _former_props[key] + wraped_prog * (props[key] - _former_props[key]);
+          _former_props[key] + wraped_prog * ((props[key] as any) - _former_props[key]);
       } else if (typeof props[key] === "boolean") {
         if (_former_props[key] == undefined) _former_props[key] = false;
         res[key] = wraped_prog === 1 ? props[key] : _former_props[key];

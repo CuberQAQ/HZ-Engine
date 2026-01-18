@@ -32,17 +32,6 @@ var __runInitializers = (this && this.__runInitializers) || function (thisArg, i
     }
     return useValue ? value : void 0;
 };
-var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {
-    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
-    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
-    return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
-};
-var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {
-    if (kind === "m") throw new TypeError("Private method is not writable");
-    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a setter");
-    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
-    return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
-};
 import { Save, CustomSave } from "../storage/decorator.js";
 // / <reference path="node_modules/@zeppos/device-types/dist/index.d.ts" />
 // import * as hmUI from "@zos/ui";
@@ -50,7 +39,6 @@ import { Save, CustomSave } from "../storage/decorator.js";
 // import { getDeviceInfo, SCREEN_SHAPE_SQUARE } from "@zos/device";
 // const { width, height, screenShape } = getDeviceInfo();
 let UI = (() => {
-    var _a, _UI__layerList_accessor_storage, _UI__nextViewId_accessor_storage, _UI__viewMap_accessor_storage, _UI__routerMap_accessor_storage;
     let __layerList_decorators;
     let __layerList_initializers = [];
     let __layerList_extraInitializers = [];
@@ -63,147 +51,8 @@ let UI = (() => {
     let __routerMap_decorators;
     let __routerMap_initializers = [];
     let __routerMap_extraInitializers = [];
-    return _a = class UI {
-            constructor(_core) {
-                this._core = _core;
-                _UI__layerList_accessor_storage.set(this, __runInitializers(this, __layerList_initializers, new Map()));
-                // View Class
-                this._viewClassMap = (__runInitializers(this, __layerList_extraInitializers), new Map());
-                _UI__nextViewId_accessor_storage.set(this, __runInitializers(this, __nextViewId_initializers, 50));
-                _UI__viewMap_accessor_storage.set(this, (__runInitializers(this, __nextViewId_extraInitializers), __runInitializers(this, __viewMap_initializers, new Map())));
-                _UI__routerMap_accessor_storage.set(this, (__runInitializers(this, __viewMap_extraInitializers), __runInitializers(this, __routerMap_initializers, new Map())));
-                __runInitializers(this, __routerMap_extraInitializers);
-                this._core = _core;
-                this._initUI();
-            }
-            _initUI() {
-                this.addLayer("bg", 1);
-                this.addLayer("fg", 2);
-                this.addLayer("ct", 3);
-                this.addLayer("overlay", 4);
-                this.addRouter("page", "overlay", false);
-            }
-            _cleanUI() {
-                for (let [key, value] of this.layerList) {
-                    value.destroy();
-                }
-                this.layerList.clear();
-                this._routerMap.clear();
-            }
-            resetUI() {
-                this._cleanUI();
-                this._initUI();
-            }
-            // Layer
-            get _layerList() { return __classPrivateFieldGet(this, _UI__layerList_accessor_storage, "f"); }
-            set _layerList(value) { __classPrivateFieldSet(this, _UI__layerList_accessor_storage, value, "f"); }
-            get layerList() {
-                return this._layerList;
-            }
-            addLayer(name, z_index) {
-                this._core.emit("beforeAddLayer", name, z_index);
-                if (this._layerList.has(name))
-                    throw `Layer ${name} already exist`;
-                let newLayer = new _a.Layer(this._core, name, z_index);
-                this._layerList.set(name, newLayer);
-                this._core.emit("afterAddLayer", newLayer);
-            }
-            getLayer(name) {
-                return this.layerList.get(name);
-            }
-            // _activeViewList: [name: string, layer: string, instance: UI.View<unknown>][] =
-            //   [];
-            registerView(name, cls) {
-                this._viewClassMap.set(name, cls);
-            }
-            // View
-            get _nextViewId() { return __classPrivateFieldGet(this, _UI__nextViewId_accessor_storage, "f"); }
-            set _nextViewId(value) { __classPrivateFieldSet(this, _UI__nextViewId_accessor_storage, value, "f"); }
-            get _viewMap() { return __classPrivateFieldGet(this, _UI__viewMap_accessor_storage, "f"); }
-            set _viewMap(value) { __classPrivateFieldSet(this, _UI__viewMap_accessor_storage, value, "f"); }
-            getView(id) {
-                var _b;
-                return (_b = this._viewMap.get(id)) !== null && _b !== void 0 ? _b : null;
-            }
-            createView(name, layer, prop, isSave) {
-                let id = this._nextViewId++;
-                let viewInstance = this._produceViewWithId(name, layer, prop, id);
-                this._core.debug.log(`creating view ${viewInstance.name}`);
-                viewInstance.isSave = isSave;
-                this._viewMap.set(id, viewInstance);
-                return viewInstance;
-            }
-            updateView(viewInstance, new_prop) {
-                viewInstance.commit(new_prop);
-            }
-            destroyView(viewInstance) {
-                if (viewInstance.id != null)
-                    this._viewMap.delete(viewInstance.id);
-                viewInstance.destroy();
-            }
-            /**由調用者提供id，創建一個View，不會處理isSave，也不會更新viewMap */
-            _produceViewWithId(name, layer, prop, id) {
-                if (!this._viewClassMap.get(name)) {
-                    throw "要创建的View不存在";
-                }
-                let _ViewFactory = this._viewClassMap.get(name);
-                let viewInstance = new _ViewFactory(layer, this._core);
-                viewInstance.id = id;
-                viewInstance.name = name;
-                viewInstance.create(prop);
-                this._core.debug.log(`producing view ${viewInstance.name}`);
-                return viewInstance;
-            }
-            get _routerMap() { return __classPrivateFieldGet(this, _UI__routerMap_accessor_storage, "f"); }
-            set _routerMap(value) { __classPrivateFieldSet(this, _UI__routerMap_accessor_storage, value, "f"); }
-            getRouter(tag) {
-                return this._routerMap.get(tag);
-            }
-            addRouter(tag, layer, isSave = true) {
-                if (this._routerMap.has(tag))
-                    throw `Route with tag [${tag}] already exist!`;
-                let router = new _a.Router(this, tag, layer, isSave);
-                this._routerMap.set(tag, router);
-                return router;
-            }
-            getScreenSize() {
-                let [width, height] = this._core.platform.getScreenSize();
-                return { width, height };
-            }
-            /**
-             * 根据 BasicUniversalProp 计算屏幕上的位置
-             * @param prop 包含 BasicUniversalProp 的 prop
-             * @param size (可选)图像的尺寸，若不指定，返回的anchor坐标和origin坐标一样
-             * @returns
-             */
-            calcPosition(prop, size) {
-                var _b, _c, _d, _e, _f, _g, _h, _j;
-                let { width, height } = this.getScreenSize();
-                // 1. 确定 anchor
-                // 2. 通过 align 确定初始位置
-                // 3. offset
-                // 返回左上角的位置
-                let anchor_coord = {
-                    x: (width * (((_b = prop.xalign) !== null && _b !== void 0 ? _b : 0) + 1)) / 2 + // 根据 align 求出 anchor 位置
-                        ((_c = prop.xoffset) !== null && _c !== void 0 ? _c : 0), // offset
-                    y: (height * (((_d = prop.yalign) !== null && _d !== void 0 ? _d : 0) + 1)) / 2 + // 根据 align 求出 anchor 位置
-                        ((_e = prop.yoffset) !== null && _e !== void 0 ? _e : 0), // offset
-                };
-                let origin_coord = {
-                    x: anchor_coord.x - ((((_f = prop.xanchor) !== null && _f !== void 0 ? _f : 0) + 1) / 2) * ((_g = size === null || size === void 0 ? void 0 : size.width) !== null && _g !== void 0 ? _g : 0),
-                    y: anchor_coord.y - ((((_h = prop.yanchor) !== null && _h !== void 0 ? _h : 0) + 1) / 2) * ((_j = size === null || size === void 0 ? void 0 : size.height) !== null && _j !== void 0 ? _j : 0),
-                };
-                return {
-                    anchor: anchor_coord,
-                    origin: origin_coord,
-                };
-            }
-        },
-        _UI__layerList_accessor_storage = new WeakMap(),
-        _UI__nextViewId_accessor_storage = new WeakMap(),
-        _UI__viewMap_accessor_storage = new WeakMap(),
-        _UI__routerMap_accessor_storage = new WeakMap(),
-        (() => {
+    return class UI {
+        static {
             const _metadata = typeof Symbol === "function" && Symbol.metadata ? Object.create(null) : void 0;
             __layerList_decorators = [CustomSave("ui.layerList", function serializer(layerList) {
                     let obj = {};
@@ -271,17 +120,155 @@ let UI = (() => {
                     }
                     return newRouterMap;
                 })];
-            __esDecorate(_a, null, __layerList_decorators, { kind: "accessor", name: "_layerList", static: false, private: false, access: { has: obj => "_layerList" in obj, get: obj => obj._layerList, set: (obj, value) => { obj._layerList = value; } }, metadata: _metadata }, __layerList_initializers, __layerList_extraInitializers);
-            __esDecorate(_a, null, __nextViewId_decorators, { kind: "accessor", name: "_nextViewId", static: false, private: false, access: { has: obj => "_nextViewId" in obj, get: obj => obj._nextViewId, set: (obj, value) => { obj._nextViewId = value; } }, metadata: _metadata }, __nextViewId_initializers, __nextViewId_extraInitializers);
-            __esDecorate(_a, null, __viewMap_decorators, { kind: "accessor", name: "_viewMap", static: false, private: false, access: { has: obj => "_viewMap" in obj, get: obj => obj._viewMap, set: (obj, value) => { obj._viewMap = value; } }, metadata: _metadata }, __viewMap_initializers, __viewMap_extraInitializers);
-            __esDecorate(_a, null, __routerMap_decorators, { kind: "accessor", name: "_routerMap", static: false, private: false, access: { has: obj => "_routerMap" in obj, get: obj => obj._routerMap, set: (obj, value) => { obj._routerMap = value; } }, metadata: _metadata }, __routerMap_initializers, __routerMap_extraInitializers);
-            if (_metadata) Object.defineProperty(_a, Symbol.metadata, { enumerable: true, configurable: true, writable: true, value: _metadata });
-        })(),
-        _a;
+            __esDecorate(this, null, __layerList_decorators, { kind: "accessor", name: "_layerList", static: false, private: false, access: { has: obj => "_layerList" in obj, get: obj => obj._layerList, set: (obj, value) => { obj._layerList = value; } }, metadata: _metadata }, __layerList_initializers, __layerList_extraInitializers);
+            __esDecorate(this, null, __nextViewId_decorators, { kind: "accessor", name: "_nextViewId", static: false, private: false, access: { has: obj => "_nextViewId" in obj, get: obj => obj._nextViewId, set: (obj, value) => { obj._nextViewId = value; } }, metadata: _metadata }, __nextViewId_initializers, __nextViewId_extraInitializers);
+            __esDecorate(this, null, __viewMap_decorators, { kind: "accessor", name: "_viewMap", static: false, private: false, access: { has: obj => "_viewMap" in obj, get: obj => obj._viewMap, set: (obj, value) => { obj._viewMap = value; } }, metadata: _metadata }, __viewMap_initializers, __viewMap_extraInitializers);
+            __esDecorate(this, null, __routerMap_decorators, { kind: "accessor", name: "_routerMap", static: false, private: false, access: { has: obj => "_routerMap" in obj, get: obj => obj._routerMap, set: (obj, value) => { obj._routerMap = value; } }, metadata: _metadata }, __routerMap_initializers, __routerMap_extraInitializers);
+            if (_metadata) Object.defineProperty(this, Symbol.metadata, { enumerable: true, configurable: true, writable: true, value: _metadata });
+        }
+        _core;
+        constructor(_core) {
+            __runInitializers(this, __routerMap_extraInitializers);
+            this._core = _core;
+            this._initUI();
+        }
+        _initUI() {
+            this.addLayer("bg", 1);
+            this.addLayer("fg", 2);
+            this.addLayer("ct", 3);
+            this.addLayer("overlay", 4);
+            this.addRouter("page", "overlay", false);
+        }
+        _cleanUI() {
+            for (let [key, value] of this.layerList) {
+                value.destroy();
+            }
+            this.layerList.clear();
+            this._routerMap.clear();
+        }
+        resetUI() {
+            this._cleanUI();
+            this._initUI();
+        }
+        #_layerList_accessor_storage = __runInitializers(this, __layerList_initializers, new Map());
+        // Layer
+        get _layerList() { return this.#_layerList_accessor_storage; }
+        set _layerList(value) { this.#_layerList_accessor_storage = value; }
+        get layerList() {
+            return this._layerList;
+        }
+        addLayer(name, z_index) {
+            this._core.emit("beforeAddLayer", name, z_index);
+            if (this._layerList.has(name))
+                throw `Layer ${name} already exist`;
+            let newLayer = new UI.Layer(this._core, name, z_index);
+            this._layerList.set(name, newLayer);
+            this._core.emit("afterAddLayer", newLayer);
+        }
+        getLayer(name) {
+            return this.layerList.get(name);
+        }
+        // View Class
+        _viewClassMap = (__runInitializers(this, __layerList_extraInitializers), new Map());
+        // _activeViewList: [name: string, layer: string, instance: UI.View<unknown>][] =
+        //   [];
+        registerView(name, cls) {
+            this._viewClassMap.set(name, cls);
+        }
+        #_nextViewId_accessor_storage = __runInitializers(this, __nextViewId_initializers, 50);
+        // View
+        get _nextViewId() { return this.#_nextViewId_accessor_storage; }
+        set _nextViewId(value) { this.#_nextViewId_accessor_storage = value; }
+        #_viewMap_accessor_storage = (__runInitializers(this, __nextViewId_extraInitializers), __runInitializers(this, __viewMap_initializers, new Map()));
+        get _viewMap() { return this.#_viewMap_accessor_storage; }
+        set _viewMap(value) { this.#_viewMap_accessor_storage = value; }
+        getView(id) {
+            return this._viewMap.get(id) ?? null;
+        }
+        createView(name, layer, prop, isSave) {
+            let id = this._nextViewId++;
+            let viewInstance = this._produceViewWithId(name, layer, prop, id);
+            this._core.debug.log(`creating view ${viewInstance.name}`);
+            viewInstance.isSave = isSave;
+            this._viewMap.set(id, viewInstance);
+            return viewInstance;
+        }
+        updateView(viewInstance, new_prop) {
+            viewInstance.commit(new_prop);
+        }
+        destroyView(viewInstance) {
+            if (viewInstance.id != null)
+                this._viewMap.delete(viewInstance.id);
+            viewInstance.destroy();
+        }
+        /**由調用者提供id，創建一個View，不會處理isSave，也不會更新viewMap */
+        _produceViewWithId(name, layer, prop, id) {
+            if (!this._viewClassMap.get(name)) {
+                throw "要创建的View不存在";
+            }
+            let _ViewFactory = this._viewClassMap.get(name);
+            let viewInstance = new _ViewFactory(layer, this._core);
+            viewInstance.id = id;
+            viewInstance.name = name;
+            viewInstance.create(prop);
+            this._core.debug.log(`producing view ${viewInstance.name}`);
+            return viewInstance;
+        }
+        #_routerMap_accessor_storage = (__runInitializers(this, __viewMap_extraInitializers), __runInitializers(this, __routerMap_initializers, new Map()));
+        get _routerMap() { return this.#_routerMap_accessor_storage; }
+        set _routerMap(value) { this.#_routerMap_accessor_storage = value; }
+        getRouter(tag) {
+            return this._routerMap.get(tag);
+        }
+        addRouter(tag, layer, isSave = true) {
+            if (this._routerMap.has(tag))
+                throw `Route with tag [${tag}] already exist!`;
+            let router = new UI.Router(this, tag, layer, isSave);
+            this._routerMap.set(tag, router);
+            return router;
+        }
+        getScreenSize() {
+            let [width, height] = this._core.platform.getScreenSize();
+            return { width, height };
+        }
+        /**
+         * 根据 BasicUniversalProp 计算屏幕上的位置
+         * @param prop 包含 BasicUniversalProp 的 prop
+         * @param size (可选)图像的尺寸，若不指定，返回的anchor坐标和origin坐标一样
+         * @returns
+         */
+        calcPosition(prop, size) {
+            let { width, height } = this.getScreenSize();
+            // 1. 确定 anchor
+            // 2. 通过 align 确定初始位置
+            // 3. offset
+            // 返回左上角的位置
+            let anchor_coord = {
+                x: (width * ((prop.xalign ?? 0) + 1)) / 2 + // 根据 align 求出 anchor 位置
+                    (prop.xoffset ?? 0), // offset
+                y: (height * ((prop.yalign ?? 0) + 1)) / 2 + // 根据 align 求出 anchor 位置
+                    (prop.yoffset ?? 0), // offset
+            };
+            let origin_coord = {
+                x: anchor_coord.x - (((prop.xanchor ?? 0) + 1) / 2) * (size?.width ?? 0),
+                y: anchor_coord.y - (((prop.yanchor ?? 0) + 1) / 2) * (size?.height ?? 0),
+            };
+            return {
+                anchor: anchor_coord,
+                origin: origin_coord,
+            };
+        }
+    };
 })();
 export { UI };
 (function (UI) {
     class View {
+        layer;
+        core;
+        id = null;
+        name = null;
+        isSave = true;
+        _prop = null;
         get prop() {
             return this._prop;
         }
@@ -291,10 +278,6 @@ export { UI };
         constructor(layer, core) {
             this.layer = layer;
             this.core = core;
-            this.id = null;
-            this.name = null;
-            this.isSave = true;
-            this._prop = null;
         }
         create(prop) {
             this.prop = prop;
@@ -333,6 +316,10 @@ export { UI };
     }
     UI.BgImgView = BgImgView;
     class Layer {
+        _core;
+        name;
+        z_index;
+        widgetFactory;
         constructor(_core, name, z_index) {
             this._core = _core;
             this.name = name;
@@ -355,38 +342,39 @@ export { UI };
     }
     UI.Layer = Layer;
     class Router {
+        _ui;
+        tag;
+        layer;
+        isSave;
         constructor(_ui, tag, layer, isSave = true) {
             this._ui = _ui;
             this.tag = tag;
             this.layer = layer;
             this.isSave = isSave;
-            this.defaultRouteStrategy = {
-                destroy: (viewInstance, ui) => {
-                    this._ui._core.debug.log(`destroy view ${viewInstance.name}`);
-                    ui.destroyView(viewInstance);
-                },
-                create: (viewName, layer, prop, ui, isSave) => {
-                    this._ui._core.debug.log(`create view ${viewName}`);
-                    return ui.createView(viewName, layer, prop, isSave);
-                },
-                update: (viewInstance, prop, ui) => {
-                    this._ui._core.debug.log(`update view ${viewInstance.name}`);
-                    ui.updateView(viewInstance, prop);
-                },
-            };
-            this.viewStack = [];
-            this.activeViewInstance = null;
         }
         serialize() {
-            var _a, _b;
             return {
                 tag: this.tag,
                 layer: this.layer,
                 isSave: this.isSave,
                 viewStack: this.viewStack,
-                activeViewId: (_b = (_a = this.activeViewInstance) === null || _a === void 0 ? void 0 : _a.id) !== null && _b !== void 0 ? _b : null,
+                activeViewId: this.activeViewInstance?.id ?? null,
             };
         }
+        defaultRouteStrategy = {
+            destroy: (viewInstance, ui) => {
+                this._ui._core.debug.log(`destroy view ${viewInstance.name}`);
+                ui.destroyView(viewInstance);
+            },
+            create: (viewName, layer, prop, ui, isSave) => {
+                this._ui._core.debug.log(`create view ${viewName}`);
+                return ui.createView(viewName, layer, prop, isSave);
+            },
+            update: (viewInstance, prop, ui) => {
+                this._ui._core.debug.log(`update view ${viewInstance.name}`);
+                ui.updateView(viewInstance, prop);
+            },
+        };
         static deserialize(ui, data) {
             let router = new Router(ui, data.tag, data.layer, data.isSave);
             router.viewStack = data.viewStack;
@@ -398,9 +386,11 @@ export { UI };
             }
             return router;
         }
+        viewStack = [];
         get length() {
             return this.viewStack.length;
         }
+        activeViewInstance = null;
         push(view_name, prop, strategy) {
             if (this.activeViewInstance) {
                 // this._ui.destroyView(this.activeViewInstance);
@@ -408,7 +398,7 @@ export { UI };
                 //   this.activeViewInstance,
                 //   this._ui
                 // );
-                if (strategy === null || strategy === void 0 ? void 0 : strategy.destroy) {
+                if (strategy?.destroy) {
                     strategy.destroy(this.activeViewInstance, this._ui);
                 }
                 else {
@@ -422,7 +412,7 @@ export { UI };
             // this.activeViewInstance = (
             //   strategy?.create ?? this.defaultRouteStrategy.create!
             // )(view_name, this.layer, prop, this._ui, this.isSave);
-            if (strategy === null || strategy === void 0 ? void 0 : strategy.create) {
+            if (strategy?.create) {
                 this.activeViewInstance = strategy.create(view_name, this.layer, prop, this._ui, this.isSave);
             }
             else {
@@ -437,7 +427,7 @@ export { UI };
                 //   this.activeViewInstance,
                 //   this._ui
                 // );
-                if (strategy === null || strategy === void 0 ? void 0 : strategy.destroy) {
+                if (strategy?.destroy) {
                     strategy.destroy(this.activeViewInstance, this._ui);
                 }
                 else {
@@ -460,11 +450,11 @@ export { UI };
                 //   this._ui,
                 //   this.isSave
                 // );
-                if (strategy === null || strategy === void 0 ? void 0 : strategy.create) {
-                    this.activeViewInstance = strategy.create(backViewInfo[0], this.layer, back_prop !== null && back_prop !== void 0 ? back_prop : backViewInfo[1], this._ui, this.isSave);
+                if (strategy?.create) {
+                    this.activeViewInstance = strategy.create(backViewInfo[0], this.layer, back_prop ?? backViewInfo[1], this._ui, this.isSave);
                 }
                 else {
-                    this.activeViewInstance = this.defaultRouteStrategy.create(backViewInfo[0], this.layer, back_prop !== null && back_prop !== void 0 ? back_prop : backViewInfo[1], this._ui, this.isSave);
+                    this.activeViewInstance = this.defaultRouteStrategy.create(backViewInfo[0], this.layer, back_prop ?? backViewInfo[1], this._ui, this.isSave);
                 }
             }
         }
@@ -475,7 +465,7 @@ export { UI };
                 //   this.activeViewInstance,
                 //   this._ui
                 // );
-                if (strategy === null || strategy === void 0 ? void 0 : strategy.destroy) {
+                if (strategy?.destroy) {
                     strategy.destroy(this.activeViewInstance, this._ui);
                 }
                 else {
@@ -490,7 +480,7 @@ export { UI };
             // this.activeViewInstance = (
             //   strategy?.create ?? this.defaultRouteStrategy.create!
             // )(view_name, this.layer, prop, this._ui, this.isSave);
-            if (strategy === null || strategy === void 0 ? void 0 : strategy.create) {
+            if (strategy?.create) {
                 this.activeViewInstance = strategy.create(view_name, this.layer, prop, this._ui, this.isSave);
             }
             else {
@@ -507,7 +497,7 @@ export { UI };
             //   prop,
             //   this._ui
             // );
-            if (strategy === null || strategy === void 0 ? void 0 : strategy.update) {
+            if (strategy?.update) {
                 strategy.update(this.activeViewInstance, prop, this._ui);
             }
             else {
@@ -520,7 +510,7 @@ export { UI };
                 //   this.activeViewInstance,
                 //   this._ui
                 // );
-                if (strategy === null || strategy === void 0 ? void 0 : strategy.destroy) {
+                if (strategy?.destroy) {
                     strategy.destroy(this.activeViewInstance, this._ui);
                 }
                 else {

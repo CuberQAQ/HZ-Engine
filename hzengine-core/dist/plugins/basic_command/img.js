@@ -7,7 +7,6 @@ export function img(core) {
         core.debug.log("[IMG Plugin] Info: Transform plugin not set up");
     // show command
     core.script.use((ctx, next) => {
-        var _a;
         if (ctx.rawtext.trim().split(" ")[0].toLowerCase() !== "show")
             return next();
         if (ctx.slicedArgs.length === 1)
@@ -23,7 +22,7 @@ export function img(core) {
             name_key += ctx.slicedArgs[i].str + " ";
         }
         name_key = name_key.trim().toLowerCase();
-        let path = (_a = core.storage.preloadedData.image.nameMap[name_key]) === null || _a === void 0 ? void 0 : _a[0];
+        let path = core.storage.preloadedData.image.nameMap[name_key]?.[0];
         if (!path)
             throw `Show Command: image with name_key [${name_key}] not found `;
         // let size = (hmUI as any).getImageInfo(path);
@@ -55,7 +54,7 @@ export function img(core) {
         }
         Async.nextTick(() => {
             // @ts-ignore
-            router.replace(show_view_name, prop, routerStrategy !== null && routerStrategy !== void 0 ? routerStrategy : undefined);
+            router.replace(show_view_name, prop, routerStrategy ?? undefined);
         });
     }
     // hide command
@@ -78,12 +77,11 @@ export function img(core) {
             throw `Hide Command: router with tag [${tag}] not found `;
         }
         Async.nextTick(() => {
-            router.clear(routerStrategy !== null && routerStrategy !== void 0 ? routerStrategy : undefined);
+            router.clear(routerStrategy ?? undefined);
         });
     }
     // scene command
     core.script.use((ctx, next) => {
-        var _a;
         if (ctx.rawtext.trim().split(" ")[0].toLowerCase() !== "scene")
             return next();
         if (ctx.slicedArgs.length === 1)
@@ -99,7 +97,7 @@ export function img(core) {
             name_key += ctx.slicedArgs[i].str + " ";
         }
         name_key = name_key.trim().toLowerCase();
-        let path = (_a = core.storage.preloadedData.image.nameMap[name_key]) === null || _a === void 0 ? void 0 : _a[0];
+        let path = core.storage.preloadedData.image.nameMap[name_key]?.[0];
         if (!path)
             throw `Scene Command: image with name_key [${name_key}] not found `;
         // let size = (hmUI as any).getImageInfo(path);
@@ -132,14 +130,14 @@ export function img(core) {
             // @ts-ignore
             Async.nextTick(() => {
                 // @ts-ignore
-                router.push(scene_view_name, prop, routerStrategy !== null && routerStrategy !== void 0 ? routerStrategy : undefined);
+                router.push(scene_view_name, prop, routerStrategy ?? undefined);
             });
         }
         else {
             // @ts-ignore
             Async.nextTick(() => {
                 // @ts-ignore
-                router.update(prop, routerStrategy !== null && routerStrategy !== void 0 ? routerStrategy : undefined);
+                router.update(prop, routerStrategy ?? undefined);
             });
         }
     }

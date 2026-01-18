@@ -36,6 +36,18 @@ export class Script {
   private accessor _nextRunPosition: [path: string, index: number] | null =
     null;
 
+  public get nextRunPosition() {
+    return this._nextRunPosition;
+  }
+
+  /**
+   * 当前正在执行的命令内容
+   */
+  private _currentRawCommand: string = "-";
+  public get currentRawCommand() {
+    return this._currentRawCommand;
+  }
+
   // Script Run
 
   /**
@@ -61,6 +73,7 @@ export class Script {
     // remove comment
 
     rawCommand = removeComment(rawCommand);
+    this._currentRawCommand = rawCommand.trim();
 
     if (rawCommand.trim().length && !rawCommand.trim().startsWith("#")) {
       if (rawCommand.trim().startsWith("*")) {

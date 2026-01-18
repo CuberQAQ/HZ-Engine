@@ -1,0 +1,6 @@
+onlyBuiltDependencies:
+  - electron
+  - esbuild
+
+overrides:
+  hzengine-core: link:../../../../Users/28129/AppData/Local/pnpm/global/5/node_modules/hzengine-core

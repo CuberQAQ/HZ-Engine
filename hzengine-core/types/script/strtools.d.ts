@@ -5,9 +5,9 @@
  */
 export declare function splitStr2Objs(str: string): {
     str: string;
-    isQuoted?: boolean;
-    isSquared?: boolean;
-    isRounded?: boolean;
+    isQuoted?: boolean | undefined;
+    isSquared?: boolean | undefined;
+    isRounded?: boolean | undefined;
 }[];
 export declare function mergeObjs2Str(objs: {
     str: string;

@@ -59,6 +59,8 @@ export function registerPlugin(core) {
         });
     }
     class TransformRouteStrategy {
+        outTransforms;
+        inTransforms;
         constructor(outTransforms, inTransforms) {
             this.outTransforms = outTransforms;
             this.inTransforms = inTransforms;
@@ -85,8 +87,7 @@ export function registerPlugin(core) {
         },
         animationPlugin,
         getTransition(name) {
-            var _a;
-            return (_a = getTransitionMap(core)[name]) !== null && _a !== void 0 ? _a : null;
+            return getTransitionMap(core)[name] ?? null;
         }
     };
 }

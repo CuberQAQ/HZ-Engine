@@ -1,7 +1,7 @@
 import { HZEngineCore, UI } from "hzengine-core";
 import HZEnginePlatformWeb from "../hzengine-platform-web";
 import ReactDOM from "react-dom/client";
-import Say from "./say";
+import Say from "./Say";
 import { registerReactView } from "./react-view";
 import Menu from "./Menu";
 import BgImg from "./BgImg";
@@ -20,10 +20,9 @@ export function EletronViewPlugin(core: HZEngineCore) {
 }
 
 class EmptyView extends UI.View<any, typeof HZEnginePlatformWeb> {
-  parent: HTMLDivElement | null = this.core.ui.getLayer(this.layer)
-    ?.widgetFactory;
   protected onCreate(prop: any): void {
-    console.log("create view. parent", this.parent);
+    const parent = this.core.ui.getLayer(this.layer)?.widgetFactory;
+    console.log("create view. parent", parent);
 
     const div = document.createElement("div");
     // div.style.zIndex = z_index.toString();
@@ -33,6 +32,9 @@ class EmptyView extends UI.View<any, typeof HZEnginePlatformWeb> {
     div.style.left = "0px";
     div.style.top = "0px";
     div.style.pointerEvents = "none";
+
+    parent?.append(div);
+    console.log("EmptyView appended to parent", parent);
 
     this.core.debug.log(`EmptyView [${this.name}] created`, prop);
   }

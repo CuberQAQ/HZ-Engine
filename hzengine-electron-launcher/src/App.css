@@ -1,9 +1,38 @@
-/* #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
-} */
+* {
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+  box-sizing: border-box !important;
+}
+
+html, body, #root {
+  width: 100vw !important;
+  height: 100vh !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  cursor: default !important;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+}
+
+.drag-region {
+  -webkit-app-region: drag;
+  user-select: none;
+}
+
+.no-drag {
+  -webkit-app-region: no-drag;
+}
+
+.unselectable {
+  user-select: none;
+  -webkit-user-select: none;
+}
 
 .logo {
   height: 6em;
@@ -42,10 +71,14 @@
 }
 
 
+#hzengine-game-content, #hzengine-game-content * {
+  cursor: default !important;
+}
+
 .hz_container {
-  width: 480px;
-  height: 480px;
-  position: fixed;
+  width: 100%;
+  height: 100%;
+  position: absolute;
   top: 0;
   left: 0;
   pointer-events: none;
@@ -54,8 +87,8 @@
 }
 
 .hz_root {
-  width: 480px;
-  height: 480px;
+  width: 100%;
+  height: 100%;
   background-color: rgb(0, 0, 0);
   pointer-events: none;
   overflow: hidden;

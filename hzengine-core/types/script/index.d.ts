@@ -19,6 +19,12 @@ export declare class Script {
      * 注意：存储该值的时候应总是拷贝赋值而非直接引用赋值
      */
     private accessor _nextRunPosition;
+    get nextRunPosition(): [path: string, index: number] | null;
+    /**
+     * 当前正在执行的命令内容
+     */
+    private _currentRawCommand;
+    get currentRawCommand(): string;
     /**
      * 执行_nextRunPosition，并返回下一行_nextRunPosition是否不为null
      */

@@ -12,15 +12,20 @@ export interface Platform<WidgetFactory = any> {
   isFileSync({ path }: { path: string }): boolean;
   readdirSync(option: Platform.readdirSync.Option): Platform.readdirSync.Result;
   statSync(option: Platform.statSync.Option): Platform.statSync.Result;
-  readFileSync(option: Platform.readFileSync.Option): Platform.readFileSync.Result;
+  readFileSync(
+    option: Platform.readFileSync.Option
+  ): Platform.readFileSync.Result;
   writeFileSync(option: Platform.writeFileSync.Option): void;
 
-  
-
-  getImageInfo(img_path: string): {
-    width: number;
-    height: number;
-  };
+  getImageInfo(img_path: string):
+    | {
+        width: number;
+        height: number;
+      }
+    | Promise<{
+        width: number;
+        height: number;
+      }>;
 
   // timer & async
   getTime(): number; // in Utc
@@ -33,8 +38,6 @@ export interface Platform<WidgetFactory = any> {
 }
 
 export declare namespace Platform {
-
-
   export interface AudioPlayer {
     onPrepared?: (success: boolean) => void | undefined;
     onCompleted?: () => void | undefined;
@@ -43,7 +46,7 @@ export declare namespace Platform {
     stop(): void;
     release(): void;
     getMediaInfo(): MediaInfo;
-    setSource({ path }: { path: string }): void;
+    setSource({ path }: { path: string }): void; //TODO path? file?
   }
 
   export interface MediaInfo {
@@ -153,6 +156,5 @@ export declare namespace Platform {
     }
   }
 }
-
 
 export default Platform;

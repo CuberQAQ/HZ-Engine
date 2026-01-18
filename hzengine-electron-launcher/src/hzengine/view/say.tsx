@@ -83,9 +83,11 @@ function Say(this: UI.View<UI.Message>, prop: UI.Message) {
           style={{
             flexGrow: 1,
             textAlign: "center",
-            textJustify: "auto",
             fontSize: "24px",
             position: "relative",
+            whiteSpace: "pre-wrap",
+            wordBreak: "break-all",
+            padding: "0 16px"
           }}
         >
           {innerText}

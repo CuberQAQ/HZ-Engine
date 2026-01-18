@@ -32,105 +32,92 @@ var __runInitializers = (this && this.__runInitializers) || function (thisArg, i
     }
     return useValue ? value : void 0;
 };
-var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {
-    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
-    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
-    return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
-};
-var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {
-    if (kind === "m") throw new TypeError("Private method is not writable");
-    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a setter");
-    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
-    return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
-};
 import { Save } from "../storage/decorator.js";
 let System = (() => {
-    var _a, _System_condition_accessor_storage;
     let _condition_decorators;
     let _condition_initializers = [];
     let _condition_extraInitializers = [];
-    return _a = class System {
-            constructor(_core) {
-                this._core = _core;
-                _System_condition_accessor_storage.set(this, __runInitializers(this, _condition_initializers, _a.Condition.Free));
-                this._pauseTimer = (__runInitializers(this, _condition_extraInitializers), null);
-                _core.on("system.continue", () => {
-                    this._pauseTimer = null;
-                    this.continue();
-                });
-            }
-            get condition() { return __classPrivateFieldGet(this, _System_condition_accessor_storage, "f"); }
-            set condition(value) { __classPrivateFieldSet(this, _System_condition_accessor_storage, value, "f"); }
-            /**
-             * 暂停(可指定一段时间)
-             * 后调用的会覆盖之前pause的设定时间
-             * @param delayMs
-             */
-            pause(delayMs) {
-                this._core.debug.log(`Pause`);
-                if (this.condition === _a.Condition.Gaming) {
-                    this.condition = _a.Condition.Pause;
-                }
-                else
-                    throw `pause but condition error (todo)`; // TODO
-                if (this._pauseTimer) {
-                    this._core.async.removeTask(this._pauseTimer);
-                    this._pauseTimer = null;
-                }
-                if (delayMs !== undefined) {
-                    this._pauseTimer = this._core.async.addDelayTask("system.continue", [], delayMs);
-                }
-            }
-            /**
-             * 继续由于pause中断的游戏
-             */
-            continue() {
-                if (this.condition !== _a.Condition.Pause)
-                    return;
-                this.condition = _a.Condition.Gaming;
-                this.run();
-            }
-            /**
-             * 阻塞
-             */
-            block() {
-                if (this.condition !== _a.Condition.Gaming)
-                    throw `block but condition error (todo)`;
-                this.condition = _a.Condition.Blocked;
-            }
-            /**
-             * 取消阻塞
-             */
-            unBlock() {
-                if (this.condition !== _a.Condition.Blocked)
-                    return;
-                this.condition = _a.Condition.Gaming;
-                this.run();
-            }
-            run() {
-                this.condition = _a.Condition.Gaming;
-                while (this.condition === _a.Condition.Gaming) {
-                    // console.log("Run Single Line");
-                    this._core.script.runSingleLine();
-                }
-            }
-            start(initLabel = "start") {
-                // 初始化存档
-                this._core.storage.archiveData;
-                this._core.debug.log("Game Start");
-                this._core.script.clear();
-                this._core.script.jumpLabel(initLabel);
-                this.run();
-            }
-        },
-        _System_condition_accessor_storage = new WeakMap(),
-        (() => {
+    return class System {
+        static {
             const _metadata = typeof Symbol === "function" && Symbol.metadata ? Object.create(null) : void 0;
             _condition_decorators = [Save("system.condition")];
-            __esDecorate(_a, null, _condition_decorators, { kind: "accessor", name: "condition", static: false, private: false, access: { has: obj => "condition" in obj, get: obj => obj.condition, set: (obj, value) => { obj.condition = value; } }, metadata: _metadata }, _condition_initializers, _condition_extraInitializers);
-            if (_metadata) Object.defineProperty(_a, Symbol.metadata, { enumerable: true, configurable: true, writable: true, value: _metadata });
-        })(),
-        _a;
+            __esDecorate(this, null, _condition_decorators, { kind: "accessor", name: "condition", static: false, private: false, access: { has: obj => "condition" in obj, get: obj => obj.condition, set: (obj, value) => { obj.condition = value; } }, metadata: _metadata }, _condition_initializers, _condition_extraInitializers);
+            if (_metadata) Object.defineProperty(this, Symbol.metadata, { enumerable: true, configurable: true, writable: true, value: _metadata });
+        }
+        _core;
+        constructor(_core) {
+            this._core = _core;
+            _core.on("system.continue", () => {
+                this._pauseTimer = null;
+                this.continue();
+            });
+        }
+        #condition_accessor_storage = __runInitializers(this, _condition_initializers, System.Condition.Free);
+        get condition() { return this.#condition_accessor_storage; }
+        set condition(value) { this.#condition_accessor_storage = value; }
+        _pauseTimer = (__runInitializers(this, _condition_extraInitializers), null);
+        /**
+         * 暂停(可指定一段时间)
+         * 后调用的会覆盖之前pause的设定时间
+         * @param delayMs
+         */
+        pause(delayMs) {
+            this._core.debug.log(`Pause`);
+            if (this.condition === System.Condition.Gaming) {
+                this.condition = System.Condition.Pause;
+            }
+            else
+                throw `pause but condition error (todo)`; // TODO
+            if (this._pauseTimer) {
+                this._core.async.removeTask(this._pauseTimer);
+                this._pauseTimer = null;
+            }
+            if (delayMs !== undefined) {
+                this._pauseTimer = this._core.async.addDelayTask("system.continue", [], delayMs);
+            }
+        }
+        /**
+         * 继续由于pause中断的游戏
+         */
+        continue() {
+            if (this.condition !== System.Condition.Pause)
+                return;
+            this.condition = System.Condition.Gaming;
+            this.run();
+        }
+        /**
+         * 阻塞
+         */
+        block() {
+            if (this.condition !== System.Condition.Gaming)
+                throw `block but condition error (todo)`;
+            this.condition = System.Condition.Blocked;
+        }
+        /**
+         * 取消阻塞
+         */
+        unBlock() {
+            if (this.condition !== System.Condition.Blocked)
+                return;
+            this.condition = System.Condition.Gaming;
+            this.run();
+        }
+        run() {
+            this.condition = System.Condition.Gaming;
+            while (this.condition === System.Condition.Gaming) {
+                // console.log("Run Single Line");
+                this._core.script.runSingleLine();
+            }
+        }
+        start(initLabel = "start") {
+            // 初始化存档
+            this._core.storage.archiveData;
+            this._core.debug.log("Game Start");
+            this._core.script.clear();
+            this._core.script.jumpLabel(initLabel);
+            this.run();
+        }
+    };
 })();
 export { System };
 (function (System) {

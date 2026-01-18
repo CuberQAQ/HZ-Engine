@@ -15,7 +15,10 @@ export interface Platform<WidgetFactory = any> {
     getImageInfo(img_path: string): {
         width: number;
         height: number;
-    };
+    } | Promise<{
+        width: number;
+        height: number;
+    }>;
     getTime(): number;
     createAudioPlayer(): Platform.AudioPlayer;
     releaseAudioPlayer(audio_player: Platform.AudioPlayer): void;

@@ -1,5 +1,10 @@
 .DS_Store
 **/node_modules
+.VSCodeCounter
+preloaded.json
+*.hzpk
+globalData.json
+
 dist/*
 npm-debug.log
 yarn-debug.log*

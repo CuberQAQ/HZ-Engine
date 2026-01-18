@@ -2,8 +2,8 @@
 {
   "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
   "appId": "cuberqaq.hzengine.launcher",
-  "asar": true,
-  "productName": "HZ-Engine Launcher",
+  "asar": false,
+  "productName": "HZ-Engine",
   "directories": {
     "output": "release/${version}"
   },

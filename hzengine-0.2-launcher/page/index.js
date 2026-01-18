@@ -7,7 +7,9 @@ import hmFS from '@zos/fs';
 import * as hmRouter from '@zos/router';
 import asukauiPlatformZeppos from '../shared/asukaui-platform-zeppos';
 var designWidth = 480;
-
+import { Profiler } from "@silver-zepp/profiler"
+const profiler = new Profiler();
+profiler.show();
 /**
  * 动态计算尺寸
  * @param {number} raw 

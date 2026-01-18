@@ -8,34 +8,34 @@
   {
     "syncs": [
       {
-        "repeat": 10,
+        "repeat": 5,
         "syncs": [
           [{
-            "time": 0.1,
+            "time": 0.15,
             "wrapper": "ease",
             "frame": {
-              "xoffset": -15
+              "xoffset": -8
             }
           },
           {
-            "time": 0.1,
+            "time": 0.15,
             "wrapper": "ease",
             "frame": {
-              "xoffset": 15
+              "xoffset": 8
             }
           }],
           [{
-            "time": 0.08,
+            "time": 0.10,
             "wrapper": "ease",
             "frame": {
-              "yoffset": -15
+              "yoffset": -8
             }
           },
           {
-            "time": 0.08,
+            "time": 0.10,
             "wrapper": "ease",
             "frame": {
-              "yoffset": 15
+              "yoffset": 8
             }
           }]
         ]

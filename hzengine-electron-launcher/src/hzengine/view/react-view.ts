@@ -10,10 +10,9 @@ export function registerReactView<PropType extends Storage.Saveable<PropType>>(
   const ReactView = class extends UI.View<PropType, any> {
     div: HTMLDivElement | null = null;
     root: ReactDOM.Root | null = null;
-    parent: HTMLDivElement | null = this.core.ui.getLayer(this.layer)
-    ?.widgetFactory;
   protected onCreate(prop: any): void {
-    console.log("create view. parent", this.parent);
+    const parent = this.core.ui.getLayer(this.layer)?.widgetFactory;
+    console.log("create ReactView. parent", parent);
 
     this.div = document.createElement("div");
     // div.style.zIndex = z_index.toString();
@@ -24,7 +23,7 @@ export function registerReactView<PropType extends Storage.Saveable<PropType>>(
     this.div.style.top = "0px";
     this.div.style.pointerEvents = "none";
 
-    this.parent?.append(this.div);
+    parent?.append(this.div);
     this.core.debug.log(`ReactView [${this.name}] create`, prop);
     this.root = ReactDOM.createRoot(this.div)
     this.root.render(React.createElement(component.bind(this), prop, null))

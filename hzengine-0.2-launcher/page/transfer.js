@@ -6,7 +6,9 @@ import hmFS from '@zos/fs';
 import { Time } from '@zos/sensor';
 import { setPageBrightTime } from '@zos/display';
 import '@zos/utils';
-
+import { Profiler } from "@silver-zepp/profiler"
+const profiler = new Profiler();
+profiler.show();
 const {
   width,
   height,

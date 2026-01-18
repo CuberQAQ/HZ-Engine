@@ -1,7 +1,7 @@
 {
   "configVersion": "v2",
   "app": {
-    "appId": 1060470,
+    "appId": 1072151,
     "appName": "HZEngine Launcher",
     "appType": "app",
     "version": {
@@ -12,7 +12,9 @@
     "vender": "CuberQAQ",
     "description": "HZEngine 0.2.0 Launcher"
   },
-  "permissions": ["data:os.device.info"],
+  "permissions": [
+    "data:os.device.info"
+  ],
   "runtime": {
     "apiVersion": {
       "compatible": "2.0.0",
@@ -44,6 +46,26 @@
         {
           "name": "Monaco",
           "deviceSource": 8519936
+        },
+        {
+          "name": "Monaco",
+          "deviceSource": 8519937
+        },
+        {
+          "name": "Monaco",
+          "deviceSource": 8519939
+        },
+        {
+          "name": "Balance2",
+          "deviceSource": 9568512
+        },
+        {
+          "name": "Balance2",
+          "deviceSource": 9568513
+        },
+        {
+          "name": "Balance2",
+          "deviceSource": 9568515
         },
         {
           "name": "GTR4",

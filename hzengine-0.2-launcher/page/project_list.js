@@ -4,7 +4,9 @@ import { getDeviceInfo, SCREEN_SHAPE_ROUND } from '@zos/device';
 import hmFS from '@zos/fs';
 import * as hmRouter from '@zos/router';
 import '@zos/utils';
-
+import { Profiler } from "@silver-zepp/profiler"
+const profiler = new Profiler();
+profiler.show();
 const {
   width,
   height,

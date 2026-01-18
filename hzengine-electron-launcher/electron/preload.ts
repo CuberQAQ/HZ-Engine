@@ -22,12 +22,41 @@ contextBridge.exposeInMainWorld("ipcRenderer", {
     const [channel, ...omit] = args;
     return ipcRenderer.invoke(channel, ...omit);
   },
-
-  // You can expose other APTs you need here.
-  // ...
+  sendSync(...args: any[]) {
+    return ipcRenderer.sendSync(args[0], ...args.slice(1));
+  },
 });
 
-contextBridge.exposeInMainWorld("fs", fs);
+contextBridge.exposeInMainWorld("fs", {
+  readFileSync: (path: string, options?: any) => {
+    const result = fs.readFileSync(path, options);
+    if (Buffer.isBuffer(result)) {
+      return result.buffer.slice(result.byteOffset, result.byteOffset + result.byteLength);
+    }
+    return result;
+  },
+  readdirSync: (path: string) => fs.readdirSync(path),
+  statSync: (path: string) => {
+    const stats = fs.statSync(path);
+    return {
+      isFile: () => stats.isFile(),
+      isDirectory: () => stats.isDirectory(),
+      size: stats.size,
+    };
+  },
+  writeFileSync: (path: string, data: any, options?: any) => fs.writeFileSync(path, data, options),
+  existsSync: (path: string) => fs.existsSync(path),
+  mkdirSync: (path: string, options?: any) => fs.mkdirSync(path, options),
+  unlinkSync: (path: string) => fs.unlinkSync(path),
+});
+
+contextBridge.exposeInMainWorld("path", {
+  join: (...args: string[]) => path.join(...args),
+  dirname: (p: string) => path.dirname(p),
+  basename: (p: string) => path.basename(p),
+  resolve: (...args: string[]) => path.resolve(...args),
+});
+
 contextBridge.exposeInMainWorld("isFile", (path: string) => {
   try {
     const stat = fs.statSync(path);
@@ -36,8 +65,3 @@ contextBridge.exposeInMainWorld("isFile", (path: string) => {
     return false;
   }
 });
-// contextBridge.exposeInMainWorld("openProject", () => {
-//   return dialog.showOpenDialog({
-//     properties: ["openDirectory"],
-//   })
-// })

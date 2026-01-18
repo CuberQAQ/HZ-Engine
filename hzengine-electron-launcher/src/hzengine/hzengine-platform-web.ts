@@ -1,10 +1,31 @@
 import { HZEngineCore, Platform } from "hzengine-core";
-declare const fs: typeof import("node:fs");
+declare const fs: {
+  readFileSync: (path: string, options?: any) => string | ArrayBuffer;
+  readdirSync: (path: string) => string[];
+  statSync: (path: string) => { isFile: () => boolean; isDirectory: () => boolean; size: number };
+  writeFileSync: (path: string, data: any, options?: any) => void;
+  existsSync: (path: string) => boolean;
+  mkdirSync: (path: string, options?: any) => void;
+};
+declare const path: {
+  join: (...args: string[]) => string;
+  dirname: (p: string) => string;
+  basename: (p: string) => string;
+  resolve: (...args: string[]) => string;
+};
 declare const isFile: (path: string) => boolean;
+declare const ipcRenderer: {
+  invoke: (channel: string, ...args: any[]) => Promise<any>;
+  sendSync: (channel: string, ...args: any[]) => any;
+};
 
 const HZEnginePlatformWeb: Platform = {
-  name: "",
+  name: "ElectronWeb",
   getScreenSize: function (): [width: number, height: number] {
+    const root = document.getElementById("hzengine-root");
+    if (root) {
+      return [root.clientWidth, root.clientHeight];
+    }
     return [window.innerWidth, window.innerHeight];
   },
   createUILayer: function ({ z_index }: { z_index: number }): HTMLDivElement {
@@ -30,13 +51,23 @@ const HZEnginePlatformWeb: Platform = {
   readdirSync: function (
     option: Platform.readdirSync.Option
   ): string[] | undefined {
-    return fs.readdirSync(option.path);
+    try {
+      return fs.readdirSync(option.path);
+    } catch (e) {
+      console.error('readdirSync error:', e);
+      return undefined;
+    }
   },
   statSync: function (
     option: Platform.statSync.Option
   ): Platform.statSync.FSStat | undefined {
     try {
-      return fs.statSync(option.path);
+      const s = fs.statSync(option.path);
+      return {
+        size: s.size,
+        isFile: () => s.isFile(),
+        isDirectory: () => s.isDirectory(),
+      } as Platform.statSync.FSStat;
     } catch {
       return undefined;
     }
@@ -44,37 +75,45 @@ const HZEnginePlatformWeb: Platform = {
   readFileSync: function (
     option: Platform.readFileSync.Option
   ): string | ArrayBuffer | undefined {
+    console.log('[PlatformWeb] readFileSync:', option.path, option.options);
     try {
+      let result;
       if (option.options?.encoding) {
-        return fs.readFileSync(option.path, {
-          encoding: option.options.encoding as BufferEncoding,
+        result = fs.readFileSync(option.path, {
+          encoding: option.options.encoding,
         });
-      } else return fs.readFileSync(option.path); // TODO
+      } else {
+        result = fs.readFileSync(option.path);
+      }
+      console.log('[PlatformWeb] readFileSync result type:', typeof result, result instanceof ArrayBuffer ? 'ArrayBuffer' : '');
+      return result as string | ArrayBuffer;
     } catch (e) {
-      console.error(e);
+      console.error('[PlatformWeb] readFileSync error:', e);
     }
     return undefined;
   },
   writeFileSync: function (option: Platform.writeFileSync.Option): void {
-    // const data =
-    //   option.data instanceof ArrayBuffer
-    //     ? Buffer.from(option.data)
-    //     : option.data;
-    // if (option.options?.encoding) {
-    //   return fs.writeFileSync(option.path, data, {
-    //     flag: "w+",
-    //     encoding: option.options.encoding as BufferEncoding,
-    //   });
-    // } else
-    //   return fs.writeFileSync(option.path, data, {
-    //     flag: "w+",
-    //   });
+    try {
+      const dir = path.dirname(option.path as string);
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+      fs.writeFileSync(option.path, option.data, option.options);
+    } catch (e) {
+      console.error("writeFileSync error:", e);
+    }
   },
   getImageInfo: function (img_path: string): {
     width: number;
     height: number;
   } {
-    console.warn("[getImageInfo] Function not implemented.");
+    const size = ipcRenderer.sendSync("get-image-size-sync", img_path);
+    if (size) {
+      return {
+        width: size.width,
+        height: size.height,
+      };
+    }
     return { width: 0, height: 0 };
   },
   getTime: function (): number {

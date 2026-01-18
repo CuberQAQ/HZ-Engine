@@ -11,17 +11,12 @@
     # 例如内置装饰器[REAL]的作用是在实机模式下执行后面的语句
     # [REAL] "只有在实机才能看到这句话"
     # "神秘人物" "欢迎来到HZEngine的世界!"
-    "欢迎来到HZEngine Demo\n(dev-0726)"
 
     girl "你好，我是綾地寧寧"
-    girl "要不要一起去咖啡廳"
 
-    menu
-    @"前往咖啡廳"
-        call ciallo
-    @"還是算了"
-        girl "可惡！你居然不願意和我一起去咖啡廳！\nFUCK YOU"
-    end menu
+    girl "欢迎来到HZEngine Demo\n(dev-0726)"
+    
+    girl "开始吧~"
 
     menu
     @"前往咖啡馆"
