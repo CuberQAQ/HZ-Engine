@@ -1,11 +1,12 @@
 {
   "compilerOptions": {
-    "module": "ES6",
-    "moduleResolution": "classic",
+    "module": "es2022",
+    "moduleResolution": "node",
+    "ignoreDeprecations": "6.0",
     "checkJs": true,
     "jsx": "preserve",
-    "jsxImportSource": "@cuberqaq/asuka-solid"
+    "jsxImportSource": "@cuberqaq/asuka-ui/solid"
   },
-  "exclude": ["node_modules", "**/node_modules/*"],
+  "exclude": ["node_modules", "**/node_modules/*", "rollup.config.js"],
   "files": ["node_modules/@zeppos/device-types/dist/index.d.ts"]
 }

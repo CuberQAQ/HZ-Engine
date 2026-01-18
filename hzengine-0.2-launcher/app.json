@@ -1,7 +1,7 @@
 {
-  "configVersion": "v2",
+  "configVersion": "v3",
   "app": {
-    "appId": 1072151,
+    "appId": 1103011,
     "appName": "HZEngine Launcher",
     "appType": "app",
     "version": {
@@ -44,32 +44,10 @@
       },
       "platforms": [
         {
-          "name": "Monaco",
-          "deviceSource": 8519936
+          "st": "r"
         },
         {
-          "name": "Monaco",
-          "deviceSource": 8519937
-        },
-        {
-          "name": "Monaco",
-          "deviceSource": 8519939
-        },
-        {
-          "name": "Balance2",
-          "deviceSource": 9568512
-        },
-        {
-          "name": "Balance2",
-          "deviceSource": 9568513
-        },
-        {
-          "name": "Balance2",
-          "deviceSource": 9568515
-        },
-        {
-          "name": "GTR4",
-          "deviceSource": 7930112
+          "st": "s"
         }
       ],
       "designWidth": 480
@@ -77,10 +55,10 @@
   },
   "i18n": {
     "en-US": {
-      "appName": "HZEngine Launcher"
+      "appName": "HZ-Engine Launcher"
     },
     "zh-CN": {
-      "appName": "HZEngine 启动器"
+      "appName": "HZ-Engine 启动器"
     }
   },
   "defaultLanguage": "en-US"

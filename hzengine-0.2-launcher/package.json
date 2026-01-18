@@ -17,6 +17,8 @@
     "@babel/plugin-transform-runtime": "^7.25.9",
     "@babel/preset-env": "^7.26.0",
     "@rollup/plugin-babel": "^6.0.4",
+    "@rollup/plugin-commonjs": "^29.0.0",
+    "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-multi-entry": "^6.0.1",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@zeppos/device-types": "^3.0.0",
@@ -29,9 +31,9 @@
     "typescript": "^5.6.3"
   },
   "dependencies": {
-    "@cuberqaq/asuka-ui": "file:../asuka-ui",
+    "@cuberqaq/asuka-ui": "link:../asuka-ui",
     "@silver-zepp/profiler": "^0.8.0",
     "@zeppos/zml": "^0.0.29",
-    "hzengine-core": "file:../hzengine-core"
+    "hzengine-core": "link:../hzengine-core"
   }
 }
