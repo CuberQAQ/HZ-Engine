@@ -29,8 +29,8 @@ class EmptyView extends UI.View<any, typeof HZEnginePlatformWeb> {
     div.style.position = "absolute";
     div.style.width = "100%";
     div.style.height = "100%";
-    div.style.left = "0px";
-    div.style.top = "0px";
+    div.style.left = "0";
+    div.style.top = "0";
     div.style.pointerEvents = "none";
 
     parent?.append(div);

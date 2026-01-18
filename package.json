@@ -1,1 +1,1 @@
-{"dependencies":{"@cuberqaq/asuka-ui":"file:asuka-ui","hzengine-core":"file:hzengine-core"}}
+{"dependencies":{"@cuberqaq/asuka-ui":"file:asuka-ui","@zeppos/zml":"^0.0.43","hzengine-core":"file:hzengine-core"}}

@@ -32,13 +32,23 @@ const HZLayout: React.FC<HZLayoutProps> = ({
     opacity: alpha
   };
 
+  const convertToRem = (val: string | number | undefined) => {
+    if (val === undefined) return 'auto';
+    if (typeof val === 'number') return `${val / 16}rem`;
+    if (typeof val === 'string' && val.endsWith('px')) {
+      const pxVal = parseFloat(val);
+      return `${pxVal / 16}rem`;
+    }
+    return val;
+  };
+
   const boxStyle: CSSProperties = {
     position: 'absolute',
-    transform: `translate(${xanchor * -50 -50}%, ${yanchor * -50 -50}%)`,
-    top: `calc(${yalign * 50 + 50}% + ${yoffset}px)`,
-    left: `calc(${xalign * 50 + 50}% + ${xoffset}px)`,
-    width: width || 'auto',
-    height: height || 'auto'
+    transform: `translate(${xanchor * -50 - 50}%, ${yanchor * -50 - 50}%)`,
+    top: `calc(${yalign * 50 + 50}% + ${yoffset / 16}rem)`,
+    left: `calc(${xalign * 50 + 50}% + ${xoffset / 16}rem)`,
+    width: convertToRem(width),
+    height: convertToRem(height)
   };
 
   return (

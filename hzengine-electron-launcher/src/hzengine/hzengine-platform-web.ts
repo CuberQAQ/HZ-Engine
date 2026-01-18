@@ -34,8 +34,8 @@ const HZEnginePlatformWeb: Platform = {
     div.style.position = "absolute";
     div.style.width = "100%";
     div.style.height = "100%";
-    div.style.left = "0px";
-    div.style.top = "0px";
+    div.style.left = "0";
+    div.style.top = "0";
     div.style.pointerEvents = "none";
 
     const root = document.getElementById("hzengine-root");

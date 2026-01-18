@@ -19,8 +19,8 @@ export function registerReactView<PropType extends Storage.Saveable<PropType>>(
     this.div.style.position = "absolute";
     this.div.style.width = "100%";
     this.div.style.height = "100%";
-    this.div.style.left = "0px";
-    this.div.style.top = "0px";
+    this.div.style.left = "0";
+    this.div.style.top = "0";
     this.div.style.pointerEvents = "none";
 
     parent?.append(this.div);

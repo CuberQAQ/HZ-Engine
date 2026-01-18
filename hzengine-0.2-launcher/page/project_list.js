@@ -1,12 +1,11 @@
-import { A as AsukaUI, a as asukauiPlatformZeppos, N as NativeBindingsFactory, L as LayoutManagerFactory, r as render, c as createSignal, q as getHzpkList, b as createElement, i as insertNode, d as insert, e as createComponent, F as For, s as setProp, t as posix, f as effect, p as px, h as Alignment, E as EdgeInsets, k as reportError } from './asukaui-platform-zeppos-C9n-TeRQ.js';
-import hmUI__default from '@zos/ui';
-import { getDeviceInfo, SCREEN_SHAPE_ROUND } from '@zos/device';
-import hmFS from '@zos/fs';
-import * as hmRouter from '@zos/router';
-import '@zos/utils';
-import { Profiler } from "@silver-zepp/profiler"
-const profiler = new Profiler();
-profiler.show();
+import { r as render, c as createSignal, g as getHzpkList, a as createElement, i as insertNode, b as insert, d as createComponent, F as For, s as setProp, p as posix, e as effect } from "../shared/hzpk.chunk.js";
+import { p as px } from "../shared/dynamic_px.chunk.js";
+import hmUI__default from "@zos/ui";
+import hmFS__default from "@zos/fs";
+import { getDeviceInfo, SCREEN_SHAPE_ROUND } from "@zos/device";
+import * as hmRouter from "@zos/router";
+import { A as AsukaUI, a as asukauiPlatformZeppos, N as NativeBindingsFactory, L as LayoutManagerFactory, b as Alignment, E as EdgeInsets, r as reportError } from "../shared/asukaui-platform-zeppos.chunk.js";
+import "@zos/utils";
 const {
   width,
   height,
@@ -16,33 +15,15 @@ const asuka = new AsukaUI(asukauiPlatformZeppos);
 Page({
   build() {
     try {
-      // 隐藏方屏设备的顶栏
-      // hmUI.setStatusBarVisible(false);
-
-      // 隐藏方屏设备的顶栏
       hmUI__default.setStatusBarVisible(false);
       console.log("page transfer building");
-      // onGesture({
-      //   callback: (event) => {
-      //     if (event === GESTURE_UP) {
-      //       console.log("up");
-      //     }
-      //     return true;
-      //   },
-      // });
-      // setScrollLock({
-      //   lock: true,
-      // });
-
       asuka.registerNodeFactory(NativeBindingsFactory);
       asuka.registerNodeFactory(LayoutManagerFactory);
       let view = asuka.mountView(hmUI__default);
       render(() => {
         let [hzpk_list, setHzpk_list] = createSignal(getHzpkList());
-        // throw new Error(JSON.stringify(hzpk_list()));
         return (() => {
-          var _el$ = createElement("padding"),
-            _el$2 = createElement("vstack");
+          var _el$ = createElement("padding"), _el$2 = createElement("vstack");
           insertNode(_el$, _el$2);
           insert(_el$2, createComponent(For, {
             get each() {
@@ -55,26 +36,24 @@ Page({
                 return _el$3;
               })();
             },
-            children: item => [(() => {
-              var _el$4 = createElement("sized-box"),
-                _el$5 = createElement("zstack"),
-                _el$6 = createElement("button");
+            children: (item) => [(() => {
+              var _el$4 = createElement("sized-box"), _el$5 = createElement("zstack"), _el$6 = createElement("button");
               insertNode(_el$4, _el$5);
               insertNode(_el$5, _el$6);
-              setProp(_el$6, "nc", 0x333333);
-              setProp(_el$6, "pc", 0x555555);
+              setProp(_el$6, "nc", 3355443);
+              setProp(_el$6, "pc", 5592405);
               setProp(_el$6, "onclick", () => {
-                if (hmFS.readdirSync({
+                if (hmFS__default.readdirSync({
                   path: posix.join(item.dir, "save")
-                }) == undefined) {
-                  hmFS.mkdirSync({
+                }) == void 0) {
+                  hmFS__default.mkdirSync({
                     path: posix.join(item.dir, "save")
                   });
                 }
-                if (hmFS.readdirSync({
+                if (hmFS__default.readdirSync({
                   path: posix.join(item.dir, "cache")
-                }) == undefined) {
-                  hmFS.mkdirSync({
+                }) == void 0) {
+                  hmFS__default.mkdirSync({
                     path: posix.join(item.dir, "cache")
                   });
                 }
@@ -87,31 +66,29 @@ Page({
                   })
                 });
               });
-              setProp(_el$6, "onlongpress", () => {});
-              effect(_p$ => {
-                var _v$ = px(100),
-                  _v$2 = Alignment.center,
-                  _v$3 = px(10),
-                  _v$4 = item.name;
+              setProp(_el$6, "onlongpress", () => {
+              });
+              effect((_p$) => {
+                var _v$ = px(100), _v$2 = Alignment.center, _v$3 = px(10), _v$4 = item.name;
                 _v$ !== _p$.e && (_p$.e = setProp(_el$4, "h", _v$, _p$.e));
                 _v$2 !== _p$.t && (_p$.t = setProp(_el$5, "alignment", _v$2, _p$.t));
                 _v$3 !== _p$.a && (_p$.a = setProp(_el$6, "radius", _v$3, _p$.a));
                 _v$4 !== _p$.o && (_p$.o = setProp(_el$6, "text", _v$4, _p$.o));
                 return _p$;
               }, {
-                e: undefined,
-                t: undefined,
-                a: undefined,
-                o: undefined
+                e: void 0,
+                t: void 0,
+                a: void 0,
+                o: void 0
               });
               return _el$4;
             })(), (() => {
               var _el$7 = createElement("space");
-              effect(_$p => setProp(_el$7, "h", px(10), _$p));
+              effect((_$p) => setProp(_el$7, "h", px(10), _$p));
               return _el$7;
             })()]
           }));
-          effect(_$p => setProp(_el$, "padding", EdgeInsets.symmetric({
+          effect((_$p) => setProp(_el$, "padding", EdgeInsets.symmetric({
             horizontal: screenShape === SCREEN_SHAPE_ROUND ? px(40) : px(0),
             vertical: screenShape === SCREEN_SHAPE_ROUND ? px(30) : px(0)
           }), _$p));
@@ -119,39 +96,10 @@ Page({
         })();
       }, view);
       asuka.refreshSync();
-
-      // let data = null;
-      // data = hmFS.readFileSync({
-      //   path: "data://hzpk_list.json",
-      //   options: { encoding: "utf8" },
-      // });
-      // if (typeof data !== "string") {
-      //   hmUI.createWidget(hmUI.widget.TEXT, {
-      //     x: 0,
-      //     y: 0,
-      //     w: width,
-      //     h: height,
-      //     text: "请先安装视觉小说项目",
-      //     color: 0xeeeeee,
-      //     align_h: hmUI.align.CENTER_H,
-      //     align_v: hmUI.align.CENTER_V,
-      //     text_size: px(32),
-      //   });
-      //   return;
-      // }
-      // data = JSON.parse(data);
-
-      // hmRouter.replace({
-      //   url: "page/hz",
-      //   params: JSON.stringify({
-      //     projectPath: data.dir,
-      //     cachePath: path.join(data.dir, "cache"),
-      //     savePath: path.join(data.dir, "save"),
-      //   }),
-      // });
     } catch (e) {
       reportError("page error", e);
     }
   },
-  onDestroy() {}
+  onDestroy() {
+  }
 });

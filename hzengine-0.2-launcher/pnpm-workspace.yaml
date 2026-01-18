@@ -1,3 +1,4 @@
 overrides:
   '@cuberqaq/asuka-ui': link:../../../../Users/28129/AppData/Local/pnpm/global/5/node_modules/@cuberqaq/asuka-ui
+  '@cuberqaq/asuka-ui-lite': link:../../../../Users/28129/AppData/Local/pnpm/global/5/node_modules/@cuberqaq/asuka-ui-lite
   hzengine-core: link:../../../../Users/28129/AppData/Local/pnpm/global/5/node_modules/hzengine-core

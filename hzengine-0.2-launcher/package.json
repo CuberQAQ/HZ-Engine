@@ -5,8 +5,10 @@
   "type": "module",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "watch": "tsc --watch"
+    "dev": "vite build --mode development",
+    "dev:watch": "vite build --mode development --watch",
+    "build": "vite build --mode production",
+    "build:watch": "vite build --mode production --watch"
   },
   "author": "",
   "license": "ISC",
@@ -28,12 +30,14 @@
     "rollup-plugin-esbuild": "^6.1.1",
     "rollup-plugin-typescript2": "^0.36.0",
     "tslib": "^2.8.1",
-    "typescript": "^5.6.3"
+    "typescript": "^5.6.3",
+    "vite": "^7.3.1",
+    "vite-plugin-solid": "^2.11.10"
   },
   "dependencies": {
-    "@cuberqaq/asuka-ui": "link:../asuka-ui",
+    "@cuberqaq/asuka-ui": "link:../../../../Users/28129/AppData/Local/pnpm/global/5/node_modules/@cuberqaq/asuka-ui",
     "@silver-zepp/profiler": "^0.8.0",
-    "@zeppos/zml": "^0.0.29",
-    "hzengine-core": "link:../hzengine-core"
+    "@zeppos/zml": "^0.0.43",
+    "hzengine-core": "link:../../../../Users/28129/AppData/Local/pnpm/global/5/node_modules/hzengine-core"
   }
 }

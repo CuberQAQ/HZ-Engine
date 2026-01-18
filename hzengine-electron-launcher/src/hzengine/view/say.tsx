@@ -57,7 +57,7 @@ function Say(this: UI.View<UI.Message>, prop: UI.Message) {
           display: "flex",
           flexDirection: "column",
           // 黑色文字描边
-          textShadow: "0 0 10px black",
+          textShadow: "0 0 0.625rem black",
         }}
       >
         <img
@@ -70,10 +70,10 @@ function Say(this: UI.View<UI.Message>, prop: UI.Message) {
         />
         <div
           style={{
-            height: "42px",
+            height: "2.625rem",
             textAlign: "left",
-            paddingLeft: "16px",
-            fontSize: "28px",
+            paddingLeft: "1rem",
+            fontSize: "1.75rem",
             position: "relative",
           }}
         >
@@ -83,11 +83,11 @@ function Say(this: UI.View<UI.Message>, prop: UI.Message) {
           style={{
             flexGrow: 1,
             textAlign: "center",
-            fontSize: "24px",
+            fontSize: "1.5rem",
             position: "relative",
             whiteSpace: "pre-wrap",
             wordBreak: "break-all",
-            padding: "0 16px"
+            padding: "0 1rem"
           }}
         >
           {innerText}
