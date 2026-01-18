@@ -6,37 +6,44 @@
 # 开发
 
 ## 安装依赖
+
+1. 安装 [pnpm](https://pnpm.io/installation)
+
+2. 安装依赖
 ```bash
-npm i
+pnpm i
 ```
-or pnpm
 
-## 使用 TypeScript
-可用于写引擎插件、游戏内界面（游戏设置、存档页面）等
-位于 lib 文件夹下. 请将源码写在src文件夹中。编译后会输出到dist文件夹中
-
-### 编译
-在 lib 文件夹中
+3. 配置 `asuka-ui`
+- 拉取 `asuka-ui` submodule
 ```bash
-tsc
+git submodule update --init
 ```
-即可编译ts
-
+- 在 `asuka-ui` 文件夹中安装依赖
 ```bash
-tsc --watch
+cd asuka-ui
+pnpm i
 ```
-可监听文件变化并自动重新编译
 
-
-
-## 使用 AsukaUI JSX 
-Asuka UI 目前用于写启动器而非游戏页面。包含直链下载、包管理等
-jsx文件位于page文件夹下
-### 编译
-1. 删除page/hzpk_***.js
-2. 运行
+4. 配置 `hzengine-core`
+- 在 `hzengine-core` 文件夹中安装依赖
 ```bash
-rollup -c
+cd hzengine-core
+pnpm i
 ```
-每个 jsx 文件都需要在`roll.config.js`中配置
-即可将jsx编译成js文件
+
+## 构建
+```bash
+pnpm build
+```
+
+监听变化：
+```bash
+pnpm build:watch
+```
+
+## 打包
+```bash
+zeus build
+```
+

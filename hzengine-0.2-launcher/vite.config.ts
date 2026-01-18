@@ -60,7 +60,7 @@ export default defineConfig(({ mode }) => {
           entryFileNames: "[name].js", // [name] 包含路径，如 page/index.page.js
           format: "es",
           inlineDynamicImports: false,
-          chunkFileNames: "shared/[name].chunk.js",
+          chunkFileNames: "generated/[name].chunk.js",
         },
         external: [
           /@zos\/.*/,
