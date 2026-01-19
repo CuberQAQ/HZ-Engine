@@ -14,11 +14,10 @@ import {
   render,
 
 } from '@cuberqaq/asuka-ui/solid'
-const { width, height, screenShape } = getDeviceInfo();
+import { getDeviceInfo, SCREEN_SHAPE_ROUND } from "@zos/device";
 import { px } from "../shared/dynamic_px.js";
 import hmUI from "@zos/ui";
 import hmFS from "@zos/fs";
-import { getDeviceInfo, SCREEN_SHAPE_ROUND } from "@zos/device";
 import * as hmRouter from "@zos/router";
 import {
   addHzpk,
@@ -28,6 +27,8 @@ import {
   unpackHzpk_v1,
 } from "../shared/hzpk.js";
 import asukauiPlatformZeppos from "../shared/asukaui-platform-zeppos.js";
+
+const { width, height, screenShape } = getDeviceInfo();
 
 var designWidth = 480;
 const asuka = new AsukaUI(asukauiPlatformZeppos);
@@ -64,7 +65,7 @@ Page({
           <padding
             padding={EdgeInsets.symmetric({
               horizontal: screenShape === SCREEN_SHAPE_ROUND ? px(40) : px(0),
-              vertical: screenShape === SCREEN_SHAPE_ROUND ? px(30) : px(0),
+              vertical: screenShape === SCREEN_SHAPE_ROUND ? px(80) : px(0),
             })}
           >
             <vstack>

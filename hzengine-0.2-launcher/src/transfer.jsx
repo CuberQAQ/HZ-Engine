@@ -27,11 +27,11 @@ import {
   Show,
   Switch,
 } from "@cuberqaq/asuka-ui/solid";
-const { width, height, screenShape } = getDeviceInfo();
+import { getDeviceInfo, SCREEN_SHAPE_ROUND } from "@zos/device";
 import { px } from "../shared/dynamic_px.js";
 import hmUI from "@zos/ui";
 import hmFS from "@zos/fs";
-import { getDeviceInfo, SCREEN_SHAPE_ROUND } from "@zos/device";
+
 import {
   addHzpk,
   checkHzpk_v1,
@@ -42,6 +42,8 @@ import { Time } from "@zos/sensor";
 
 import { setPageBrightTime } from "@zos/display";
 import asukauiPlatformZeppos from "../shared/asukaui-platform-zeppos.js";
+
+const { width, height, screenShape } = getDeviceInfo();
 
 const timeSensor = new Time();
 const Conditions = {
@@ -70,15 +72,15 @@ Page(
   BasePage({
     onInit() {
       console.log("page transfer init");
-      setPageBrightTime({
-        brightTime: 11451419,
-      });
     },
 
     build() {
       try {
         // 隐藏方屏设备的顶栏
         hmUI.setStatusBarVisible(false);
+        setPageBrightTime({
+          brightTime: 11451419,
+        });
         console.log("page transfer building");
         // onGesture({
         //   callback: (event) => {
@@ -119,7 +121,17 @@ Page(
                       text_style={hmUI.text_style.WRAP}
                       text="请打开 Zepp App 中本小程序的设置页面，输入 hzpk 直链 url"
                     />
-                    <button text="重新安装" nc={0x333333} pc={0x555555} h={px(60)} r={px(30)} w={px(300)} onclick={() => { this.call("redownload", {}) }} />
+                    <button
+                      text="重新安装"
+                      nc={0x333333}
+                      pc={0x555555}
+                      h={px(60)}
+                      r={px(30)}
+                      w={px(300)}
+                      onclick={() => {
+                        this.call("redownload", {});
+                      }}
+                    />
                   </Match>
                   <Match when={transferingState() === Conditions.DOWNLOADING}>
                     <text text="下载中" />

@@ -7,7 +7,7 @@
   height: 100%;
   align-items: center;
   justify-content: start;
-  gap: 0.5rem;
+  gap: 8px;
   pointer-events: all;
 }
 
@@ -18,9 +18,9 @@
   align-items: center;
   align-content: center;
   justify-content: center;
-  gap: 0.5rem;
-  padding: 0.5rem;
-  border-radius: 0.25rem;
+  gap: 8px;
+  padding: 8px;
+  border-radius: 4px;
   background: rgba(45, 45, 45, 0.8);
   color: white;
   pointer-events: all;

@@ -3,7 +3,6 @@
 import { create, id } from "@zos/media";
 
 import { getDeviceInfo } from "@zos/device";
-const { width, height } = getDeviceInfo();
 import { HZEngineCore, System } from "hzengine-core";
 import hmUI, { setStatusBarVisible } from "@zos/ui";
 import * as hmFS from "@zos/fs";
@@ -11,6 +10,8 @@ import { Time, Battery } from "@zos/sensor";
 import BlackTrans from './lib/plugins/black_trans/index'
 import ViewPlugin from './lib/view/index'
 import { Profiler } from "@silver-zepp/profiler"
+
+const { width, height } = getDeviceInfo();
 const profiler = new Profiler();
 profiler.show();
 import {

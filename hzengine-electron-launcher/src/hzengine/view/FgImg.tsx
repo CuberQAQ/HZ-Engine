@@ -12,7 +12,7 @@ const FgImg = (props: UI.FgImgViewProp) => {
 
     return (
         <HZLayout {...defaultProps} {...props as any}>
-            <img style={{ display: 'block', width: '100%', height: '100%', objectFit: 'contain' }} src={props.imgPath} />
+            <img style={{ display: 'block' }} src={props.imgPath} />
         </HZLayout>
     )
 }

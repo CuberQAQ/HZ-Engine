@@ -7,21 +7,22 @@ import hmFS from '@zos/fs';
 import * as hmRouter from '@zos/router';
 import asukauiPlatformZeppos from '../shared/asukaui-platform-zeppos';
 var designWidth = 480;
-import { Profiler } from "@silver-zepp/profiler"
-const profiler = new Profiler();
-profiler.show();
-/**
- * 动态计算尺寸
- * @param {number} raw 
- */
-function px(raw) {
-  return Math.ceil(raw / designWidth * DEVICE_WIDTH);
-}
+// import { Profiler } from "@silver-zepp/profiler"
+// const profiler = new Profiler();
+// profiler.show();
 const {
   width,
   height,
   screenShape
 } = getDeviceInfo();
+
+/**
+ * 动态计算尺寸
+ * @param {number} raw 
+ */
+function px(raw) {
+  return Math.ceil(raw / designWidth * width);
+}
 Page({
   build() {
 
@@ -92,7 +93,7 @@ size=${JSON.stringify(hmUI.getImageInfo("data://games/f9c5b194-2f3e-4418-a454-4a
         });
       });
       column_buttons.mountChild(button_transfer);
-      createSpacer();
+      // createSpacer();
 
       // /** 设置 @type {RenderNode} */
       // let button_settings = asuka.createNode("button");

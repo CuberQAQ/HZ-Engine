@@ -83,19 +83,6 @@ AppSettingsPage({
               },
               "通过直链安装 HZPK 包"
             ),
-            Text(
-              {
-                style: {
-                  // fontSize: "14px",
-                  // textAlign: "center",
-                },
-              },
-              ["操作说明："]
-            ),
-            Text(null, [
-              "1. 在视觉小说项目中使用 hze pack 将项目打包为 hzpk 包",
-            ]),
-            Text(null, ["2. 将 hzpk 包上传到支持直链的网盘，获取直链链接"]),
             View({
               style: {
                 height: "10px",

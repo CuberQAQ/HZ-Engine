@@ -28,26 +28,26 @@ export class ErrorBoundary extends Component<{ children: ReactNode }, { hasError
             width: '100%',
             height: '100%',
             background: 'rgba(0, 0, 0, 0.7)',
-            backdropFilter: 'blur(0.25rem)',
+            backdropFilter: 'blur(4px)',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
             alignItems: 'center',
             zIndex: 9999,
-            padding: '1.25rem',
+            padding: '20px',
             boxSizing: 'border-box'
           }}>
             <div style={{
               background: '#1a1a1c',
-              border: '0.0625rem solid #ff4d4f',
-              borderRadius: '0.5rem',
-              padding: '1rem',
+              border: '1px solid #ff4d4f',
+              borderRadius: '8px',
+              padding: '16px',
               maxWidth: '90%',
-              width: '25rem',
-              boxShadow: '0 0.25rem 0.75rem rgba(0,0,0,0.5)'
+              width: '400px',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.5)'
             }}>
               <Text color="red" weight="bold" mb="2" style={{ display: 'block' }}>程序发生错误</Text>
-              <ScrollArea scrollbars="vertical" style={{ height: '9.375rem', marginBottom: '1rem' }}>
+              <ScrollArea scrollbars="vertical" style={{ height: '150px', marginBottom: '16px' }}>
                 <Text size="1" color="gray" style={{ fontFamily: 'monospace', wordBreak: 'break-all' }}>
                   {this.state.error?.stack || this.state.error?.message}
                 </Text>
@@ -119,7 +119,7 @@ const RollingText = ({ text, style }: { text: string; style?: React.CSSPropertie
 
   return (
     <div style={{ 
-      height: "0.875rem", 
+      height: "14px", 
       overflow: "hidden", 
       position: "relative",
       ...style 
@@ -128,11 +128,11 @@ const RollingText = ({ text, style }: { text: string; style?: React.CSSPropertie
         display: "flex",
         flexDirection: "column",
         transition: animating ? "transform 0.25s cubic-bezier(0.4, 0, 0.2, 1)" : "none",
-        transform: animating ? "translateY(-0.875rem)" : "translateY(0)",
+        transform: animating ? "translateY(-14px)" : "translateY(0)",
         textAlign: style?.textAlign
       }}>
         {items.map(item => (
-          <div key={item.id} style={{ height: "0.875rem", lineHeight: "0.875rem", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+          <div key={item.id} style={{ height: "14px", lineHeight: "14px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
             {item.val}
           </div>
         ))}
@@ -312,7 +312,7 @@ function App() {
       boxSizing: "border-box",
       display: "flex",
       background: "transparent",
-      padding: "0.0625rem",
+      padding: "1px",
       pointerEvents: "none"
     }}>
       <div
@@ -320,8 +320,8 @@ function App() {
           width: "100%",
           height: "100%",
           background: "#1a1a1c",
-          border: "0.0625rem solid #2d2d30",
-          borderRadius: "0.75rem",
+          border: "1px solid #2d2d30",
+          borderRadius: "12px",
           display: "flex",
           flexDirection: "column",
           position: "relative",
@@ -334,47 +334,48 @@ function App() {
         <Flex
           justify="between"
           align="center"
-          style={{ height: "2rem", background: "rgba(0,0,0,0.1)", flexShrink: 0, position: "relative", zIndex: 10, paddingLeft: "0.75rem", paddingRight: "0.75rem" }}
+          px="3"
           className="drag-region unselectable"
+          style={{ height: "32px", background: "rgba(0,0,0,0.1)", flexShrink: 0, position: "relative", zIndex: 10 }}
         >
-          <Flex align="center" style={{ gap: "0.5rem", position: "relative", zIndex: 12 }} className="no-drag">
+          <Flex align="center" gap="2" className="no-drag" style={{ position: "relative", zIndex: 12 }}>
             <IconButton
               variant="ghost"
               color="gray"
               size="1"
               onClick={handleBack}
-              style={{ cursor: "pointer", height: "1.5rem", width: "1.5rem", pointerEvents: "auto" }}
+              style={{ cursor: "pointer", height: "24px", width: "24px", pointerEvents: "auto" }}
             >
-              <svg style={{ width: "0.75rem", height: "0.75rem" }} viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6.85355 3.14645C7.04882 3.34171 7.04882 3.65829 6.85355 3.85355L3.70711 7H12.5C12.7761 7 13 7.22386 13 7.5C13 7.77614 12.7761 8 12.5 8H3.70711L6.85355 11.1464C7.04882 11.3417 7.04882 11.6583 6.85355 11.8536C6.65829 12.0488 6.34171 12.0488 6.14645 11.8536L2.14645 7.85355C1.95118 7.65829 1.95118 7.34171 2.14645 7.14645L6.14645 3.14645C6.34171 2.95118 6.65829 2.95118 6.85355 3.14645Z" fill="currentColor" fillRule="evenodd" clipRule="evenodd"></path></svg>
+              <svg width="12" height="12" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6.85355 3.14645C7.04882 3.34171 7.04882 3.65829 6.85355 3.85355L3.70711 7H12.5C12.7761 7 13 7.22386 13 7.5C13 7.77614 12.7761 8 12.5 8H3.70711L6.85355 11.1464C7.04882 11.3417 7.04882 11.6583 6.85355 11.8536C6.65829 12.0488 6.34171 12.0488 6.14645 11.8536L2.14645 7.85355C1.95118 7.65829 1.95118 7.34171 2.14645 7.14645L6.14645 3.14645C6.34171 2.95118 6.65829 2.95118 6.85355 3.14645Z" fill="currentColor" fillRule="evenodd" clipRule="evenodd"></path></svg>
             </IconButton>
-            <Flex align="center" style={{ gap: "0.5rem", pointerEvents: "none" }}>
-            <Text size="1" color="gray" style={{ fontWeight: "bold", opacity: 0.5, letterSpacing: "0.0625rem" }}>HZ-Engine Desktop</Text>
+            <Flex align="center" gap="2" style={{ pointerEvents: "none" }}>
+              <Text size="1" color="gray" style={{ fontWeight: "bold", opacity: 0.5, letterSpacing: "1px" }}>HZ-Engine Desktop</Text>
               {projectName && (
                 <>
-                  <div style={{ width: "0.0625rem", height: "0.625rem", background: "gray", opacity: 0.2 }} />
+                  <div style={{ width: "1px", height: "10px", background: "gray", opacity: 0.2 }} />
                   <Text size="1" color="gray" style={{ fontWeight: "bold", opacity: 0.5 }}>{projectName}</Text>
                 </>
               )}
             </Flex>
           </Flex>
-          <Flex style={{ gap: "0.5rem", position: "relative", zIndex: 11 }} className="no-drag">
+          <Flex gap="2" className="no-drag" style={{ position: "relative", zIndex: 11 }}>
             <IconButton
               variant="ghost"
               color="gray"
               size="1"
               onClick={handleMinimize}
-              style={{ cursor: "pointer", height: "1.5rem", width: "1.5rem", pointerEvents: "auto" }}
+              style={{ cursor: "pointer", height: "24px", width: "24px", pointerEvents: "auto" }}
             >
-              <svg style={{ width: "0.625rem", height: "0.625rem" }} viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.25 7.5C2.25 7.22386 2.47386 7 2.75 7H12.25C12.5261 7 12.75 7.22386 12.75 7.5C12.75 7.77614 12.5261 8 12.25 8H2.75C2.47386 8 2.25 7.77614 2.25 7.5Z" fill="currentColor"></path></svg>
+              <svg width="10" height="10" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.25 7.5C2.25 7.22386 2.47386 7 2.75 7H12.25C12.5261 7 12.75 7.22386 12.75 7.5C12.75 7.77614 12.5261 8 12.25 8H2.75C2.47386 8 2.25 7.77614 2.25 7.5Z" fill="currentColor"></path></svg>
             </IconButton>
             <IconButton
               variant="ghost"
               color="gray"
               size="1"
               onClick={handleClose}
-              style={{ cursor: "pointer", height: "1.5rem", width: "1.5rem", pointerEvents: "auto" }}
+              style={{ cursor: "pointer", height: "24px", width: "24px", pointerEvents: "auto" }}
             >
-              <svg style={{ width: "0.625rem", height: "0.625rem" }} viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11.7816 4.03157C12.0062 3.80702 12.0062 3.44295 11.7816 3.2184C11.5571 2.99385 11.193 2.99385 10.9685 3.2184L7.50005 6.68682L4.03164 3.2184C3.80708 2.99385 3.44301 2.99385 3.21846 3.2184C2.99391 3.44295 2.99391 3.80702 3.21846 4.03157L6.68688 7.49999L3.21846 10.9684C2.99391 11.193 2.99391 11.557 3.21846 11.7816C3.44301 12.0061 3.80708 12.0061 4.03164 11.7816L7.50005 8.31316L10.9685 11.7816C11.193 12.0061 11.5571 12.0061 11.7816 11.7816C12.0062 11.557 12.0062 11.193 11.7816 10.9684L8.31322 7.49999L11.7816 4.03157Z" fill="currentColor"></path></svg>
+              <svg width="10" height="10" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11.7816 4.03157C12.0062 3.80702 12.0062 3.44295 11.7816 3.2184C11.5571 2.99385 11.193 2.99385 10.9685 3.2184L7.50005 6.68682L4.03164 3.2184C3.80708 2.99385 3.44301 2.99385 3.21846 3.2184C2.99391 3.44295 2.99391 3.80702 3.21846 4.03157L6.68688 7.49999L3.21846 10.9684C2.99391 11.193 2.99391 11.557 3.21846 11.7816C3.44301 12.0061 3.80708 12.0061 4.03164 11.7816L7.50005 8.31316L10.9685 11.7816C11.193 12.0061 11.5571 12.0061 11.7816 11.7816C12.0062 11.557 12.0062 11.193 11.7816 10.9684L8.31322 7.49999L11.7816 4.03157Z" fill="currentColor"></path></svg>
             </IconButton>
           </Flex>
         </Flex>
@@ -411,33 +412,34 @@ function App() {
 
         {/* Footer */}
         <Flex 
+          p="2" 
+          px="3"
           justify="between" 
           align="center"
           className="unselectable"
           style={{ 
-            borderTop: "0.0625rem solid rgba(255,255,255,0.03)", 
+            borderTop: "1px solid rgba(255,255,255,0.03)", 
             flexShrink: 0,
             background: "rgba(0,0,0,0.1)",
-            height: "1.75rem",
-            padding: "0.5rem 0.75rem"
+            height: "28px"
           }}
         >
-          <Flex style={{ gap: "0.75rem" }} align="center">
+          <Flex gap="3" align="center">
             <div style={{ 
               color: "gray", 
               opacity: 0.4, 
-              fontSize: "0.625rem", 
+              fontSize: "10px", 
               fontFamily: "monospace", 
-              minWidth: "7.5rem",
-              height: "0.875rem",
-              lineHeight: "0.875rem"
+              minWidth: "120px",
+              height: "14px",
+              lineHeight: "14px"
             }}>
               {scriptInfo.name}:{scriptInfo.line}
             </div>
           </Flex>
           <RollingText 
             text={commandInfo}
-            style={{ color: "gray", opacity: 0.4, fontSize: "0.625rem", fontFamily: "monospace", textAlign: "right", flexGrow: 1 }}
+            style={{ color: "gray", opacity: 0.4, fontSize: "10px", fontFamily: "monospace", textAlign: "right", flexGrow: 1 }}
           />
         </Flex>
       </div>

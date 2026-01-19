@@ -3,10 +3,6 @@
   line-height: 1.5;
   font-weight: 400;
 
-  /* 以 480px 寬度為基準，設置 1rem = 16px (480 / 30 = 16) */
-  /* 使用 min(100vw, 100vh) 確保在不同長寬比下縮放比例一致 */
-  font-size: calc(min(100vw, 100vh) / 30);
-
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
   background-color: transparent;
@@ -60,8 +56,8 @@ h1 {
 }
 
 button {
-  border-radius: 0.5rem;
-  border: 0.0625rem solid transparent;
+  border-radius: 8px;
+  border: 1px solid transparent;
   padding: 0.6em 1.2em;
   font-size: 1em;
   font-weight: 500;
@@ -75,7 +71,7 @@ button:hover {
 }
 button:focus,
 button:focus-visible {
-  outline: 0.25rem auto -webkit-focus-ring-color;
+  outline: 4px auto -webkit-focus-ring-color;
 }
 
 @media (prefers-color-scheme: light) {
