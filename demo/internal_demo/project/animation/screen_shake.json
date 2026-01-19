@@ -1,0 +1,51 @@
+[
+  {
+    "frame": {
+      "xoffset": 0,
+      "yoffset": 0
+    }
+  },
+  {
+    "syncs": [
+      {
+        "repeat": 5,
+        "syncs": [
+          [{
+            "time": 0.15,
+            "wrapper": "ease",
+            "frame": {
+              "xoffset": -8
+            }
+          },
+          {
+            "time": 0.15,
+            "wrapper": "ease",
+            "frame": {
+              "xoffset": 8
+            }
+          }],
+          [{
+            "time": 0.10,
+            "wrapper": "ease",
+            "frame": {
+              "yoffset": -8
+            }
+          },
+          {
+            "time": 0.10,
+            "wrapper": "ease",
+            "frame": {
+              "yoffset": 8
+            }
+          }]
+        ]
+      }
+    ]
+  },
+  {
+    "frame": {
+      "xoffset": 0,
+      "yoffset": 0
+    }
+  }
+]

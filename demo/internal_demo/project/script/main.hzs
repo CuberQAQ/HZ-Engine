@@ -4,19 +4,20 @@
 
     character girl "晞云娘"
     $ a = 3
-    show girl normal
-    scene bg sky
+    show bg cafe
 
     # 使用 [{decorator_name}] command 可以使用装饰器
     # 例如内置装饰器[REAL]的作用是在实机模式下执行后面的语句
     # [REAL] "只有在实机才能看到这句话"
     # "神秘人物" "欢迎来到HZEngine的世界!"
+    "欢迎来到HZEngine Demo"
 
-    girl "你好，我是晞云娘~"
+    show girl normal with (fadeout, fadein)
+    pause 0.5
+    girl "hi，我是晞云娘~"
 
-    girl "欢迎来到HZEngine Demo\n(beta 0.2)"
-    
-    girl "让我们开始新的旅程吧~"
+    girl "一起开始HZ世界的探索之旅吧~"
+
 
     menu
     @"前往咖啡馆"
@@ -40,20 +41,22 @@
         end menu
         "菜单结束"
         "嵌套测试完成"
-    @"if语句测试"
+    @"if分支测试"
         call if_test
     @"轮回测试"
         call loop_test
-    @"eval测试"
-        "即将执行一个不存在的函数，请观察日志输出"
-        eval ciallo()
+    # @"动画系统测试"
+    #     call transform_test
+    @"配置系统测试"
+        call config_test
+    
     end menu
 
 
 *end
 
     # hide girl
-    "游戲結束，恭喜達成真結局\n即将触发轮回！！\nQAQ"
+    "游戏结束，恭喜达成真结局\n即将触发轮回！！\nQAQ"
 
 
     jump start
