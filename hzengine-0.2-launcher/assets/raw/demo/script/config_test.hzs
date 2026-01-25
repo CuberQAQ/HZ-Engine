@@ -1,0 +1,27 @@
+*config_test
+
+    "欢迎来到配置系统测试"
+
+    "此处演示的配置项是\ngame.autoplay.enable"
+
+    "接下来的文字将会自动播放"
+
+    set game.autoplay.enable true
+    pause 0.5
+
+    "文字1"
+
+    "文字2"
+
+    "文字3"
+
+    "文字4"
+
+    set game.autoplay.enable false
+    pause 0.5
+
+    "这条文字开始不会自动播放"
+
+    girl "测试完成！成功了吗？\nQAQ"
+
+    

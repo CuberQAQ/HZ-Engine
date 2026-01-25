@@ -79,7 +79,7 @@ Page(
         // 隐藏方屏设备的顶栏
         hmUI.setStatusBarVisible(false);
         setPageBrightTime({
-          brightTime: 11451419,
+          brightTime: 600000,
         });
         console.log("page transfer building");
         // onGesture({

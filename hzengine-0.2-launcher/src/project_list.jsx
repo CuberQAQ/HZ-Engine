@@ -81,30 +81,45 @@ Page({
                           pc={0x555555}
                           text={item.name}
                           onclick={() => {
+                            let cachePath = path.join(item.dir, "cache");
+                            let savePath = path.join(item.dir, "save");
+
+                            if (item.isDemo) {
+                              cachePath = "data://demo_cache/cache";
+                              savePath = "data://demo_cache/save";
+
+                              if (
+                                hmFS.readdirSync({ path: "data://demo_cache" }) ==
+                                undefined
+                              ) {
+                                hmFS.mkdirSync({ path: "data://demo_cache" });
+                              }
+                            }
+
                             if (
                               hmFS.readdirSync({
-                                path: path.join(item.dir, "save"),
+                                path: savePath,
                               }) == undefined
                             ) {
                               hmFS.mkdirSync({
-                                path: path.join(item.dir, "save"),
+                                path: savePath,
                               });
                             }
                             if (
                               hmFS.readdirSync({
-                                path: path.join(item.dir, "cache"),
+                                path: cachePath,
                               }) == undefined
                             ) {
                               hmFS.mkdirSync({
-                                path: path.join(item.dir, "cache"),
+                                path: cachePath,
                               });
                             }
                             hmRouter.replace({
                               url: "page/hz",
                               params: JSON.stringify({
                                 projectPath: item.dir,
-                                cachePath: path.join(item.dir, "cache"),
-                                savePath: path.join(item.dir, "save"),
+                                cachePath: cachePath,
+                                savePath: savePath,
                               }),
                             });
                           }}

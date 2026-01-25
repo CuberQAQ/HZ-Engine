@@ -1,0 +1,38 @@
+*if_test
+    "请选择一个数字，结果将保存进变量sd.choice中"
+    menu
+    @"-1"
+        eval sd.choice = -1
+    @"0"
+        eval sd.choice = 0
+    @"1"
+        eval sd.choice = 1
+    @"2"
+        eval sd.choice = 2
+    @"ciallo"
+        eval sd.choice = "ciallo"
+    end menu
+    #输出选择的变量和类型
+    eval console.log("你选择的数字是", sd.choice, "类型是", typeof(sd.choice))
+    if typeof sd.choice != "number"
+        "你选择的不是数字"
+    elif Math.abs(sd.choice % 2) == 0
+        if sd.choice > 0
+            "你选择的数既是偶数又是正数"
+        elif sd.choice == 0
+            "你选择的数是0"
+        else
+            "你选择的数既是偶数又是负数"
+        end if
+    elif Math.abs(sd.choice % 2) == 1
+        if sd.choice > 0
+            "你选择的数既是奇数又是正数"
+        else
+            "你选择的数既是奇数又是负数"
+        end if
+    else
+        "你选择了一个不存在的数字(看到这段文字请联系开发者，因为说明这段代码有bug！)"
+    end if
+    "if语句测试完成"
+
+    return

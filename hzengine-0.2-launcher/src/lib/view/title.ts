@@ -23,6 +23,7 @@ export class TitleView extends UI.View<TitleViewProp, PlatformZOS> {
   opening_view_id: number | null = null;
   onCreate(prop: TitleViewProp): void {
     // this.core.debug.log(`onCreate title view`);
+    hmUI.updateStatusBarTitle(prop.title);
     // title text widget
     {
       let w = width;
@@ -72,18 +73,24 @@ export class TitleView extends UI.View<TitleViewProp, PlatformZOS> {
               cb && Async.nextTick(cb);
             };
             if (!black_trans_plugin) {
-              this.core.debug.log("[TitleView]","black_trans plugin not found");
+              this.core.debug.log(
+                "[TitleView]",
+                "black_trans plugin not found",
+              );
               start();
             } else {
               black_trans_plugin.show({
-                cb: () =>
+                cb: () => {
+                  hmUI.setStatusBarVisible(true);
+
                   start(() => {
                     black_trans_plugin.hide({});
-                  }),
+                  });
+                },
               });
             }
           },
-        }
+        },
       );
     }
     // load archives button
@@ -109,12 +116,12 @@ export class TitleView extends UI.View<TitleViewProp, PlatformZOS> {
             try {
               this.core.storage.loadArchiveData("archive000.json");
             } catch (e) {
-              this.core.debug.log("[TitleView]","請先開始遊戲");
+              this.core.debug.log("[TitleView]", "請先開始遊戲");
               throw e;
             }
             this.core.ui.getRouter("page")!.pop();
           },
-        }
+        },
       );
     }
     // gallery button
@@ -137,9 +144,9 @@ export class TitleView extends UI.View<TitleViewProp, PlatformZOS> {
           press_color: 0x555555,
           click_func: () => {
             hmUI.showToast({ text: "施工中..." });
-            this.core.ui.getRouter("page")!.push("gallery", {});
+            // this.core.ui.getRouter("page")!.push("gallery", {});
           },
-        }
+        },
       );
     }
     // settings button
@@ -162,9 +169,9 @@ export class TitleView extends UI.View<TitleViewProp, PlatformZOS> {
           press_color: 0x555555,
           click_func: () => {
             hmUI.showToast({ text: "施工中..." });
-            this.core.ui.getRouter("page")!.push("settings", {});
+            // this.core.ui.getRouter("page")!.push("settings", {});
           },
-        }
+        },
       );
     }
 
@@ -174,7 +181,7 @@ export class TitleView extends UI.View<TitleViewProp, PlatformZOS> {
           "info_opening",
           this.layer,
           { bg_alpha: 1, logo_alpha: 0 },
-          this.isSave
+          this.isSave,
         ).id;
         let animation =
           this._animationPlugin.createTempAnimation<InfoOpeningProp>({
@@ -233,7 +240,7 @@ export class TitleView extends UI.View<TitleViewProp, PlatformZOS> {
 
   _buildAnim() {
     if (!this._animationPlugin) {
-      this.core.debug.log("[Title View]","Animation Plugin not found");
+      this.core.debug.log("[Title View]", "Animation Plugin not found");
       return;
     }
     if (this._animation != null) return;
@@ -241,7 +248,7 @@ export class TitleView extends UI.View<TitleViewProp, PlatformZOS> {
     let getFadeinTrack = (
       delay: number,
       key: string,
-      duration: number = 0.55
+      duration: number = 0.55,
     ): TransformPlugin.Profile.Track<unknown> => {
       return [
         { frame: { [`${key}_alpha`]: 0, [`${key}_xoffset`]: 200 } },
@@ -257,7 +264,7 @@ export class TitleView extends UI.View<TitleViewProp, PlatformZOS> {
     let delayList = Array<number>(5)
       .fill(0)
       .map((_, i) => i * 0.16 + 1.5);
-      // this.core.debug.log(`delayList = ${JSON.stringify(delayList)}`);
+    // this.core.debug.log(`delayList = ${JSON.stringify(delayList)}`);
 
     this._animation =
       this._animationPlugin.createTempAnimation<TitleViewAnimProp>({
@@ -283,35 +290,35 @@ export class TitleView extends UI.View<TitleViewProp, PlatformZOS> {
           this._widgets.title_text.setAlpha(~~((props.text_alpha ?? 1) * 255));
           this._widgets.title_text.setProperty(
             hmUI.prop.X,
-            ~~(props.text_xoffset ?? 0)
+            ~~(props.text_xoffset ?? 0),
           );
           this._widgets.button_start.setAlpha(
-            ~~((props.button_start_alpha ?? 1) * 255)
+            ~~((props.button_start_alpha ?? 1) * 255),
           );
           this._widgets.button_start.setProperty(
             hmUI.prop.X,
-            ~~(x + (props.button_start_xoffset ?? 0))
+            ~~(x + (props.button_start_xoffset ?? 0)),
           );
           this._widgets.button_load.setAlpha(
-            ~~((props.button_load_alpha ?? 1) * 255)
+            ~~((props.button_load_alpha ?? 1) * 255),
           );
           this._widgets.button_load.setProperty(
             hmUI.prop.X,
-            ~~(x + (props.button_load_xoffset ?? 0))
+            ~~(x + (props.button_load_xoffset ?? 0)),
           );
           this._widgets.button_gallery.setAlpha(
-            ~~((props.button_gallery_alpha ?? 1) * 255)
+            ~~((props.button_gallery_alpha ?? 1) * 255),
           );
           this._widgets.button_gallery.setProperty(
             hmUI.prop.X,
-            ~~(x + (props.button_gallery_xoffset ?? 0))
+            ~~(x + (props.button_gallery_xoffset ?? 0)),
           );
           this._widgets.button_settings.setAlpha(
-            ~~((props.button_settings_alpha ?? 1) * 255)
+            ~~((props.button_settings_alpha ?? 1) * 255),
           );
           this._widgets.button_settings.setProperty(
             hmUI.prop.X,
-            ~~(x + (props.button_settings_xoffset ?? 0))
+            ~~(x + (props.button_settings_xoffset ?? 0)),
           );
         },
       });

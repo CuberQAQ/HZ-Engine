@@ -1,0 +1,15 @@
+[
+    {
+        "frame": {
+            "xanchor": 0
+        }
+    },
+    {
+        "time": 0.5,
+        "wrapper": "easeout",
+        "frame": {
+            "xalign": 1.0,
+            "xanchor": -1.0
+        }
+    }
+]

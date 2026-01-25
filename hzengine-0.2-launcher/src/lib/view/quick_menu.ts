@@ -1,10 +1,10 @@
 import * as hmUI from "@zos/ui";
-import { getDeviceInfo, SCREEN_SHAPE_SQUARE } from "@zos/device";
 import { HZEngineCore, UI } from "hzengine-core";
 import { px } from "./shared/dynamic_px.js";
 
 import { getText } from "@zos/i18n";
 import { PlatformZOS } from "./hzengine-platform-zeppos.js";
+import { getDeviceInfo, SCREEN_SHAPE_SQUARE } from "@zos/device";
 const { width, height, screenShape } = getDeviceInfo();
 
 /**

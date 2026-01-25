@@ -1,0 +1,10 @@
+[
+  {
+    "frame": { "alpha": 0 }
+  },
+  {
+    "time": 0.8,
+    "wrapper": "easein",
+    "frame": { "alpha": 1 }
+  }
+]

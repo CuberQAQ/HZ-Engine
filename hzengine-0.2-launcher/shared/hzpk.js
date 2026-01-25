@@ -246,6 +246,15 @@ export function getHzpkList() {
     );
   }
 
+  if (hzpk_list == null) hzpk_list = [];
+
+  // Add demo project
+  hzpk_list.push({
+    name: "演示项目",
+    dir: "assets://raw/demo",
+    isDemo: true,
+  });
+
   return hzpk_list;
 }
 export function addHzpk(hzpk) {

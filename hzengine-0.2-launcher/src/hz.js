@@ -2,18 +2,18 @@
 /// <reference path="../shared/zos_media.d.ts" />
 import { create, id } from "@zos/media";
 
-import { getDeviceInfo } from "@zos/device";
+import { getDeviceInfo, SCREEN_SHAPE_SQUARE } from "@zos/device";
 import { HZEngineCore, System } from "hzengine-core";
 import hmUI, { setStatusBarVisible } from "@zos/ui";
 import * as hmFS from "@zos/fs";
 import { Time, Battery } from "@zos/sensor";
-import BlackTrans from './lib/plugins/black_trans/index'
-import ViewPlugin from './lib/view/index'
-import { Profiler } from "@silver-zepp/profiler"
+import BlackTrans from "./lib/plugins/black_trans/index";
+import ViewPlugin from "./lib/view/index";
+// import { Profiler } from "@silver-zepp/profiler"
 
-const { width, height } = getDeviceInfo();
-const profiler = new Profiler();
-profiler.show();
+const { width, height, screenShape } = getDeviceInfo();
+// const profiler = new Profiler();
+// profiler.show();
 import {
   onKey,
   KEY_EVENT_CLICK,
@@ -25,6 +25,7 @@ import {
 import { onGesture } from "@zos/interaction";
 
 import { px } from "../shared/dynamic_px";
+import { setPageBrightTime } from "@zos/display";
 
 // 电量传感器，用于获取电池电量
 const battery = new Battery();
@@ -55,6 +56,10 @@ Page({
     // 隐藏方屏设备的顶栏
     setStatusBarVisible(false);
 
+    setPageBrightTime({
+      brightness: 300000,
+    });
+
     if (!this.state.projectPath) {
       hmUI.createWidget(hmUI.widget.TEXT, {
         x: 0,
@@ -74,7 +79,8 @@ Page({
     var timeSensor = new Time();
 
     // 创建HZEngineCore实例
-    var _hmPlayer = null, hmPlayerOccupied = false;
+    var _hmPlayer = null,
+      hmPlayerOccupied = false;
 
     hzengine = new HZEngineCore({
       name: "zeppos",
@@ -86,10 +92,18 @@ Page({
 
       // ui
       createUILayer({ z_index }) {
-        return hmUI.createWidget(hmUI.widget.VIEW_CONTAINER, {
-          scroll_enable: 0,
-          z_index,
-        });
+        if (screenShape === SCREEN_SHAPE_SQUARE && (z_index === 2 || z_index === 3)) {
+          return hmUI.createWidget(hmUI.widget.VIEW_CONTAINER, {
+            x: 0,
+            y: height - width,
+            scroll_enable: 0,
+            z_index,
+          });
+        } else
+          return hmUI.createWidget(hmUI.widget.VIEW_CONTAINER, {
+            scroll_enable: 0,
+            z_index,
+          });
       },
       deleteUILayer(widgetFactory) {
         hmUI.deleteWidget(widgetFactory);
@@ -125,14 +139,14 @@ Page({
 
       // timer & async
       getTime: () => timeSensor.getTime(),
-      
 
       // audio
       createAudioPlayer() {
         if (!_hmPlayer) {
           _hmPlayer = create(id.PLAYER);
         }
-        if(hmPlayerOccupied) throw new Error(`[HZEngine] ZeppOS can only have one AudioPlayer.`);
+        if (hmPlayerOccupied)
+          throw new Error(`[HZEngine] ZeppOS can only have one AudioPlayer.`);
         hmPlayerOccupied = true;
         return _hmPlayer;
       },
@@ -193,14 +207,17 @@ Page({
       function addTouchPad(layerInstance) {
         // TODO touch pad
         core.debug.log("[TouchPad] Test for ZeppOS");
-        let touchPad = layerInstance.widgetFactory.createWidget(hmUI.widget.TEXT, {
-          x: 0,
-          y: 0,
-          w: 600,
-          h: 600,
-          text: "",
-        });
-    
+        let touchPad = layerInstance.widgetFactory.createWidget(
+          hmUI.widget.TEXT,
+          {
+            x: 0,
+            y: 0,
+            w: 600,
+            h: 600,
+            text: "",
+          },
+        );
+
         touchPad.addEventListener(hmUI.event.SELECT, (info) => {
           console.log("按下了屏幕");
           if (core.system.condition === System.Condition.Pause) {
@@ -215,9 +232,6 @@ Page({
       });
     }
     global_gesture(hzengine);
-    
-
-
 
     // /**
     //  * 測試脚本
